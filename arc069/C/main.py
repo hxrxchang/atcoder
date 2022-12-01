@@ -1,9 +1,7 @@
 N, M = map(int, input().split())
 
 def solve(N, M):
-  if N * 2 == M:
-    return N
-  elif N * 2 > M:
+  if N * 2 > M:
     return min(N, M // 2)
   else:
     cnt = N
