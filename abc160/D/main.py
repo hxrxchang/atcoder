@@ -1,36 +1,35 @@
 from collections import deque
 
 N, X, Y = map(int, input().split())
-X -= 1
-Y -= 1
 
-dist = [[-1] * N for _ in range(N)]
+graph = {i: set() for i in range(1, N + 1)}
+for i in range(1, N):
+  j = i + 1
+  graph[i].add(j)
+  graph[j].add(i)
+graph[X].add(Y)
+graph[Y].add(X)
 
-i = 0
-while i < N:
+dist = {i: [-1] * (N + 1) for i in range(1, N + 1)}
+
+for i in range(1, N + 1):
   que = deque()
   que.append(i)
+  dist[i][i] = 0
   while len(que) > 0:
     v = que.popleft()
-    values = []
-    if v > 0:
-      values.append(v - 1)
-    if v < N - 1:
-      values.append(v + 1)
-    if v == X:
-      values.append(Y)
-    if v == Y:
-      values.append(X)
-    for v2 in values:
+    for v2 in graph[v]:
       if dist[i][v2] == -1:
-        dist[i][v2] = dist[i][v] + 1
         que.append(v2)
-  i += 1
+        dist[i][v2] = dist[i][v] + 1
 
-res = [0] * N
-for i in range(N):
-  for j in range(i + 1, N):
-    res[dist[i][j]] += 1
+for i in range(1, N):
+  cnt = 0
+  for j in range(1, N):
+    d = dist[j][j:]
+    print(d)
+    c = d.count(i)
+    cnt += c
+  print(cnt)
 
-for i in range(N - 1):
-  print(res[i])
+
