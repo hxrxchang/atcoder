@@ -10,8 +10,8 @@ for i in range(1, N):
 graph[X].add(Y)
 graph[Y].add(X)
 
-dist = {i: [-1] * (N + 1) for i in range(1, N + 1)}
-
+dist = [[None] * (N + 1) for _ in range(N + 1)]
+counter = {i: 0 for i in range(1, N)}
 for i in range(1, N + 1):
   que = deque()
   que.append(i)
@@ -19,17 +19,11 @@ for i in range(1, N + 1):
   while len(que) > 0:
     v = que.popleft()
     for v2 in graph[v]:
-      if dist[i][v2] == -1:
+      if dist[i][v2] == None:
+        cnt = dist[i][v] + 1
+        dist[i][v2] = cnt
+        counter[cnt] += 1
         que.append(v2)
-        dist[i][v2] = dist[i][v] + 1
 
 for i in range(1, N):
-  cnt = 0
-  for j in range(1, N):
-    d = dist[j][j:]
-    print(d)
-    c = d.count(i)
-    cnt += c
-  print(cnt)
-
-
+  print(counter[i] // 2)
