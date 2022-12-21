@@ -34,5 +34,3 @@ for i in range(N):
 
 for i in range(N - 1):
   print(res[i])
-
-
