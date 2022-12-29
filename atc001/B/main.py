@@ -1,23 +1,31 @@
 class UnionFind:
   def __init__(self, n):
-    self.parents = list(range(n))
+    # parentsは要素が正の値のときはそのインデックスのルートを表す。
+    # 負の値のときはそのインデックスはルートであり絶対値がそのルートが持つ要素数を表す。
+    self.parents = [-1] * n
 
-  def root(self, i):
-    if self.parents[i] == i:
-      return i
-    self.parents[i] = self.root(self.parents[i])
-    return self.parents[i]
+  def root(self, n):
+    if self.parents[n] < 0:
+      return n
+    self.parents[n] = self.root(self.parents[n])
+    return self.parents[n]
 
-  def unit(self, i, j):
-    i = self.root(i)
-    j = self.root(j)
-    if i == j:
+  def unit(self, a, b):
+    a = self.root(a)
+    b = self.root(b)
+    if a == b:
       return
-    else:
-      self.parents[i] = j
+    # a, bはルートなので必ず負の値(そのルートがもつ要素数)になる
+    if abs(self.parents[a]) < abs(self.parents[b]):
+      b, a = a, b
+    # ルートの要素数を更新
+    self.parents[a] += self.parents[b]
+    # サイズが小さい方のルートを大きい方のルートに繋げる
+    self.parents[b] = a
 
-  def is_same(self, i, j):
-    return self.root(i) == self.root(j)
+  def is_same(self, a, b):
+    return self.root(a) == self.root(b)
+
 
 N, Q = map(int, map(int, input().split()))
 uf = UnionFind(N)
