@@ -1,57 +1,36 @@
 # Yesになる条件:
 #   - グラフが閉路ではない
 #   - 各Nodeが隣接する要素は2以下である。
-from collections import defaultdict
+class UnionFind:
+  def __init__(self, n):
+    # parentsは要素が正の値のときはそのインデックスのルートを表す。
+    # 負の値のときはそのインデックスはルートであり絶対値がそのルートが持つ要素数を表す。
+    self.parents = [-1] * n
+    self.elements_cnt = [0] * n
 
-class UnionFind():
-    def __init__(self, n):
-        self.n = n
-        self.parents = [-1] * n
-        self.elements_cnt = [0] * n
+  def root(self, n):
+    if self.parents[n] < 0:
+      return n
+    self.parents[n] = self.root(self.parents[n])
+    return self.parents[n]
 
-    def find(self, x):
-        if self.parents[x] < 0:
-            return x
-        else:
-            self.parents[x] = self.find(self.parents[x])
-            return self.parents[x]
+  def unit(self, a, b):
+    self.elements_cnt[a] += 1
+    self.elements_cnt[b] += 1
+    a = self.root(a)
+    b = self.root(b)
+    if a == b:
+      return
+    # a, bはルートなので必ず負の値(そのルートがもつ要素数)になる
+    if abs(self.parents[a]) < abs(self.parents[b]):
+      b, a = a, b
+    # ルートの要素数を更新
+    self.parents[a] += self.parents[b]
+    # サイズが小さい方のルートを大きい方のルートに繋げる
+    self.parents[b] = a
 
-    def union(self, x, y):
-        self.elements_cnt[x] += 1
-        self.elements_cnt[y] += 1
-        x = self.find(x)
-        y = self.find(y)
-
-        if x == y:
-            return
-
-        if self.parents[x] > self.parents[y]:
-            x, y = y, x
-
-        self.parents[x] += self.parents[y]
-        self.parents[y] = x
-
-    def size(self, x):
-        return -self.parents[self.find(x)]
-
-    def same(self, x, y):
-        return self.find(x) == self.find(y)
-
-    def members(self, x):
-        root = self.find(x)
-        return [i for i in range(self.n) if self.find(i) == root]
-
-    def roots(self):
-        return [i for i, x in enumerate(self.parents) if x < 0]
-
-    def group_count(self):
-        return len(self.roots())
-
-    def all_group_members(self):
-        group_members = defaultdict(list)
-        for member in range(self.n):
-            group_members[self.find(member)].append(member)
-        return group_members
+  def is_same(self, a, b):
+    return self.root(a) == self.root(b)
 
 N, M = map(int, input().split())
 uf = UnionFind(N)
@@ -59,10 +38,10 @@ for _ in range(M):
   A, B = map(int, input().split())
   A -= 1
   B -= 1
-  if uf.find(A) == uf.find(B): #根が共通するということはuniteすると閉路を作ってしまう。
+  if uf.is_same(A, B): #根が共通するということはuniteすると閉路を作ってしまう。
     print("No")
     exit()
-  uf.union(A, B)
+  uf.unit(A, B)
 
 if max(uf.elements_cnt) > 2:
   print("No")
