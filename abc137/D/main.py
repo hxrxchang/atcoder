@@ -10,13 +10,15 @@ for _ in range(N):
   AtoB[A].append(B)
 
 ans = 0
-
 que = []
 
 for B in AtoB:
   for b in B:
+    # pythonのヒープは小さい順なので、符号反転して追加(絶対値の大きさで取得する)
     heappush(que, -b)
   if que:
-    ans += abs(heappop(que))
+    # 反転した符号を戻す
+    a = -heappop(que)
+    ans += a
 
 print(ans)
