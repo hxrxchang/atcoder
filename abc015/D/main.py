@@ -6,6 +6,7 @@ for _ in range(N):
   screen_shots.append((width, importance))
 
 dp = []
+# dp[n][k][w]:=n番目以下の荷物から k個以下選び、重さwがWを超えないように荷物を選んだ時の価値の最大値
 for _ in range(N + 1):
   n = []
   for _ in range(K + 1):
