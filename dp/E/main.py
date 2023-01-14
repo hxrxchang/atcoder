@@ -15,6 +15,7 @@ for i in range(N + 1):
   row = [INF] * max_value
   dp.append(row)
 
+# ここが肝。これがないと値がずっとINFになってしまう。
 dp[0][0] = 0
 
 for i in range(N):
