@@ -1,15 +1,16 @@
 N = int(input())
 S = input()
+atcoder = "atcoder"
 
-max_n = 100000
+# dp[i][j]: Sのi文字目までを用いた時、文字列"atcoder"のj文字目までを作る通りの数
 dp = []
-for _ in range(max_n + 1):
-  row = [0] * 8
+for _ in range(N + 1):
+  row = [0] * (len(atcoder) + 1)
   dp.append(row)
 
 dp[0][0] = 1
 for i in range(N):
-  for j in range(8):
+  for j in range(len(atcoder) + 1):
     dp[i + 1][j] += dp[i][j]
     if S[i] == 'a' and j == 0:
       dp[i + 1][j + 1] += dp[i][j]
@@ -26,8 +27,8 @@ for i in range(N):
     if S[i] == 'r' and j == 6:
       dp[i + 1][j + 1] += dp[i][j]
 
-  for j in range(8):
+  for j in range(len(atcoder) + 1):
     dp[i + 1][j] %= 10 ** 9 + 7
 
-print(dp[N][7])
+print(dp[N][len(atcoder)])
 
