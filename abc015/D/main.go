@@ -16,7 +16,7 @@ func main() {
         fmt.Scan(&screenShots[i][0], &screenShots[i][1])
     }
 
-    // dp[n][k][w]:=n番目以下の荷物から k個以下選び、重さwがWを超えないように荷物を選んだ時の価値の最大値
+    // dp[n][k][w]:=n枚目以下のスクリーンショットから k枚以下選び、幅がWを超えないように選んだ時の重要度の最大値
     dp := make([][][]int, N+1)
     for i := range dp {
         dp[i] = make([][]int, K+1)
