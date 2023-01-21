@@ -22,3 +22,7 @@ for i in range(N):
 
 print(dp[N][len(atcoder)])
 
+# # ↓で確認するとわかりやすい
+# for i in range(len(dp)):
+#   print(S[i - 1], dp[i])
+
