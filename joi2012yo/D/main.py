@@ -7,11 +7,7 @@ for _ in range(K):
 
 # dp[i][j]: i番目のパスタがj日目に選ばれるパターン数
 # i = 1: トマトソース、i = 2: クリームソース,、i = 3: バジルソース
-dp = []
-for _ in range(4):
-  row = [0] * (N + 1)
-  dp.append(row)
-
+dp = [[0] * (N + 1) for _ in range(4)]
 dp[1][0] = 1
 
 for i in range(1, N + 1):
@@ -35,4 +31,3 @@ for i in range(1, 4):
   ans += dp[i][-1]
 
 print(ans % 10000)
-
