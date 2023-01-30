@@ -1,14 +1,15 @@
+import math
+
 N, H = map(int, input().split())
 items = []
-
-# Aが最大値となる刀を記録
+# Aが最大値となる刀を記録(Aが同値のものが複数ある場合、Bが最小になるものを選ぶ)
 A, B = map(int, input().split())
 max_a_item = {'A': A, 'B': B, 'idx': 0}
-items.append({'A': A, 'B': B})
+items.append(max_a_item)
 
 for i in range(1, N):
   A, B = map(int, input().split())
-  # Aが同値の場合、Bが大きい方を残したいからBが小さい方にする
+  # Aが同値のものが複数ある場合、Bが最小になるものを選ぶ
   if (A == max_a_item['A'] and B < max_a_item['B']) or max_a_item['A'] < A:
     max_a_item = {'A': A, 'B': B, 'idx': i}
   items.append({'A': A, 'B': B})
@@ -16,18 +17,28 @@ for i in range(1, N):
 items.pop(max_a_item['idx'])
 items.sort(key=lambda x:x['B'], reverse=True)
 
-cnt = 0
-for item in items:
-  H -= item['B']
-  cnt += 1
-  if H < 0:
-    print(cnt)
-    exit
+# 投げる刀の中でBが最小値となるもののindex
+min_b_idx = 0
+for i in range(len(items)):
+  if max_a_item['B'] < items[i]['B']:
+    min_b_idx = i
+  else:
+    break
 
-print(H, max_a_item['A'])
-if H % max_a_item['A'] != 0:
-  cnt += H // max_a_item['A'] + 1
+cnt = 0
+if len(items):
+  for i in range(min_b_idx + 1):
+    H -= items[i]['B']
+    cnt += 1
+    if H < 0:
+      print(cnt)
+      exit()
+
+if max_a_item['A'] >= max_a_item['B']:
+  cnt += math.ceil(H / max_a_item['A'])
 else:
-  cnt += H // max_a_item['A']
+  H -= max_a_item['B']
+  cnt += 1
+  cnt += math.ceil(H / max_a_item['A'])
 
 print(cnt)
