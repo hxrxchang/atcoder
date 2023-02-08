@@ -17,15 +17,16 @@ def bfs(que, dist):
       if dist[next_city] == -1:
         que.append(next_city)
         dist[next_city] = d + 1
-  furthest = max(dist)
-  return {'idx': dist.index(furthest), 'val': furthest}
+  return dist
 
 def get_furthest(start):
   dist = [-1] * (N + 1)
   que = deque()
   que.append(start)
   dist[start] = 0
-  return bfs(que, dist)
+  dist = bfs(que, dist)
+  furthest = max(dist)
+  return {'idx': dist.index(furthest), 'val': furthest}
 
 # 1: 都市1から最も遠い都市を探索
 furthest_from_1 = get_furthest(1)
@@ -34,10 +35,3 @@ furthest_from_1 = get_furthest(1)
 res = get_furthest(furthest_from_1['idx'])
 ans = res['val'] + 1
 print(ans)
-
-
-
-
-
-
-
