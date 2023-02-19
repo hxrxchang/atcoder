@@ -1,9 +1,12 @@
+from collections import Counter
 N, K = map(int, input().split())
 A = list(map(int, input().split()))
+A = Counter(A)
 
-numbers = [False]
-print(numbers)
-for a in A:
-  print(a)
-  numbers[a] = True
+for i in range(K):
+  if A[i] == 0:
+    i -= 1
+    break
+
+print(i + 1)
 
