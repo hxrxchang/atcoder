@@ -1,6 +1,6 @@
 H, W = map(int, input().split())
 
-board = [['W'] * (W + 1) for _ in range(H + 1)]
+board = [['W'] * W for _ in range(H)]
 
 class UnionFind:
   def __init__(self, n):
@@ -37,15 +37,15 @@ Q = int(input())
 for _ in range(Q):
   query = list(map(int, input().split()))
   if query[0] == 1:
-    y, x = query[1], query[2]
+    y, x = query[1] - 1, query[2] - 1
     board[y][x] = "R"
     for item in [[y + 1, x], [y - 1, x], [y, x + 1], [y, x - 1]]:
       y2, x2 = item[0], item[1]
-      if y2 <= H and x2 <= W:
+      if y2 < H and x2 < W:
         if board[y2][x2] == "R":
           uf.unit(y * x, y2 * x2)
   else:
-    y, x, y2, x2 = query[1], query[2], query[3], query[4]
+    y, x, y2, x2 = query[1] - 1, query[2] - 1, query[3] - 1, query[4] - 1
     if is_red(y, x, y2, x2) and uf.is_same(y * x, y2 * x2):
       print("Yes")
     else:
