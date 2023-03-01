@@ -31,7 +31,10 @@ class UnionFind:
 def is_red(y, x, y2, x2):
   return board[y][x] == "R" and board[y2][x2] == "R"
 
-uf = UnionFind((H + 1) * (W + 1))
+def get_idx(y, x):
+  return y * W + x
+
+uf = UnionFind(H * W)
 
 Q = int(input())
 for _ in range(Q):
@@ -41,12 +44,12 @@ for _ in range(Q):
     board[y][x] = "R"
     for item in [[y + 1, x], [y - 1, x], [y, x + 1], [y, x - 1]]:
       y2, x2 = item[0], item[1]
-      if y2 < H and x2 < W:
+      if 0 <= y2 and y2 < H and 0<= x2 and x2 < W:
         if board[y2][x2] == "R":
-          uf.unit(y * x, y2 * x2)
+          uf.unit(get_idx(y, x), get_idx(y2, x2))
   else:
     y, x, y2, x2 = query[1] - 1, query[2] - 1, query[3] - 1, query[4] - 1
-    if is_red(y, x, y2, x2) and uf.is_same(y * x, y2 * x2):
+    if is_red(y, x, y2, x2) and uf.is_same(get_idx(y, x), get_idx(y2, x2)):
       print("Yes")
     else:
       print("No")
