@@ -1,17 +1,16 @@
 N = int(input())
 D, X = map(int, input().split())
-cnt = 0
+total = X
+
 for _ in range(N):
   A = int(input())
-  c = 0
+  cnt = 1
   i = 1
-  days = 1
-  while days <= D:
-    tmp +=
+  while i * A + 1 <= D:
+    cnt += 1
     i += 1
+  total += cnt
 
-ans = D + cnt
-
-print(ans)
+print(total)
 
 
