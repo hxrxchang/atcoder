@@ -1,17 +1,22 @@
-from heapq import heappop, heappush
+from heapq import heappop, heappush, heapify
+from collections import deque
 
 N, Q = map(int, input().split())
-tmp = 1
 
-called = set()
+tmp = 0
+que = []
+heapify(que)
+done = set()
+
 for i in range(Q):
   E = list(map(int, input().split()))
   if E[0] == 1:
-    called.add(tmp)
     tmp += 1
+    heappush(que, tmp)
   elif E[0] == 2:
-    called.remove(E[1])
+    done.add(E[1])
   else:
-    que = []
-    heappush(que, list(called))
-    print(heappop(que)[0])
+    while que[0] in done:
+      heappop(que)
+    print(que[0])
+
