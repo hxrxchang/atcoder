@@ -17,6 +17,7 @@ for i in range(R):
         y, x, d = b[0], b[1], b[2]
         if abs(i - y) + abs(j - x) <= d:
           board[i][j] = '.'
+          break
     if isinstance(board[i][j], int):
       board[i][j] = '.'
 
