@@ -1,12 +1,14 @@
+# 問題が意味不明。解いてて楽しくない。
 N = int(input())
 A = list(map(int, input().split()))
 
-A.sort()
-memo = {}
+counter = {}
 for a in A:
-    if a in memo:
-        memo[a] += 1
-    else:
-        memo[a] = 1
+    counter[a] = counter.get(a, 0) + 1
 
+unique_numbers = sorted(list(set(A)), reverse=True)
 
+for n in unique_numbers:
+    print(counter[n])
+for i in range(N - len(unique_numbers)):
+    print(0)
