@@ -2,41 +2,17 @@ H, W = map(int, input().split())
 A = [list(input()) for i in range(H)]
 B = [list(input()) for i in range(H)]
 
-for i in range(H):
-    a = A.pop(0)
-    A.append(a)
-    flag = True
-    for j in range(H):
-        a = A[j]
-        b = B[j]
-        if a.count("#") != b.count("#"):
-            flag = False
-            break
-    if flag:
-        break
-    else:
-        if i == H-1:
-            print("No")
+# (s, t) の組み合わせを全探索
+for s in range(H):
+    for t in range(W):
+        jugde = True
+        # A, B の各マスを全探索で比較
+        for i in range(H):
+            for j in range(W):
+                if A[(i - s + H) % H][(j - t + W) % W] != B[i][j]:
+                    jugde = False
+        if jugde:
+            print("Yes")
             exit()
 
-A2 = [list(x) for x in zip(*A)]
-B2 = [list(x) for x in zip(*B)]
-
-for i in range(W):
-    a = A2.pop(W - 1)
-    A2.insert(0, a)
-    flag = True
-    for j in range(W):
-        a = A2[j]
-        b = B2[j]
-        if a.count("#") != b.count("#"):
-            flag = False
-            break
-    if flag:
-        break
-    else:
-        if i ==  W-1:
-            print("No")
-            exit()
-
-print("Yes")
+print("No")
