@@ -16,3 +16,15 @@ else:
         elif int(B[i]) > int(A[i]):
             print("LESS")
             break
+
+# これでもいける
+A = int(input())
+B = int(input())
+
+if A == B:
+    print("EQUAL")
+elif A > B:
+    print("GREATER")
+elif B > A:
+    print("LESS")
+
