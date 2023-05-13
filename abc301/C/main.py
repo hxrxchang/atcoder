@@ -1,5 +1,4 @@
 from collections import defaultdict
-from string import ascii_lowercase
 
 S = list(input())
 T = list(input())
@@ -11,16 +10,18 @@ for i in range(len(S)):
     S_dict[S[i]] += 1
     T_dict[T[i]] += 1
 
-for s in list(ascii_lowercase):
-    diff = abs(S_dict[s] - T_dict[s])
-    if diff == 0:
-        continue
-    if s not in atc or (S_dict['@'] == 0 and T_dict['@'] == 0 and diff <= max(S_dict['@'], T_dict['@'])):
-        print("No")
+for s in atc:
+    mx = max(S_dict[s], T_dict[s])
+    if S_dict['@'] < mx - S_dict[s] or T_dict['@'] < mx - T_dict[s]:
+        print('No')
         exit()
-    if S_dict['@'] >= T_dict['@']:
-        S_dict['@'] -= diff
-    else:
-        T_dict['@'] -= diff
+    S_dict['@'] -= mx - S_dict[s]
+    S_dict[s] = mx
+    T_dict['@'] -= mx - T_dict[s]
+    T_dict[s] = mx
 
-print("Yes")
+if S_dict == T_dict:
+    print('Yes')
+else:
+    print('No')
+
