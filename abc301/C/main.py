@@ -11,6 +11,8 @@ for i in range(len(S)):
     T_dict[T[i]] += 1
 
 for s in atc:
+    # 文字数が少ない方を多い方にあわせるように処理する。
+    # そうする理由は、多い方を少ない方にあわせると、減らした文字を他の文字に振り分ける必要があるが、どうすればいいかわからないから。
     mx = max(S_dict[s], T_dict[s])
     if S_dict['@'] < mx - S_dict[s] or T_dict['@'] < mx - T_dict[s]:
         print('No')
