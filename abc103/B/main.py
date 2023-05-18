@@ -2,7 +2,6 @@ S = input()
 T = input()
 
 for _ in range(len(T)):
-  print(T)
   if S == T:
     print("Yes")
     exit()
