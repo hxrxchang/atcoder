@@ -1,12 +1,6 @@
-import math
-from decimal import Decimal
-
 A, B = map(int, input().split())
-A, B = Decimal(A), B
 
-ans = A / B
-
-if ans % 1 == 0:
-  print(int(ans))
+if A % B == 0:
+  print(A // B)
 else:
-  print(math.ceil(ans))
+  print(A // B + 1)

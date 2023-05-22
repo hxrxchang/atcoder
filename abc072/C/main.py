@@ -14,4 +14,3 @@ for a in set_A:
   ans = max(ans, cnt[a - 1] + cnt[a] + cnt[a + 1])
 
 print(ans)
-
