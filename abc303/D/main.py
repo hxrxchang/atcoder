@@ -1,140 +1,22 @@
+INF = 10**18
+
 X, Y, Z = map(int, input().split())
 S = input()
 
-caps_on = False
-if Y < Z:
-  key = 'shift'
-else:
-  key = 'caps'
+dp = [[INF] * 2 for _ in range(len(S) + 1)]
+dp[0][0] = 0
 
-def time_a(next_str):
-  global caps_on
-  if caps_on == False:
-    if next_str == 'a':
-      if X < Z + Y:
-        return X
-      else:
-        if caps_on:
-          caps_on = False
-        else:
-          caps_on = True
-        return Z + Y
-    elif next_str == 'A':
-      if X > Z + Y:
-        if caps_on:
-          caps_on = False
-        else:
-          caps_on = True
-        return Z + Y
-      else:
-        return X
-    elif next_str == '':
-      if X < Z + Y:
-        return X
-      else:
-        if caps_on:
-          caps_on = False
-        else:
-          caps_on = True
-        return Z + Y
-  else:
-    if next_str == 'a':
-      if X < Z + Y:
-        return X
-      else:
-        if caps_on:
-          caps_on = False
-        else:
-          caps_on = True
-        return Z + Y
-    elif next_str == 'A':
-      if X > Z + Y:
-        if caps_on:
-          caps_on = False
-        else:
-          caps_on = True
-        return Z + Y
-      else:
-        return X
-    elif next_str == '':
-      if X < Z + Y:
-        return X
-      else:
-        if caps_on:
-          caps_on = False
-        else:
-          caps_on = True
-        return Z + Y
-
-def time_A(next_str):
-  global caps_on
-  if caps_on == True:
-    if next_str == 'a':
-      if X < Z + Y:
-        return X
-      else:
-        if caps_on:
-          caps_on = False
-        else:
-          caps_on = True
-        return Z + Y
-    elif next_str == 'A':
-      if X > Z + Y:
-        if caps_on:
-          caps_on = False
-        else:
-          caps_on = True
-        return Z + Y
-      else:
-        return X
-    elif next_str == '':
-      if X < Z + Y:
-        return X
-      else:
-        if caps_on:
-          caps_on = False
-        else:
-          caps_on = True
-        return Z + Y
-  else:
-    if next_str == 'a':
-      if X < Z + Y:
-        return X
-      else:
-        if caps_on:
-          caps_on = False
-        else:
-          caps_on = True
-        return Z + Y
-    elif next_str == 'A':
-      if X > Z + Y:
-        if caps_on:
-          caps_on = False
-        else:
-          caps_on = True
-        return Z + Y
-      else:
-        return X
-    elif next_str == '':
-      if X < Z + Y:
-        return X
-      else:
-        if caps_on:
-          caps_on = False
-        else:
-          caps_on = True
-        return Z + Y
-
-cnt = 0
 for i in range(len(S)):
-  s = S[i]
-  if i == len(S) - 1:
-    next_str = ''
-  else:
-    next_str = S[i+1]
-  if s == 'a':
-    cnt += time_a(next_str)
-  elif s == 'A':
-    cnt += time_A(next_str)
+  cur = 0 if S[i] == 'a' else 1
+  for j in range(2):
+    for k in range(2):
+      v = dp[i][j]
+      if j != k:
+        v += Z
+      if cur == k:
+        v += X
+      else:
+        v += Y
+      dp[i + 1][k] = min(dp[i + 1][k], v)
 
-print(cnt)
+print(min(dp[len(S)][0], dp[len(S)][1]))
