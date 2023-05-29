@@ -1,11 +1,11 @@
 N = int(input())
 
 restaurants = []
-for _ in range(N):
+for i in range(N):
   A, B = input().split()
   B = int(B)
-  restaurants.append([A, B])
+  restaurants.append([A, B, i + 1])
 sorted_res = sorted(restaurants, key=lambda x: (x[0], -x[1]))
 
 for res in sorted_res:
-  print(restaurants.index(res) + 1)
+  print(res[2])
