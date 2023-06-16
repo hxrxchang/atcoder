@@ -1,13 +1,15 @@
 N = int(input())
-S = input()
+S = list(input())
 
-first = S.find('"')
-last = S.rfind('"')
+change_idx = []
+in_mode = False
+for i, s in enumerate(S):
+  if s == '"':
+    in_mode = not in_mode
+  if s == ',' and not in_mode:
+    change_idx.append(i)
 
-s1 = S[0:first]
-s3 = S[last + 1:len(S)]
-s2 = S[first:last]
+for idx in change_idx:
+  S[idx] = '.'
 
-s1 = s1.replace(",", ".")
-s3 = s3.replace(",", ".")
-print(s1 + s2 + s3)
+print(''.join(S))
