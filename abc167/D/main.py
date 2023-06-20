@@ -2,23 +2,22 @@ import math
 
 N, K = map(int, input().split())
 A = list(map(int, input().split()))
-A = [a - 1 for a in A]  # 0-indexedに変更
+A = [a - 1 for a in A]
 
-logK = int(math.log2(K)) + 1
-doubling = [[0] * N for _ in range(logK)]
+maxi = math.ceil(math.log2(K))
 
-for i in range(N):
-  doubling[0][i] = A[i]
+dp = [[0] * N for _ in range(maxi)]
 
-for k in range(logK - 1):
-  for i in range(N):
-    doubling[k + 1][i] = doubling[k][doubling[k][i]]
+for i, a in enumerate(A):
+  dp[0][i] = a
 
-now = 0
-for k in range(logK):
-  if K & 1:
-    now = doubling[k][now]
-  K = K >> 1
+for i in range(1, maxi):
+  for j in range(N):
+    dp[i][j] = dp[i - 1][dp[i - 1][j]]
 
-print(now + 1)
+position = 0
+for i in range(maxi, -1, -1):
+  if (K >> i) & 1:
+    position = dp[i][position]
 
+print(position + 1)
