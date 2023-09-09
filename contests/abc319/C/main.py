@@ -5,16 +5,35 @@ for _ in range(3):
   for i in list(map(int, input().split())):
     numbers.append(i)
 
-comb = itertools.combinations(list(range(0, 9)), 2)
+def is_gakkari(n):
+  if numbers[n[0]] == numbers[n[1]] and numbers[n[2]] != numbers[n[1]]:
+    return True
+  if numbers[n[3]] == numbers[n[4]] and numbers[n[5]] != numbers[n[4]]:
+    return True
+  if numbers[n[6]] == numbers[n[7]] and numbers[n[8]] != numbers[n[7]]:
+    return True
+  if numbers[n[0]] == numbers[n[3]] and numbers[n[6]] != numbers[n[3]]:
+    return True
+  if numbers[n[1]] == numbers[n[4]] and numbers[n[7]] != numbers[n[4]]:
+    return True
+  if numbers[n[2]] == numbers[n[5]] and numbers[n[8]] != numbers[n[5]]:
+    return True
+  if numbers[n[0]] == numbers[n[4]] and numbers[n[8]] != numbers[n[4]]:
+    return True
+  if numbers[n[2]] == numbers[n[4]] and numbers[n[6]] != numbers[n[4]]:
+    return True
+  return False
 
-cnt = 0
+
+perm = itertools.permutations(list(range(0, 9)), 9)
+
+total = 0
 gakkari_cnt = 0
-for c in comb:
-  for n in [item for item in list(range(0, 9)) if item not in list(c)]:
-    cnt += 1
-    if numbers[c[0]] == numbers[c[1]] and numbers[c[1]] != numbers[n]:
-      gakkari_cnt += 1
+for p in perm:
+  total += 1
+  if is_gakkari(p):
+    gakkari_cnt += 1
 
-print(gakkari_cnt)
-ans = 1 - (gakkari_cnt / len(list(itertools.combinations(list(range(0, 9)), 3))))
+ans = 1 - gakkari_cnt / total
+
 print(ans)
