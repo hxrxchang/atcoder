@@ -1,19 +1,19 @@
 N, L, R = map(int, input().split())
 A = list(map(int, input().split()))
+reversed_A = A[::-1]
 
-# i番目をLにするとき、i以降の数列の和の最小値
-dpL = [0] * N
-# i番目にA[i]を選ぶとき、i以降の数列の和の最小値
-dpA = [0] * N
-# i番目をRにするとき、i以降の数列の和の最小値
-dpR = [R * (N - i) for i in range(N)]
+# dp_L[i]: 左から最小になるように選んでいく方法で、左からi個確認した際の累積和
+dp_L = [0] * (N + 1)
+# dp_R[i]: 右から最小になるように選んでいく方法で、右からi個確認した際の累積和
+dp_R = [0] * (N + 1)
 
-dpA[-1] = A[-1]
-dpL[-1] = L
+for i in range(1, N + 1):
+  dp_L[i] = min(dp_L[i - 1] + A[i - 1], L * i)
+  dp_R[i] = min(dp_R[i - 1] + reversed_A[i - 1], R * i)
 
-for i in range(N - 1, 0, -1):
-  dpA[i - 1] = A[i - 1] + min(dpA[i], dpR[i])
-  dpL[i - 1] = L + min(dpL[i], dpA[i], dpR[i])
+ans = float('inf')
+for i in range(N + 1):
+  j = N - i
+  ans = min(ans, dp_L[i] + dp_R[j])
 
-ans = min(dpA[0], dpL[0], dpR[0])
 print(ans)
