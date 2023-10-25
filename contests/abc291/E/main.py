@@ -6,29 +6,46 @@ into_num = [0] * N
 
 for _ in range(M):
   x, y = map(int, input().split())
-  graph[x - 1].append(y - 1)
-  into_num[y - 1] += 1
+  x -= 1
+  y -= 1
+  graph[y].append(x)
+  into_num[x] += 1
 
-numbers = [x + 1 for x in range(N)]
-numbers.sort(reverse=True)
+que = deque()
 
-def topological_sort(G, into_num):
-  #入ってくる有向辺を持たないノードを列挙
-  q = deque()
-  #V: 頂点数
-  for i in range(N):
-    if into_num[i]==0:
-      q.append(i)
-  #以下、幅優先探索
-  ans = []
-  while q:
-    v = q.popleft()
-    ans.append(v)
-    for adj in G[v]:
-      into_num[adj] -= 1 #入次数を減らす
-      if into_num[adj]==0:
-        q.append(adj) #入次数が0になったら、キューに入れる
-  return ans
+# その時点での入次数が0の頂点の数
+tmp = 0
+for i in range(N):
+  if into_num[i] == 0:
+    tmp += 1
+    que.append(i)
 
-ans = topological_sort(graph, into_num)
-print(ans)
+if tmp != 1:
+  print("No")
+  exit()
+
+order = [0 for _ in range(N)]
+# 未確定の頂点の数
+rem = N
+
+while True:
+  current = que.popleft()
+  tmp -= 1
+  order[current] = rem
+  rem -= 1
+
+  if rem == 0:
+    break
+
+  for node in graph[current]:
+    into_num[node] -= 1
+    if into_num[node] == 0:
+      que.append(node)
+      tmp += 1
+
+  if tmp != 1:
+    print("No")
+    exit()
+
+print("Yes")
+print(*order)
