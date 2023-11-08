@@ -13,19 +13,20 @@ for _ in range(Q):
   A, B = map(int, input().split())
   A, B = A - 1, B - 1
   flag = False
+  visited = [False] * N
   que = deque()
   que.append(A)
-  visited = [False] * N
+  visited[A] = True
   while que:
     item = que.popleft()
-    if visited[item]:
-      continue
-    visited[item] = True
     for i in graph[item]:
       if i == B:
         flag = True
         break
-      que.append(i)
+      if not visited[i]:
+        que.append(i)
+        visited[i] = True
+
   if flag:
     print("Yes")
   else:
