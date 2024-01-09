@@ -6,32 +6,22 @@ match: Lines
 cases:
   - name: sample1
     in: |
-      3 3
-      ##.
-      #.#
-      #..
+      8 6
     out: |
-      499122178
+      Alice
   - name: sample2
     in: |
-      4 5
-      ..#..
-      .###.
-      #####
-      ..#..
+      1 1
     out: |
-      598946613
+      Draw
   - name: sample3
     in: |
-      3 4
-      #...
-      .#.#
-      ..##
+      13 1
     out: |
-      285212675
+      Bob
 
 extend:
   - type: Text
-    path: "./e"
+    path: "./a"
     in: /in/*.txt
     out: /out/*.txt

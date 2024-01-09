@@ -22,8 +22,11 @@ test-suite = "{{ manifest_dir }}/testcases/{{ bin_alias }}.yml"
 
 [template]
 src = '''
+use proconio::{fastout, input};
+
+#[fastout]
 fn main() {
-    todo!();
+    input! {}
 }
 '''
 
@@ -125,6 +128,8 @@ path = "./{{ contest }}"
 ##bin-src-path = './src/bin/{{ bin_alias }}.rs' # optional
 
 [test]
+# Toolchain for the test. (optional)
+# toolchain = "1.42.0"
 # Profile for `cargo build`. ("dev" | "release")
 #
 # Defaults to `"dev"`.
@@ -133,7 +138,7 @@ path = "./{{ contest }}"
 [submit]
 kind = "file"
 path = "{{ src_path }}"
-language_id = "5054"
+language_id = "4050"
 #[submit]
 #kind = "command"
 #args = ["cargo", "equip", "--exclude-atcoder-crates", "--resolve-cfgs", "--remove", "docs", "--minify", "libs", "--rustfmt", "--check", "--bin", "{{ bin_name }}"]
