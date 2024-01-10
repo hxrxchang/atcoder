@@ -1,3 +1,4 @@
+workspace = {members = ["abc156", "abc139", "abc054"],exclude = []}
 [package]
 name = "rust"
 version = "0.1.0"
