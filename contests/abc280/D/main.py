@@ -19,7 +19,6 @@ def prime_factorize(n):
     return a
 
 pf_list = prime_factorize(K)
-pf_set = set(pf_list)
 pf_dict = defaultdict(int)
 for n in pf_list:
     pf_dict[n] = pf_dict[n] + 1
@@ -34,7 +33,7 @@ def how_many(n, p):
 
 # 各素因数ごとに、素因数をその指数回割れる最小の数を探す
 ans = 0
-for p in pf_set:
+for p in pf_dict.keys():
     f = 0
     n = p
     while True:
