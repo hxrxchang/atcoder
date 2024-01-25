@@ -1,4 +1,4 @@
-workspace = {members = ["abc156", "abc139", "abc054", "code-festival-2016-qualb", "sumitrust2019", "abc335", "abc326", "abc235", "typical90", "abc277", "abc280"],exclude = []}
+workspace = {members = ["abc156", "abc139", "abc054", "code-festival-2016-qualb", "sumitrust2019", "abc335", "abc326", "abc235", "typical90", "abc277", "abc280", "abc267"],exclude = []}
 [package]
 name = "rust"
 version = "0.1.0"
