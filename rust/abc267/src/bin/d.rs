@@ -8,11 +8,12 @@ fn main() {
         a: [i64; n],
     }
 
-    let mut dp = vec![vec![-1e18 as i64; n + 1]; n + 1];
+    // dp[i][j]: A[i]までの要素の中から、j個選んだ時の最大値
+    let mut dp = vec![vec![-1e18 as i64; m + 1]; n + 1];
     dp[0][0] = 0;
 
     for i in 1..=n {
-        for j in 0..=n {
+        for j in 0..=m {
             if j == 0 {
                 dp[i][j] = 0;
             } else if i >= j {
