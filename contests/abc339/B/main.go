@@ -18,74 +18,57 @@ func main() {
 }
 
 func solve() {
-	in1 := mapToIntSlice(input())
-	H, W, N := in1[0], in1[1], in1[2]
-
-	grid := make([][]rune, H)
-	for i := range grid {
-		grid[i] = make([]rune, W)
-		for j := range grid[i] {
-			grid[i][j] = '.'
+	in := mapToIntSlice((input()))
+	H, W, N := in[0], in[1], in[2]
+	grid := make([][]string, H)
+	for i := 0; i < H; i++ {
+		grid[i] = make([]string, W)
+		for j := 0; j < W; j++ {
+			grid[i][j] = "."
 		}
 	}
 
-	grid[0][0] = '#'
-	direction := "right"
-	tmp := [2]int{0, 1}
+	h := 0
+	w := 0
+	// 0: up, 1: right, 2: down, 3: left
+	dir := 0
 
-	for i := 0; i < N-1; i++ {
-		h, w := tmp[0], tmp[1]
-		fmt.Println(h, w, direction)
-		switch direction {
-		case "right":
-			if grid[h][w] == '.' {
-				grid[h][w] = '#'
-				direction = "down"
-				tmp = [2]int{wrapNumber(h + 1, H - 1), w}
-			} else {
-				fmt.Println("13")
-				grid[h][w] = '.'
-				direction = "up"
-				tmp = [2]int{wrapNumber(h - 1, H - 1), w}
-			}
-		case "down":
-			if grid[h][w] == '.' {
-				grid[h][w] = '#'
-				direction = "left"
-				tmp = [2]int{h, wrapNumber(w - 1, W - 1)}
-			} else {
-				grid[h][w] = '.'
-				direction = "right"
-				tmp = [2]int{h, wrapNumber(w + 1, W - 1)}
-			}
-		case "left":
-			if grid[h][w] == '.' {
-				grid[h][w] = '#'
-				direction = "up"
-				tmp = [2]int{wrapNumber(h - 1, H), w}
-			} else {
-				grid[h][w] = '.'
-				direction = "down"
-				tmp = [2]int{wrapNumber(h + 1, H), w}
-			}
-		case "up":
-			if grid[h][w] == '.' {
-				grid[h][w] = '#'
-				direction = "right"
-				tmp = [2]int{h, wrapNumber(w + 1, W)}
-			} else {
-				grid[h][w] = '.'
-				direction = "left"
-				tmp = [2]int{h, wrapNumber(w - 1, W)}
-			}
+	for i := 0; i < N; i++ {
+		if grid[h][w] == "." {
+			grid[h][w] = "#"
+			dir += 1
+		} else {
+			grid[h][w] = "."
+			dir -= 1
+		}
+		dir %= 4
+		if dir < 0 {
+			dir += 4
+		}
+
+		switch dir {
+		case 0:
+			h -= 1
+		case 1:
+			w += 1
+		case 2:
+			h += 1
+		case 3:
+			w -= 1
+		}
+
+		h %= H
+		if h < 0 {
+			h += H
+		}
+		w %= W
+		if w < 0 {
+			w += W
 		}
 	}
 
-	for _, row := range grid {
-		for _, cell := range row {
-			fmt.Print(string(cell))
-		}
-		fmt.Println()
+	for i := 0; i < H; i++ {
+		fmt.Println(strings.Join(grid[i], ""))
 	}
 }
 
@@ -223,13 +206,4 @@ func (h *intHeap) Pop() interface{} {
 	x := old[n-1]
 	*h = old[0 : n-1]
 	return x
-}
-
-// wrapNumber は、与えられた数値が0 ~ Nの範囲に収まるように調整する関数です。
-func wrapNumber(value int, N int) int {
-	// モジュロ演算の結果が負にならないように調整
-	if value < 0 {
-		return (value%(N+1) + (N + 1)) % (N + 1)
-	}
-	return value % (N + 1)
 }
