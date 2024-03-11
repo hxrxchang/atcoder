@@ -27,7 +27,7 @@ func solve() {
 	_ = s2i(input())
 	r := mapToIntSlice(input())
 
-	nums := make(map[int]struct{})
+	nums := makeSet[int]()
 
 	for _, a2 := range a {
 		for _, b2 := range b {
@@ -159,6 +159,10 @@ func gcd(v1, v2 int) int {
 
 func lcm(v1, v2 int) int {
 	return v1 * v2 / gcd(v1, v2)
+}
+
+func makeSet[V comparable]() map[V]struct{} {
+	return make(map[V]struct{})
 }
 
 // heap (priority queue)
