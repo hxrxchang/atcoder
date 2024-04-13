@@ -21,20 +21,19 @@ func main() {
 
 func solve() {
 	n := getInt()
-	que := newQueue[int]()
 	ans := 1
+	que := newQueue[int]()
 	que.push(1)
-
 	for i := 0; i < n; i++ {
 		q := getInts()
 		if q[0] == 1 {
 			que.push(q[1])
-			ans = ans * 10 + q[1] % MOD
+			ans = (ans * 10 + q[1]) % MOD
 		} else if q[0] == 2 {
 			keta := que.size()
-			topElem := que.popLeft()
-			ans -= topElem * pow(10, keta - 1, MOD)
-			ans = ans % MOD
+			left := que.popLeft()
+			ans -= left * pow(10, keta-1, MOD)
+			ans = mod(ans, MOD)
 		} else {
 			fmt.Println(ans)
 		}
@@ -244,4 +243,3 @@ func (q *Queue[T]) size() int {
 func (q *Queue[T]) empty() bool {
 	return len(q.values) == 0
 }
-
