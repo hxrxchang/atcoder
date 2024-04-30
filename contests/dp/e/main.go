@@ -27,13 +27,40 @@ type Item struct {
 
 func solve() {
 	in := getInts()
-	n, _ := in[0], in[1]
+	n, w := in[0], in[1]
 	items := make([]*Item, n)
-
+	totalV := 0
 	for i := 0; i < n; i++ {
 		in = getInts()
-		items[i] = &Item{in[0], in[1]}
+		items[i] = &Item{w: in[0], v: in[1]}
+		totalV += in[1]
 	}
+
+	dp := make([]int, totalV + 1)
+	for i := 0; i < totalV + 1; i++ {
+		dp[i] = BIGGEST
+	}
+	dp[0] = 0
+
+	for _, item := range items {
+		tmp := make([]int, totalV + 1)
+		copy(tmp, dp)
+		for v := 1; v <= totalV; v++ {
+			if v - item.v >= 0 {
+				tmp[v] = min(dp[v], dp[v - item.v] + item.w)
+			}
+		}
+		dp = tmp
+	}
+
+	ans := 0
+	for i := 0; i <= totalV; i++ {
+		if dp[i] <= w {
+			ans = i
+		}
+	}
+
+	fmt.Println(ans)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
