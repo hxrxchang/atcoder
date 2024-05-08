@@ -3,13 +3,17 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"math"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
+
+	"golang.org/x/exp/constraints"
 )
 
 const BUFSIZE = 10000000
+const MOD = 1000000007
+const BIGGEST = int(1e18)
 var rdr *bufio.Reader
 
 func main() {
@@ -18,10 +22,68 @@ func main() {
 }
 
 func solve() {
+	t := getStr()
+	n := getInt()
+	bags := make([][]string, n)
 
+	for i := 0; i < n; i++ {
+		in := getStrs()
+		items := []string{}
+		for i := 1; i < len(in); i++ {
+			items = append(items, in[i])
+		}
+		bags[i] = items
+	}
+
+	dp := make([]int, len(t) + 1)
+	for i := 0; i <= len(t); i++ {
+		dp[i] = BIGGEST
+	}
+	dp[0] = 0
+
+	for i := 0; i < n; i++ {
+		tmp := make([]int, len(t) + 1)
+		copy(tmp, dp)
+
+		for _, item := range bags[i] {
+			for j := 0; j <= len(t); j++ {
+				if tmp[j] == BIGGEST {
+					continue
+				}
+				if j + len(item) <= len(t) {
+					if t[j:j+len(item)] == item {
+						dp[j+len(item)] = min(tmp[j + len(item)], tmp[j] + 1)
+					}
+				}
+			}
+		}
+	}
+
+	if dp[len(t)] == BIGGEST {
+		fmt.Println(-1)
+	} else {
+		fmt.Println(dp[len(t)])
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+func getInt() int {
+	return s2i(input())
+}
+
+func getInts() []int {
+	return mapToIntSlice(input())
+}
+
+func getStr() string {
+	return input()
+}
+
+func getStrs() []string {
+	return strToSlice(input(), " ")
+}
+
 // 一行をstringで読み込み
 func input() string {
 	buf := make([]byte, 0, 16)
@@ -117,8 +179,16 @@ func mod(x, y int) int {
 	return m
 }
 
-func pow(x, y int) int {
-	return int(math.Pow(float64(x), float64(y)))
+func pow(base, exp, mod int) int {
+	result := 1
+	for exp > 0 {
+		if exp%2 == 1 {
+			result = (result * base) % mod
+		}
+		base = (base * base) % mod
+		exp /= 2
+	}
+	return result
 }
 
 func gcd(v1, v2 int) int {
@@ -135,24 +205,99 @@ func lcm(v1, v2 int) int {
 	return v1 * v2 / gcd(v1, v2)
 }
 
+func ceilDiv(a, b int) int {
+	if a + b - 1 < 0 && (a + b - 1) % b != 0 {
+		return (a + b - 1) / b - 1
+	}
+	return (a + b - 1) / b
+}
+
+// set
+func newSet[V comparable]() map[V]struct{} {
+	return make(map[V]struct{})
+}
+
 // heap (priority queue)
-type intHeap []int
-func (h intHeap) Len() int {
+// 1.21 以上になったら comp.Ordered に変更する
+type Heap[T constraints.Ordered] []T
+func (h Heap[T]) len() int {
 	return len(h)
 }
-func (h intHeap) Less(i, j int) bool {
+func (h Heap[T]) less(i, j int) bool {
 	return h[i] < h[j]
 }
-func (h intHeap) Swap(i, j int) {
+func (h Heap[T]) swap(i, j int) {
 	h[i], h[j] = h[j], h[i]
 }
-func (h *intHeap) Push(x interface{}) {
-	*h = append(*h, x.(int))
+func (h *Heap[T]) push(x T) {
+	*h = append(*h, x)
 }
-func (h *intHeap) Pop() interface{} {
+func (h *Heap[T]) pop() interface{} {
 	old := *h
 	n := len(old)
 	x := old[n-1]
 	*h = old[0 : n-1]
 	return x
+}
+
+func sortInts(slice []int) []int {
+	copiedSlice := make([]int, len(slice))
+	copy(copiedSlice, slice)
+
+	sort.Ints(copiedSlice)
+	return copiedSlice
+}
+
+func reverseInts(slice []int) []int {
+	copiedSlice := make([]int, len(slice))
+	copy(copiedSlice, slice)
+
+	for i, j := 0, len(copiedSlice)-1; i < j; i, j = i+1, j-1 {
+		copiedSlice[i], copiedSlice[j] = copiedSlice[j], copiedSlice[i]
+	}
+	return copiedSlice
+}
+
+// queue
+type Queue[T any] struct {
+	values []T
+}
+func newQueue[T any]() *Queue[T] {
+	return &Queue[T]{}
+}
+func (q *Queue[T]) push(v T) {
+	q.values = append(q.values, v)
+}
+func (q *Queue[T]) popLeft() T {
+	v := q.values[0]
+	q.values = q.values[1:]
+	return v
+}
+func (q *Queue[T]) pop() T {
+	v := q.values[len(q.values)-1]
+	q.values = q.values[:len(q.values)-1]
+	return v
+}
+func (q *Queue[T]) front() T {
+	return q.values[0]
+}
+func (q *Queue[T]) size() int {
+	return len(q.values)
+}
+func (q *Queue[T]) empty() bool {
+	return len(q.values) == 0
+}
+
+// algorithm
+func getDividors(n int) []int {
+	ret := make([]int, 0)
+	for i := 1; i*i <= n; i++ {
+		if n%i == 0 {
+			ret = append(ret, i)
+			if i*i != n {
+				ret = append(ret, n/i)
+			}
+		}
+	}
+	return sortInts(ret)
 }

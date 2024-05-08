@@ -14,8 +14,8 @@ dp[0] = 0
 for i in range(N):
     tmp = dp[:]
     for item in bags[i][1:]:
-        for j, d in enumerate(dp):
-            if d == float('inf'):
+        for j, k in enumerate(tmp):
+            if k == float('inf'):
                 continue
             if item == T[j:j + len(item)]:
                 dp[j + len(item)] = min(tmp[j + len(item)], tmp[j] + 1)
