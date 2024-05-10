@@ -26,7 +26,7 @@ func solve() {
 	s := strToSlice(in[0], "")
 	k := s2i(in[1])
 
-	s = sortStrings(s)
+	s = sortSlice(s)
 	cnt := 1
 	for {
 		if cnt == k {
@@ -213,20 +213,15 @@ func (h *Heap[T]) pop() interface{} {
 	*h = old[0 : n-1]
 	return x
 }
+func sortSlice[T constraints.Ordered](slice []T) []T {
+    copiedSlice := make([]T, len(slice))
+    copy(copiedSlice, slice)
 
-func sortInts(slice []int) []int {
-	copiedSlice := make([]int, len(slice))
-	copy(copiedSlice, slice)
+    sort.Slice(copiedSlice, func(i, j int) bool {
+        return copiedSlice[i] < copiedSlice[j]
+    })
 
-	sort.Ints(copiedSlice)
-	return copiedSlice
-}
-
-func sortStrings(slice []string) []string {
-	copiedSlice := make([]string, len(slice))
-	copy(copiedSlice, slice)
-	sort.Strings(copiedSlice)
-	return copiedSlice
+    return copiedSlice
 }
 
 func reverse[T constraints.Ordered](slice []T) []T {
@@ -324,7 +319,7 @@ func getDividors(n int) []int {
 			}
 		}
 	}
-	return sortInts(ret)
+	return sortSlice(ret)
 }
 
 // 順列列挙
