@@ -22,23 +22,23 @@ func main() {
 }
 
 func solve() {
-	s := getStr()
-	t := getStr()
+	s := strToSlice(getStr(), "")
+	t := strToSlice(getStr(), "")
 
-	data := make(map[string]int)
-	for i := 0; i < len(s); i++ {
-		data[string(s[i])] += 1
+	que := newQueue[string]()
+	for _, v := range s {
+		que.push(v)
 	}
 
-	ans := make([]int, 0)
+	ans := []string{}
 	for i := 0; i < len(t); i++ {
-		if data[string(t[i])] > 0 {
-			data[string(t[i])] -= 1
-			ans = append(ans, i + 1)
+		if que.front() == t[i] {
+			ans = append(ans, i2s(i + 1))
+			que.popLeft()
 		}
 	}
 
-	fmt.Println(strings.Trim(fmt.Sprint(ans), "[]"))
+	fmt.Println(strings.Join(ans, " "))
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
