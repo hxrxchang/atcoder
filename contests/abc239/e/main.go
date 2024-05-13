@@ -22,13 +22,17 @@ func main() {
 	solve()
 }
 
+type DFSItem struct {
+	v int
+	parent int
+	visitCnt int
+}
+
 func solve() {
 	in := getInts()
 	n, q := in[0], in[1]
 	tree := make([][]int, n)
-	nodeNums := getInts()
-
-	fmt.Println(q, nodeNums)
+	x := getInts()
 
 	for i := 0; i < n-1; i++ {
 		in = getInts()
@@ -37,7 +41,42 @@ func solve() {
 		tree[b] = append(tree[b], a)
 	}
 
-	fmt.Println(tree)
+	res := make([][]int, n)
+	for i := 0; i < n; i++ {
+		res[i] = append(res[i], x[i])
+	}
+
+	que := newQueue[*DFSItem]()
+	que.push(&DFSItem{v: 0, parent: -1, visitCnt: 1})
+	for !que.empty() {
+		item := que.pop()
+		if item.visitCnt == 1 { // 行きがけ
+			que.push(&DFSItem{v: item.v, parent: item.parent, visitCnt: item.visitCnt+1})
+			for _, next := range tree[item.v] {
+				if next == item.parent {
+					continue
+				}
+				que.push(&DFSItem{v: next, parent: item.v, visitCnt: 1})
+			}
+		} else { // 帰りがけ
+			for _, next := range tree[item.v] {
+				if next == item.parent {
+					continue
+				}
+				res[item.v] = append(res[item.v], res[next]...)
+			}
+			res[item.v] = reverse(sortSlice(res[item.v]))
+			if len(res[item.v]) > 20 {
+				res[item.v] = res[item.v][:20]
+			}
+		}
+	}
+
+	for i := 0; i < q; i++ {
+		in = getInts()
+		v, d := in[0]-1, in[1]-1
+		fmt.Println(res[v][d])
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
