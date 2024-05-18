@@ -22,38 +22,38 @@ func main() {
 	solve()
 }
 
+type Card struct {
+	idx, power, cost int
+}
+
 func solve() {
 	n := getInt()
-	a := make([]int, n)
-	c := make([]int, n)
-	aidx := make(map[int]int)
-	cidx := make(map[int]int)
+	cards := make([]Card, n)
 
 	for i := 0; i < n; i++ {
 		in := getInts()
-		a[i] = in[0]
-		c[i] = in[1]
-		aidx[a[i]] = i
-		cidx[c[i]] = i
+		cards[i] = Card{i, in[0], in[1]}
 	}
-	a = reverse(sortSlice(a))
 
+	sort.Slice(cards, func(i, j int) bool {
+		return cards[i].power > cards[j].power
+	})
+
+	tmpCost := cards[0].cost
 	ans := make([]int, 0)
-	ans = append(ans, aidx[a[0]] + 1)
-	currentC := c[aidx[a[0]]]
+	ans = append(ans, cards[0].idx)
 
 	for i := 1; i < n; i++ {
-		if (c[aidx[a[i]]] < currentC) {
-			ans = append(ans, aidx[a[i]] + 1)
-			currentC = c[aidx[a[i]]]
+		if tmpCost > cards[i].cost {
+			ans = append(ans, cards[i].idx)
+			tmpCost = cards[i].cost
 		}
 	}
 
 	ans = sortSlice(ans)
-
-	ans2 := make([]string, 0)
-	for _, v := range ans {
-		ans2 = append(ans2, i2s(v))
+	ans2 := make([]string, len(ans))
+	for i, v := range ans {
+		ans2[i] = i2s(v+1)
 	}
 
 	fmt.Println(len(ans2))
