@@ -25,7 +25,7 @@ func main() {
 var n int
 var tree [][]int
 var subTreeSize []int
-var dp []int
+var distanceSum []int
 
 func solve() {
 	n = getInt()
@@ -37,36 +37,41 @@ func solve() {
 		tree[b] = append(tree[b], a)
 	}
 
+	// subTreeSize[i]: iを根とする部分木のサイズ
 	subTreeSize = make([]int, n)
-	dp = make([]int, n)
+	distanceSum = make([]int, n)
 
 	dfs1(0, -1)
+
 	dfs2(0, -1)
 
 	for i := 0; i < n; i++ {
-		fmt.Println(dp[i])
+		fmt.Println(distanceSum[i])
 	}
 }
 
+// dfs1を呼び出し後、 distaneSum[i] は 0をルートとした木の中でiを根とする部分木の距離の総和になる
 func dfs1(node, parent int) {
 	subTreeSize[node] = 1
-	dp[node] = 0
+	distanceSum[node] = 0
 	for _, next := range tree[node] {
 		if next == parent {
 			continue
 		}
 		dfs1(next, node)
+
 		subTreeSize[node] += subTreeSize[next]
-		dp[node] += dp[next] + subTreeSize[next]
+		distanceSum[node] += distanceSum[next] + subTreeSize[next]
 	}
 }
 
+// dfs2を呼び出し後、 distaneSum[i] は 頂点iから他の頂点への距離の総和になる
 func dfs2(node, parent int) {
 	for _, next := range tree[node] {
 		if next == parent {
 			continue
 		}
-		dp[next] = dp[node] - subTreeSize[next] + n - subTreeSize[next]
+		distanceSum[next] = distanceSum[node] - subTreeSize[next] + n - subTreeSize[next]
 		dfs2(next, node)
 	}
 }
