@@ -22,46 +22,46 @@ func main() {
 	solve()
 }
 
+type Node struct {
+	to, edgeId int
+}
+var tree [][]Node
+var dp []int
 
 func solve() {
 	n := getInt()
-	tree := make([][]int, n)
-	parents := make([]int, n)
-	parents[0] = -1
+	tree = make([][]Node, n)
 	for i := 0; i < n-1; i++ {
 		in := getInts()
 		a, b := in[0]-1, in[1]-1
-		tree[a] = append(tree[a], b)
-		tree[b] = append(tree[b], a)
-		parents[b] = a
+		tree[a] = append(tree[a], Node{b, i})
+		tree[b] = append(tree[b], Node{a, i})
 	}
 
-	// dp[i]: i番目のNodeに繋がる辺の色
-	dp := make([]int, n)
+	dp = make([]int, n - 1)
 
-	que := newQueue[int]()
-	que.push(0)
-
-	for !que.empty() {
-		v := que.popLeft()
-		color := 1
-
-		for _, next := range tree[v] {
-			if next == parents[v] {
-				continue
-			}
-			if color == dp[v] {
-				color++
-			}
-			dp[next] = color
-			color++
-			que.push(next)
-		}
-	}
+	dfs(0, -1, -1)
 
 	fmt.Println(max(dp...))
-	for i := 1; i < n; i++ {
+	for i := 0; i < n - 1; i++ {
 		fmt.Println(dp[i])
+	}
+}
+
+func dfs(node, color, parent int) {
+	tmp := 1
+	for _, next := range tree[node] {
+		if next.to == parent {
+			continue
+		}
+		// 自分と同じ色は使わない
+		if tmp == color {
+			tmp++
+		}
+		dp[next.edgeId] = tmp
+		tmp++
+
+		dfs(next.to, dp[next.edgeId], node)
 	}
 }
 
