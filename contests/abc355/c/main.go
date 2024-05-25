@@ -23,81 +23,41 @@ func main() {
 	solve()
 }
 
-var n int
-var bingo map[int]bool
 
 func solve() {
 	in := getInts()
-	n = in[0]
-	t := in[1]
+	N := in[0]
+	T := in[1]
+	A := getInts()
 
-	bingo = make(map[int]bool)
+	rowCount := make([]int, N)
+	colCount := make([]int, N)
+	diag1Count := 0
+	diag2Count := 0
 
-	a := getInts()
-	for i := 0; i < t; i++ {
-		bingo[a[i]] = true
-		if isBingo(a[i]) {
-			fmt.Println(i + 1)
+	for turn := 0; turn < T; turn++ {
+		num := A[turn]
+		num--
+		row := num / N
+		col := num % N
+
+		rowCount[row]++
+		colCount[col]++
+
+		if row == col {
+			diag1Count++
+		}
+		if row+col == N-1 {
+			diag2Count++
+		}
+
+		if rowCount[row] == N || colCount[col] == N || diag1Count == N || diag2Count == N {
+			fmt.Println(turn + 1)
 			return
 		}
 	}
 
 	fmt.Println(-1)
-}
-
-
-func isBingo(i int) bool {
-	// 横
-	for i := 0; i < n; i++ {
-		flag := true
-		for j := 0; j < n; j++ {
-			if !bingo[idxToNum(i, j, n)] {
-				flag = false
-				break
-			}
-		}
-		if flag {
-			return true
-		}
-	}
-
-	// 縦
-	for j := 0; j < n; j++ {
-		flag := true
-		for i := 0; i < n; i++ {
-			if !bingo[idxToNum(i, j, n)] {
-				flag = false
-				break
-			}
-		}
-		if flag {
-			return true
-		}
-	}
-
-	 // 斜め1
-	flag3 := true
-	for i := 0; i < n; i++ {
-		if !bingo[idxToNum(i, i, n)] {
-			flag3 = false
-			break
-		}
-	}
-
-	if flag3 {
-		return true
-	}
-
-	// 斜め2
-	flag4 := true
-	for i := 0; i < n; i++ {
-		if !bingo[idxToNum(i, n-i-1, n)] {
-			flag4 = false
-			break
-		}
-	}
-
-	return flag4
 }
 
 func idxToNum(i, j, n int) int {
