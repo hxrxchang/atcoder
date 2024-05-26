@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/liyue201/gostl/ds/set"
+	"github.com/liyue201/gostl/utils/comparator"
 	"golang.org/x/exp/constraints"
 )
 
@@ -26,8 +28,47 @@ func main() {
 func solve() {
 	in := getInts()
 	n, k := in[0], in[1]
-
 	p := getInts()
+
+	ss := newSortedSet[int]()
+
+	// pile[i]: カードiが場に表で置かれているとして、その山に積まれているカードの枚数
+	pile := make([]int, n + 1)
+	// under[i]: カードiの下に置かれたカードの番号
+	under := make([]int, n + 1)
+
+	res := make(map[int]int)
+
+	for i, v := range p {
+		target := ss.upperBound(v)
+		if !target.IsValid() {
+			pile[v] = 1
+			ss.add(v)
+		} else {
+			under[v] = target.Value()
+			pile[v] = pile[target.Value()] + 1
+			ss.remove(target.Value())
+			ss.add(v)
+		}
+
+		if pile[v] == k {
+			ss.remove(v)
+			pile[v] = 0
+			x := v
+			for j := 0; j < k; j++ {
+				res[x] = i + 1
+				x = under[x]
+			}
+		}
+	}
+
+	for i := 1; i <= n; i++ {
+		if res[i] == 0 {
+			fmt.Println(-1)
+		} else {
+			fmt.Println(res[i])
+		}
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -208,6 +249,32 @@ func (s *Set[V]) remove(v V) {
 func (s *Set[V]) has(v V) bool {
 	_, ok := s.values[v]
 	return ok
+}
+
+type SortedSet[T comparator.Ordered] struct {
+	values *set.Set[T]
+}
+func newSortedSet[T comparator.Ordered]() *SortedSet[T] {
+	var comparatorFn comparator.Comparator[T] = comparator.OrderedTypeCmp[T]
+	return &SortedSet[T]{values: set.New[T](comparatorFn)}
+}
+func (s *SortedSet[T]) add(v T) {
+	s.values.Insert(v)
+}
+func (s *SortedSet[T]) remove(v T) {
+	s.values.Erase(v)
+}
+func (s *SortedSet[T]) has(v T) bool {
+	return s.values.Contains(v)
+}
+func (s *SortedSet[T]) size() int {
+	return s.values.Size()
+}
+func (s *SortedSet[T]) lowerBound(v T) *set.SetIterator[T] {
+	return s.values.LowerBound(v)
+}
+func (s *SortedSet[T]) upperBound(v T) *set.SetIterator[T] {
+	return s.values.UpperBound(v)
 }
 
 // heap (priority queue)
