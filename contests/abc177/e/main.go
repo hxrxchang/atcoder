@@ -31,24 +31,24 @@ func solve() {
 	a := getInts()
 
 	num := make([]int, MAX)
-	isprime := make([]bool, MAX)
-	for i := range isprime {
-		isprime[i] = true
-	}
-
 	for _, v := range a {
 		num[v]++
 	}
 
+	isPrime := make([]bool, MAX)
+	pn := primeNumbers(MAX)
+	for _, v := range pn {
+		isPrime[v] = true
+	}
+
 	coprime := true
 	for i := 2; i < MAX; i++ {
-		if !isprime[i] {
+		if !isPrime[i] {
 			continue
 		}
 		sum := 0
 		for j := i; j < MAX; j += i {
 			sum += num[j]
-			isprime[j] = false
 		}
 		if sum > 1 {
 			coprime = false
