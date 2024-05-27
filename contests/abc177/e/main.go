@@ -42,17 +42,14 @@ func solve() {
 	}
 
 	coprime := true
-	for i := 2; i < MAX; i++ {
-		if !isPrime[i] {
-			continue
-		}
+	for _, v := range pn {
 		sum := 0
-		for j := i; j < MAX; j += i {
-			sum += num[j]
-		}
-		if sum > 1 {
-			coprime = false
-			break
+		for i := v; i < MAX; i += v {
+			sum += num[i]
+			if sum > 1 {
+				coprime = false
+				break
+			}
 		}
 	}
 
