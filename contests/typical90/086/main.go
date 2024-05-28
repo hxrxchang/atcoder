@@ -25,41 +25,60 @@ func main() {
 	solve()
 }
 
+var N, Q int
+var x, y, z, w []int
+
 func solve() {
 	in := getInts()
-	n, q := in[0], in[1]
-
-	queries := make([][]int, q)
-	for i:=0; i<q; i++ {
-		queries[i] = getInts()
+	N, Q = in[0], in[1]
+	X := make([]int, Q+1)
+	Y := make([]int, Q+1)
+	Z := make([]int, Q+1)
+	W := make([]int, Q+1)
+	for i := 1; i <= Q; i++ {
+		in := getInts()
+		X[i], Y[i], Z[i], W[i] = in[0], in[1], in[2], in[3]
 	}
 
-	cnt := make(map[int]int)
-
-	for bit := 0; bit < 1<<n; bit++ {
-		ans := 0
-		for _, q := range queries {
-			x, y, z := q[0] - 1, q[1] - 1, q[2] - 1
-			orResult := ((bit >> x) & 1 | (bit >> y) & 1 | (bit >> z) & 1)
-			ans *= 2
-			ans += orResult
-		}
-		cnt[ans]++
-	}
-
-	res := 1
+	x = make([]int, Q+1)
+	y = make([]int, Q+1)
+	z = make([]int, Q+1)
+	w = make([]int, Q+1)
+	ans := 1
 	for i := 0; i < 60; i++ {
-		ans := 0
-		for _, query := range queries {
-			w := query[3]
-			ans *= 2
-			ans += (w >> i) & 1
+		for j := 1; j <= Q; j++ {
+			x[j] = X[j]
+			y[j] = Y[j]
+			z[j] = Z[j]
+			w[j] = (W[j] / (1 << i)) % 2
 		}
-		res *= cnt[ans]
-		res %= MOD
+		ret := bitZentansaku()
+		ans *= ret
+		ans %= MOD
 	}
+	fmt.Println(ans)
+}
 
-	fmt.Println(res)
+func bitZentansaku() int {
+	ways := 0
+	for i := 0; i < (1 << N); i++ {
+		bit := make([]int, N+1)
+		for j := 0; j < N; j++ {
+			bit[j+1] = (i / (1 << j)) % 2
+		}
+
+		flag := true
+		for j := 1; j <= Q; j++ {
+			if ((bit[x[j]] | bit[y[j]]) | bit[z[j]]) != w[j] {
+				flag = false
+				break
+			}
+		}
+		if flag {
+			ways++
+		}
+	}
+	return ways
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
