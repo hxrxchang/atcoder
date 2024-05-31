@@ -21,7 +21,11 @@
       "id": "abc204_c",
       "label": "C",
       "title": "Tour",
-      "url": "https://atcoder.jp/contests/abc204/tasks/abc204_c"
+      "url": "https://atcoder.jp/contests/abc204/tasks/abc204_c",
+      "directory": {
+        "path": "c",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc204_d",
