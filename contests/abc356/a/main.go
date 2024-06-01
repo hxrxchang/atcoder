@@ -27,7 +27,7 @@ func main() {
 
 func solve() {
 	in := getInts()
-	n, l, r := in[0], in[1], in[2]
+	n, l, r := in[0], in[1] - 1, in[2] - 1
 
 	arr := make([]int, n)
 	for i := 0; i < n; i++ {
@@ -35,18 +35,15 @@ func solve() {
 	}
 
 	res := make([]int, 0)
-	res = append(res, arr[:l-1]...)
+	res = append(res, arr[:l]...)
 
-	target := arr[l-1:r]
+	target := arr[l:r+1]
 	target = reverse(target)
 	res = append(res, target...)
-	res = append(res, arr[r:]...)
 
-	res2 := make([]string, 0)
-	for _, v := range res {
-		res2 = append(res2, i2s(v))
-	}
-	printSlice(res2)
+	res = append(res, arr[r+1:]...)
+
+	printSlice(res)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
