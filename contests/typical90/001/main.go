@@ -21,39 +21,54 @@ func main() {
 	solve()
 }
 
+var n, l, k int
+var a []int
+
 func solve() {
 	in := getInts()
-	n, l := in[0], in[1]
-	k := getInt()
-	a := getInts()
+	n, l = in[0], in[1]
+	k = getInt()
+	a = getInts()
 
-	left, right := 0, l
+	left := -1
+	right := l + 1
+
 	for right - left > 1 {
 		mid := (left + right) / 2
-		if check(n, l, k, a, mid) {
+		if check(mid) {
 			left = mid
 		} else {
 			right = mid
 		}
 	}
+
 	fmt.Println(left)
 }
 
-func check(n int, l int, k int, a[]int, x int) bool {
-	num := 0 // 分割数
-	pre := 0 // 羊羹全体における前回の切れ目の位置(cm)
+// aをすべてのピースがlength以上になるように切っていく
+// length以上になるピースがk+1個以上になるかどうか
+func check(length int) bool {
+	cnt := 0
+	lastCut := -1
 	for i := 0; i < n; i++ {
-		if a[i] - pre >= x {
-			num++
-			pre = a[i]
+		var currentLength int
+		if lastCut == -1 {
+			currentLength = a[i]
+		} else {
+			currentLength = a[i] - a[lastCut]
+		}
+		if currentLength >= length {
+			cnt++
+			lastCut = i
 		}
 	}
-	if l - pre >= x {
-		num++
+	if lastCut != -1 && l - a[lastCut] >= length {
+		cnt++
 	}
-
-	return num >= k + 1
+	return cnt >= k+1
 }
+
+
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
