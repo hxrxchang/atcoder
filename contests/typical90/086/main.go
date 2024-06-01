@@ -25,60 +25,33 @@ func main() {
 	solve()
 }
 
-var N, Q int
-var x, y, z, w []int
 
 func solve() {
+	bitSize := 60
 	in := getInts()
-	N, Q = in[0], in[1]
-	X := make([]int, Q+1)
-	Y := make([]int, Q+1)
-	Z := make([]int, Q+1)
-	W := make([]int, Q+1)
-	for i := 1; i <= Q; i++ {
-		in := getInts()
-		X[i], Y[i], Z[i], W[i] = in[0], in[1], in[2], in[3]
-	}
+	n, q := in[0], in[1]
 
-	x = make([]int, Q+1)
-	y = make([]int, Q+1)
-	z = make([]int, Q+1)
-	w = make([]int, Q+1)
 	ans := 1
-	for i := 0; i < 60; i++ {
-		for j := 1; j <= Q; j++ {
-			x[j] = X[j]
-			y[j] = Y[j]
-			z[j] = Z[j]
-			w[j] = (W[j] / (1 << i)) % 2
-		}
-		ret := bitZentansaku()
-		ans *= ret
-		ans %= MOD
-	}
-	fmt.Println(ans)
-}
-
-func bitZentansaku() int {
-	ways := 0
-	for i := 0; i < (1 << N); i++ {
-		bit := make([]int, N+1)
-		for j := 0; j < N; j++ {
-			bit[j+1] = (i / (1 << j)) % 2
-		}
-
-		flag := true
-		for j := 1; j <= Q; j++ {
-			if ((bit[x[j]] | bit[y[j]]) | bit[z[j]]) != w[j] {
-				flag = false
-				break
+	for i := 0; i < q; i++ {
+		in := getInts()
+		// x, y, z はAのindexを示すので0-indexに変換
+		x, y, z, w := in[0] - 1, in[1] - 1, in[2] - 1, in[3]
+		for j := bitSize - 1; j >= 0; j-- {
+			bit := (w >> j) & 1
+			if bit == 1 {
 			}
 		}
-		if flag {
-			ways++
-		}
 	}
-	return ways
+}
+
+func solve2() {
+	n := 8
+	bitSize := 60
+
+	for i := bitSize - 1; i >= 0; i-- {
+		bit := (n >> i) & 1
+		fmt.Printf("Bit %d: %d\n", i, bit)
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
