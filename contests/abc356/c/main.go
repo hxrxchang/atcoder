@@ -26,132 +26,68 @@ func main() {
 }
 
 type Input struct {
-	size int
+	c int
 	values []int
-	result string
+	r string
 }
 
 func solve() {
 	in := getInts()
 	n, m, k := in[0], in[1], in[2]
-	keys := make([]int, n)
-	for i := 0; i < n; i++ {
-		keys[i] = i + 1
-	}
-	combinationsCh := getCombinations(keys, k)
-	combinations := make([][]int, 0)
-	for comb := range combinationsCh {
-		combinations = append(combinations, comb)
-	}
 
 	inputs := make([]Input, m)
 	for i := 0; i < m; i++ {
 		in := getStrs()
 		c := s2i(in[0])
-		r := in[len(in)-1]
-		tmpkeys := make([]int, c)
-		for j := 0; j < c; j++ {
-			tmpkeys[j] = s2i(in[j+1])
+		values := make([]int, c)
+		for i := 0; i < c; i++ {
+			values[i] = s2i(in[i+1])
 		}
-		inputs[i] = Input{size: c, values: tmpkeys, result: r}
+
+		values2 := make([]int, n)
+		for _, v := range values {
+			values2[v-1] = 1
+		}
+		r := in[len(in)-1]
+		inputs[i] = Input{c: c, values: values2, r: r}
 	}
 
-	cnt := 0
-	for _, comb := range combinations {
+	keys := make([]int, n)
+	for i := 0; i < n; i++ {
+		keys[i] = i + 1
+	}
+
+	subsets := generateSubsets(keys)
+	ans := 0
+
+	for _, subset := range subsets {
+		// どの値が含まれているかどうかを高速に判定できるように変換
+		// 例: [1, 2, 4]を [1, 1, 0, 1] に変換する
+		subset2 := make([]int, n)
+		for _, v := range subset {
+			subset2[v - 1] = 1
+		}
 		flag := true
 		for _, input := range inputs {
-			flag2 := true
-			fmt.Println(comb, input.values, input.result)
-			// if input.result == "x" {
-			// 	for _, key := range comb {
-			// 		if sliceContains(input.values, key) {
-			// 			flag2 = false
-			// 			break
-			// 		}
-			// 	}
-			// } else {
-			// 	for _, key := range comb {
-			// 		if !sliceContains(input.values, key) {
-			// 			flag2 = false
-			// 			break
-			// 		}
-			// 	}
-			// }
-			flag = flag2
+			cnt := 0
+			for i := 0; i < n; i++ {
+				if subset2[i] == 1 && input.values[i] == 1 {
+					cnt++
+				}
+			}
+			// その入力の列に出現する回数が、r="x"の場合はk以上、r="o"の場合はk未満であれば、その鍵たちは正しくないと判定できる
+			if (input.r == "x" && cnt >= k) || (input.r == "o" && cnt < k) {
+				flag = false
+				break
+			}
 		}
 		if flag {
-			cnt++
+			ans++
 		}
 	}
 
-	fmt.Println(cnt)
+	fmt.Println(ans)
 }
-
-// func solve() {
-// 	in := getInts()
-// 	// n, m, k := in[0], in[1], in[2]
-// 	m, k := in[1], in[2]
-// 	ngSet := newSet[int]()
-// 	okSet := newSet[int]()
-// 	for i := 0; i < m; i++ {
-// 		in := getStrs()
-// 		c := s2i(in[0])
-// 		r := in[len(in)-1]
-// 		keys := make([]int, c)
-// 		for j := 0; j < c; j++ {
-// 			keys[j] = s2i(in[j+1])
-// 		}
-
-// 		for _, key := range keys {
-// 			if r == "x" {
-// 				ngSet.add(key)
-// 			} else {
-// 				okSet.add(key)
-// 			}
-// 		}
-// 	}
-
-// 	oks := make([]int, 0)
-// 	for k := range okSet.values {
-// 		oks = append(oks, k)
-// 	}
-// 	oks = sortSlice(oks)
-
-// 	ngs := make([]int, 0)
-// 	for k := range ngSet.values {
-// 		ngs = append(ngs, k)
-// 	}
-// 	ngs = sortSlice(ngs)
-
-// 	okcombinationsCh := getCombinations(oks, k)
-// 	okcombinations := make([][]int, 0)
-// 	for okComb := range okcombinationsCh {
-// 		okcombinations = append(okcombinations, okComb)
-// 	}
-
-// 	ngCombinations := make([][]int, 0)
-// 	ngCombinasionsCh := getCombinations(ngs, k)
-// 	for ngComb := range ngCombinasionsCh {
-// 		ngCombinations = append(ngCombinations, ngComb)
-// 	}
-
-// 	fmt.Println(len(okcombinations) - len(ngCombinations))
-// 	cnt := 0
-// 	for _, comb := range okcombinations {
-// 		flag := true
-// 		for _, ngPair := range ngCombinations {
-// 			if compareSlices(ngPair, comb) {
-// 				flag = false
-// 				break
-// 			}
-// 		}
-// 		if flag {
-// 			cnt++
-// 		}
-// 	}
-
-// 	fmt.Println(cnt)
-// }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -555,7 +491,15 @@ func nextPermutation(x sort.Interface) bool {
 
 // 組み合わせ
 // スライスからk個選ぶ組み合わせを列挙
-func getCombinations(list []int, k int) (c chan []int) {
+func getCombinations(list []int, k int) [][]int {
+	res := make([][]int, 0)
+	combs := getCombinationsCh(list, k)
+	for comb := range combs {
+		res = append(res, comb)
+	}
+	return res
+}
+func getCombinationsCh(list []int, k int) (c chan []int) {
 	c = make(chan []int, 2)
 	n := len(list)
 
@@ -584,7 +528,15 @@ func getCombinations(list []int, k int) (c chan []int) {
 }
 
 // nCr
-func getComb(n, k int) (c chan []int) {
+func getComb(n, k int) [][]int {
+	res := make([][]int, 0)
+	combs := getCombCh(n, k)
+	for comb := range combs {
+		res = append(res, comb)
+	}
+	return res
+}
+func getCombCh(n, k int) (c chan []int) {
 	pat := make([]int, k)
 	c = make(chan []int, 1)
 
@@ -640,6 +592,24 @@ func primeNumbers(n int) []int {
 	return primes
 }
 
+// bit全探索
+func generateSubsets[T any](elements []T) [][]T {
+	n := len(elements)
+	totalCombinations := 1 << n
+	subsets := make([][]T, totalCombinations)
+
+	for i := 0; i < totalCombinations; i++ {
+		var subset []T
+		for j := 0; j < n; j++ {
+			if i&(1<<j) != 0 {
+				subset = append(subset, elements[j])
+			}
+		}
+		subsets[i] = subset
+	}
+
+	return subsets
+}
 
 // binary search
 func bisectLeft(slice []int, value int) int {
@@ -649,4 +619,7 @@ func bisectRight(slice []int, value int) int {
 	return sort.Search(len(slice), func(i int) bool { return slice[i] > value })
 }
 
-
+// sliceを一行で出力
+func printSlice[T any](data []T) {
+	fmt.Println(strings.Trim(fmt.Sprint(data), "[]"))
+}
