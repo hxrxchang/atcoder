@@ -26,39 +26,38 @@ func main() {
 }
 
 func solve() {
-	n := getInt()
+	getInt()
 	a := getInts()
+	maxA := max(a...)
 
-	dividors := make(map[int]*Set[int])
+	cntA := make([]int, maxA + 1)
 	for _, v := range a {
-		rawDividors := getDividors(v)
-		set := newSet[int]()
-		for _, d := range rawDividors {
-			set.add(d)
-		}
-		dividors[v] = set
+		cntA[v]++
 	}
 
-	cnt := 0
-
-	for i := 0; i < n; i++ {
-		a1 := a[i]
-		flag := true
-		for j, a2 := range a {
-			if i == j {
-				continue
-			}
-			if dividors[a1].has(a2) {
-				flag = false
-				break
-			}
+	for i := 1; i <= maxA; i++ {
+		if cntA[i] == 0 {
+			continue
 		}
-		if flag {
-			cnt++
+
+		// 同じ要素が複数あったら割り切れるので0にする
+		if cntA[i] > 1 {
+			cntA[i] = 0
+		}
+
+		// エラトステネスの篩と同じ要領でiの倍数を0にする
+		// 自分自身は残すようにstartをi*2にする
+		for j := i * 2; j <= maxA; j += i {
+			cntA[j] = 0
 		}
 	}
 
-	fmt.Println(cnt)
+	ans := 0
+	for _, v := range cntA {
+		ans += v
+	}
+
+	fmt.Println(ans)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
