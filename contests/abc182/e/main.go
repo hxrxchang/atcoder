@@ -25,37 +25,93 @@ func main() {
 	solve()
 }
 
-type Point struct {
-	h, w int
-}
-
 func solve() {
 	in := getInts()
 	h, w, n, m := in[0], in[1], in[2], in[3]
-	grid := make([][]string, h)
+	// 0: 何もない, 1: ライト, 2: ブロック
+	grid := make([][]int, h)
 	for i := 0; i < h; i++ {
-		grid[i] = make([]string, w)
+		grid[i] = make([]int, w)
 	}
 
-	lights := make([][]int, n)
+	lighted := make([][]bool, h)
+	for i := 0; i < h; i++ {
+		lighted[i] = make([]bool, w)
+	}
+
 	for i := 0; i < n; i++ {
 		in := getInts()
 		a, b := in[0] - 1, in[1] - 1
-		lights[i] = []int{a, b}
-		grid[a][b] = "light"
+		grid[a][b] = 1
 	}
 
-	blocks := make([][]int, m)
 	for i := 0; i < m; i++ {
 		in := getInts()
 		a, b := in[0] - 1, in[1] - 1
-		blocks[i] = []int{a, b}
-		grid[a][b] = "block"
+		grid[a][b] = 2
 	}
 
-	set := newSet[Point]()
-}
+	for i := 0; i < h; i++ {
+		isLight := false
+		for j := 0; j < w; j++ {
+			if grid[i][j] == 1 {
+				isLight = true
+				lighted[i][j] = true
+			} else if grid[i][j] == 2 {
+				isLight = false
+			} else if isLight {
+				lighted[i][j] = true
+			}
+		}
+		isLight = false
+		for j := w - 1; j >= 0; j-- {
+			if grid[i][j] == 1 {
+				isLight = true
+				lighted[i][j] = true
+			} else if grid[i][j] == 2 {
+				isLight = false
+			} else if isLight {
+				lighted[i][j] = true
+			}
+		}
+	}
 
+	for i := 0; i < w; i++ {
+		isLight := false
+		for j := 0; j < h; j++ {
+			if grid[j][i] == 1 {
+				isLight = true
+				lighted[j][i] = true
+			} else if grid[j][i] == 2 {
+				isLight = false
+			} else if isLight {
+				lighted[j][i] = true
+			}
+		}
+		isLight = false
+		for j := h - 1; j >= 0; j-- {
+			if grid[j][i] == 1 {
+				isLight = true
+				lighted[j][i] = true
+			} else if grid[j][i] == 2 {
+				isLight = false
+			} else if isLight {
+				lighted[j][i] = true
+			}
+		}
+	}
+
+	ans := 0
+	for i := 0; i < h; i++ {
+		for j := 0; j < w; j++ {
+			if lighted[i][j] {
+				ans++
+			}
+		}
+	}
+
+	fmt.Println(ans)
+}
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 func getInt() int {
