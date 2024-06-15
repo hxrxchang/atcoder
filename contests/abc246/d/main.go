@@ -28,10 +28,7 @@ func main() {
 func solve() {
 	n := getInt()
 
-	b := make([]int, pow(10, 6) + 2)
-	for i := 0; i <= pow(10, 6) + 1; i++ {
-		b[i] = i
-	}
+	b := rangeSlice(pow(10, 6) + 2)
 
 	ans := BIGGEST
 	for a := 0; a < pow(10, 6) + 1; a++ {
@@ -333,6 +330,15 @@ func sliceContains[T comparable](slice []T, v T) bool {
 		}
 	}
 	return false
+}
+
+func rangeSlice(n int) []int {
+	slice := make([]int, n)
+	for i := 0; i < n; i++ {
+		slice[i] = i
+	}
+	return slice
+
 }
 
 // queue
