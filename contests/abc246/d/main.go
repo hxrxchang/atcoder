@@ -32,18 +32,9 @@ func solve() {
 
 	ans := BIGGEST
 	for a := 0; a < pow(10, 6) + 1; a++ {
-		// ng: calc(a, b)がn未満
-		// ok: calc(a, b)がn以上
-		ng, ok := -1, pow(10, 6) + 2
-		for ok - ng > 1 {
-			mid := (ok + ng) / 2
-			if calc(a, b[mid]) >= n {
-				ok = mid
-			} else {
-				ng = mid
-			}
-		}
-		ans = min(ans, calc(a, b[ok]))
+		// bの中で、calc(a, b[idx]) >= n となる最小のidxを求める
+		idx := bisect(b, func(i int) bool { return calc(a, b[i]) >= n })
+		ans = min(ans, calc(a, b[idx]))
 	}
 
 	fmt.Println(ans)
@@ -586,11 +577,16 @@ func generateSubsets[T any](elements []T) [][]T {
 
 
 // binary search
-func bisectLeft(slice []int, value int) int {
-	return sort.Search(len(slice), func(i int) bool { return slice[i] >= value })
+func bisect(slice []int, fn func(int) bool) int {
+	return sort.Search(len(slice), fn)
 }
+// sliceの中でvalue以上の値が最初に現れるindexを返す
+func bisectLeft(slice []int, value int) int {
+	return bisect(slice, func(i int) bool { return slice[i] >= value })
+}
+// sliceの中でvalueより大きい値が最初に現れるindexを返す
 func bisectRight(slice []int, value int) int {
-	return sort.Search(len(slice), func(i int) bool { return slice[i] > value })
+	return bisect(slice, func(i int) bool { return slice[i] > value })
 }
 
 // sliceを一行で出力
