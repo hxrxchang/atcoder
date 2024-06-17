@@ -25,17 +25,50 @@ func main() {
 	solve()
 }
 
+const maxCnt = 300
+
 func solve() {
 	n := getInt()
 	in := getInts()
 	x, y := in[0], in[1]
-	dishes := make([][]int, n)
+	boxes := make([][]int, n)
 	for i := 0; i < n; i++ {
-		dishes[i] = getInts()
+		boxes[i] = getInts()
 	}
 
-	fmt.Println(dishes, x, y)
+	// dp[i][j]: たこ焼きをi個、たい焼きをj個作るのに必要な最小の箱の数
+	dp := make([][]int, maxCnt+1)
+	for i := 0; i <= maxCnt; i++ {
+		dp[i] = make([]int, maxCnt+1)
+		for j := 0; j <= maxCnt; j++ {
+			dp[i][j] = BIGGEST
+		}
+	}
+	dp[0][0] = 0
+
+	for i := 1; i <= n; i++ {
+		tmp := copy2DSlice(dp)
+		a, b := boxes[i-1][0], boxes[i-1][1]
+		for j := 0; j <= maxCnt; j++ {
+			for k := 0; k <= maxCnt; k++ {
+				tmp[min(j+a, x)][min(k+b, y)] = min(tmp[min(j+a, x)][min(k+b, y)], dp[j][k]+1)
+				tmp[j][k] = min(tmp[j][k], dp[j][k])
+			}
+		}
+		dp = tmp
+	}
+
+	// for i := 1; i <= 5; i++ {
+	// 	fmt.Println(dp[i][:10])
+	// }
+
+	if dp[x][y] == BIGGEST {
+		fmt.Println(-1)
+	} else {
+		fmt.Println(dp[x][y])
+	}
 }
+
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -325,6 +358,16 @@ func rangeSlice(n int) []int {
 	return slice
 }
 
+// 2次元スライスのコピー
+func copy2DSlice(original [][]int) [][]int {
+    newSlice := make([][]int, len(original))
+    for i := range original {
+        newSlice[i] = make([]int, len(original[i]))
+        copy(newSlice[i], original[i])
+    }
+    return newSlice
+}
+
 
 // queue
 type Queue[T any] struct {
@@ -586,3 +629,4 @@ func bisectRight(slice []int, value int) int {
 func printSlice[T any](data []T) {
 	fmt.Println(strings.Trim(fmt.Sprint(data), "[]"))
 }
+
