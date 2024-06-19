@@ -575,17 +575,16 @@ func generateSubsets[T any](elements []T) [][]T {
 	return subsets
 }
 
-
 // binary search
-func bisect(slice []int, fn func(int) bool) int {
+func bisect[T constraints.Ordered](slice []T, fn func(int) bool) int {
 	return sort.Search(len(slice), fn)
 }
 // sliceの中でvalue以上の値が最初に現れるindexを返す
-func bisectLeft(slice []int, value int) int {
+func bisectLeft[T constraints.Ordered](slice []T, value T) int {
 	return bisect(slice, func(i int) bool { return slice[i] >= value })
 }
 // sliceの中でvalueより大きい値が最初に現れるindexを返す
-func bisectRight(slice []int, value int) int {
+func bisectRight[T constraints.Ordered](slice []T, value T) int {
 	return bisect(slice, func(i int) bool { return slice[i] > value })
 }
 

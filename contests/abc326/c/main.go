@@ -273,11 +273,16 @@ func getDividors(n int) []int {
 }
 
 // binary search
-func bisectLeft(slice []int, value int) int {
-	return sort.Search(len(slice), func(i int) bool { return slice[i] >= value })
+func bisect[T constraints.Ordered](slice []T, fn func(int) bool) int {
+	return sort.Search(len(slice), fn)
 }
-func bisectRight(slice []int, value int) int {
-	return sort.Search(len(slice), func(i int) bool { return slice[i] > value })
+// sliceの中でvalue以上の値が最初に現れるindexを返す
+func bisectLeft[T constraints.Ordered](slice []T, value T) int {
+	return bisect(slice, func(i int) bool { return slice[i] >= value })
+}
+// sliceの中でvalueより大きい値が最初に現れるindexを返す
+func bisectRight[T constraints.Ordered](slice []T, value T) int {
+	return bisect(slice, func(i int) bool { return slice[i] > value })
 }
 
 // UnionFind
