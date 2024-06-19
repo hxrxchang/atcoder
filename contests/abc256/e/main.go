@@ -46,8 +46,9 @@ func solve() {
 				node = x[node]
 			}
 			ans += cost
+		} else {
+			uf.unit(i, x[i])
 		}
-		uf.unit(i, x[i])
 	}
 
 	fmt.Println(ans)
