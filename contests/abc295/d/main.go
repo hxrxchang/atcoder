@@ -26,8 +26,35 @@ func main() {
 }
 
 func solve() {
-	s := strToSlice(getStr(), "")
-	fmt.Println(s)
+	_s := strToSlice(getStr(), "")
+	s := make([]int, len(_s))
+	for i := 0; i < len(_s); i++ {
+		s[i] = s2i(_s[i])
+	}
+
+	table := make([][]bool, len(s) + 1)
+	for i := 0; i < len(table); i++ {
+		table[i] = make([]bool, 10)
+	}
+
+	for i := 0; i < len(s); i++ {
+		j := s[i]
+		copy(table[i+1], table[i])
+		table[i+1][j] = !table[i+1][j]
+	}
+
+	mp := make(map[string] int)
+
+	for _, v := range table {
+		mp[sliceToStr(v, "")]++
+	}
+
+	cnt := 0
+	for _, v := range mp {
+		cnt += getComb(v, 2)
+	}
+
+	fmt.Println(cnt)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -328,6 +355,14 @@ func copy2DSlice(original [][]int) [][]int {
     return newSlice
 }
 
+func sliceToStr[T any](data []T, separator string) string {
+	var strSlice []string
+    for _, v := range data {
+        strSlice = append(strSlice, fmt.Sprintf("%v", v))
+    }
+    return strings.Join(strSlice, separator)
+}
+
 // queue
 type Queue[T any] struct {
 	values []T
@@ -488,41 +523,14 @@ func getCombinationsCh(list []int, k int) (c chan []int) {
 }
 
 // nCr
-func getComb(n, k int) [][]int {
-	res := make([][]int, 0)
-	combs := getCombCh(n, k)
-	for comb := range combs {
-		res = append(res, comb)
+func getComb(n, k int) int {
+	numerator := 1
+	denominator := 1
+	for i := 0; i < k; i++ {
+		numerator *= n - i
+		denominator *= i + 1
 	}
-	return res
-}
-func getCombCh(n, k int) (c chan []int) {
-	pat := make([]int, k)
-	c = make(chan []int, 1)
-
-	var rec func(pos, start int)
-
-	rec = func(pos, start int) {
-		// k個選んでいれば、それを出力する
-		if pos == k {
-			tmp := make([]int, k)
-			copy(tmp, pat)
-			c <- tmp
-			return
-		}
-		// 選んでいない場合は、追加して再帰
-		// 次に選べるのは、startからn-1までの値のいずれか
-		for i := start; i < n; i++ {
-			pat[pos] = i    // posに選んだ数字をセットして
-			rec(pos+1, i+1) // pos, startを１つずつ進める
-		}
-	}
-	go func() {
-		defer close(c)
-		rec(0, 0)
-	}()
-
-	return
+	return numerator / denominator
 }
 
 // n以下の素数を列挙
