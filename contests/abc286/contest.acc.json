@@ -15,7 +15,11 @@
       "id": "abc286_b",
       "label": "B",
       "title": "Cat",
-      "url": "https://atcoder.jp/contests/abc286/tasks/abc286_b"
+      "url": "https://atcoder.jp/contests/abc286/tasks/abc286_b",
+      "directory": {
+        "path": "b",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc286_c",
