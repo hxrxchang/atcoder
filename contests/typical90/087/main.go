@@ -77,7 +77,7 @@ func count(x int) int {
 		}
 	}
 
-	dist := floydWarshall(graph)
+	dist := warshallFloyd(graph)
 	cnt := 0
 	for i := 0; i < n; i++ {
 		for j := i + 1; j < n; j++ {
@@ -89,7 +89,7 @@ func count(x int) int {
 	return cnt
 }
 
-func floydWarshall(graph [][]int) [][]int {
+func warshallFloyd(graph [][]int) [][]int {
 	n := len(graph)
 	dist := make([][]int, n)
 	for i := range dist {
