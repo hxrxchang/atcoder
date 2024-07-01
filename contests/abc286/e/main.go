@@ -26,71 +26,26 @@ func main() {
 	solve()
 }
 
-var n, p, k int
-var a [][]int
-
 func solve() {
-	in := getInts()
-	n, p, k = in[0], in[1], in[2]
+	n := getInt()
+	a := getInts()
 
-	a = make([][]int, n)
-	for i := 0; i < n; i++ {
-		a[i] = getInts()
-	}
-
-	l := getBoundary(k)
-	r := getBoundary(k - 1)
-	if r - l >= 2000000000 {
-		fmt.Println("Infinity")
-	} else {
-		fmt.Println(r - l)
-	}
-}
-
-func getBoundary(cnt int) int {
-	left := 1
-	right := 5000000000
-	minx := right
-
-	for i := 0; i < 40; i++ {
-		mid := (left + right) / 2
-		tmp := count(mid)
-		if tmp <= cnt {
-			right = mid
-			minx = min(minx, mid)
-		} else {
-			left = mid
-		}
-	}
-	return minx
-}
-
-func count(x int) int {
 	graph := make([][]int, n)
 	for i := 0; i < n; i++ {
-		graph[i] = make([]int, n)
-		for j := 0; j < n; j++ {
-			if a[i][j] == -1 {
-				graph[i][j] = x
-			} else {
-				graph[i][j] = a[i][j]
+		in := strToSlice(getStr(), "")
+		for j, v := range in {
+			if v == "Y" {
+				graph[i] = append(graph[i], a[j])
 			}
 		}
 	}
 
-	dist := floydWarshall(graph)
-	cnt := 0
-	for i := 0; i < n; i++ {
-		for j := i + 1; j < n; j++ {
-			if dist[i][j] <= p {
-				cnt++
-			}
-		}
-	}
-	return cnt
+	graph = warshallFloyd(graph)
+
+	fmt.Println(graph)
 }
 
-func floydWarshall(graph [][]int) [][]int {
+func warshallFloyd(graph [][]int) [][]int {
 	n := len(graph)
 	dist := make([][]int, n)
 	for i := range dist {
@@ -106,11 +61,11 @@ func floydWarshall(graph [][]int) [][]int {
 		}
 	}
 
-	for i := 0; i < n; i++ {
-		for j := 0; j < n; j++ {
-			for k := 0; k < n; k++ {
-				if dist[j][i] != math.MaxInt64 && dist[i][k] != math.MaxInt64 && dist[j][k] > dist[j][i]+dist[i][k] {
-					dist[j][k] = dist[j][i] + dist[i][k]
+	for k := 0; k < n; k++ {
+		for i := 0; i < n; i++ {
+			for j := 0; j < n; j++ {
+				if dist[i][k] != math.MaxInt64 && dist[k][j] != math.MaxInt64 && dist[i][j] < dist[i][k]+dist[k][j] {
+					dist[i][j] = dist[i][k] + dist[k][j]
 				}
 			}
 		}
@@ -118,9 +73,6 @@ func floydWarshall(graph [][]int) [][]int {
 
 	return dist
 }
-
-
-
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -329,8 +281,14 @@ func (s *SortedSet[T]) upperBound(v T) *set.SetIterator[T] {
 	return s.values.UpperBound(v)
 }
 
+// multiset
+func newMultiset[T comparator.Ordered]() *set.MultiSet[T] {
+	var comparatorFn comparator.Comparator[T] = comparator.OrderedTypeCmp[T]
+	return set.NewMultiSet[T](comparatorFn, set.WithGoroutineSafe())
+}
+
 // heap (priority queue)
-// 1.21 以上になったら comp.Ordered に変更する
+// 1.21 以上になったら cmp.Ordered に変更する
 type Heap[T constraints.Ordered] []T
 func (h Heap[T]) Len() int {
 	return len(h)
@@ -399,6 +357,34 @@ func sliceContains[T comparable](slice []T, v T) bool {
 		}
 	}
 	return false
+}
+
+// 0~n-1までのスライスを作成
+func rangeSlice(n int) []int {
+	slice := make([]int, n)
+	for i := 0; i < n; i++ {
+		slice[i] = i
+	}
+	return slice
+}
+
+// 2次元スライスのコピー
+func copy2DSlice(original [][]int) [][]int {
+    newSlice := make([][]int, len(original))
+    for i := range original {
+        newSlice[i] = make([]int, len(original[i]))
+        copy(newSlice[i], original[i])
+    }
+    return newSlice
+}
+
+// スライスを文字列に変換
+func sliceToStr[T any](data []T, separator string) string {
+	var strSlice []string
+    for _, v := range data {
+        strSlice = append(strSlice, fmt.Sprintf("%v", v))
+    }
+    return strings.Join(strSlice, separator)
 }
 
 // queue
@@ -561,41 +547,14 @@ func getCombinationsCh(list []int, k int) (c chan []int) {
 }
 
 // nCr
-func getComb(n, k int) [][]int {
-	res := make([][]int, 0)
-	combs := getCombCh(n, k)
-	for comb := range combs {
-		res = append(res, comb)
+func getComb(n, k int) int {
+	numerator := 1
+	denominator := 1
+	for i := 0; i < k; i++ {
+		numerator *= n - i
+		denominator *= i + 1
 	}
-	return res
-}
-func getCombCh(n, k int) (c chan []int) {
-	pat := make([]int, k)
-	c = make(chan []int, 1)
-
-	var rec func(pos, start int)
-
-	rec = func(pos, start int) {
-		// k個選んでいれば、それを出力する
-		if pos == k {
-			tmp := make([]int, k)
-			copy(tmp, pat)
-			c <- tmp
-			return
-		}
-		// 選んでいない場合は、追加して再帰
-		// 次に選べるのは、startからn-1までの値のいずれか
-		for i := start; i < n; i++ {
-			pat[pos] = i    // posに選んだ数字をセットして
-			rec(pos+1, i+1) // pos, startを１つずつ進める
-		}
-	}
-	go func() {
-		defer close(c)
-		rec(0, 0)
-	}()
-
-	return
+	return numerator / denominator
 }
 
 // n以下の素数を列挙
@@ -644,13 +603,17 @@ func generateSubsets[T any](elements []T) [][]T {
 	return subsets
 }
 
-
 // binary search
-func bisectLeft(slice []int, value int) int {
-	return sort.Search(len(slice), func(i int) bool { return slice[i] >= value })
+func bisect[T constraints.Ordered](slice []T, fn func(int) bool) int {
+	return sort.Search(len(slice), fn)
 }
-func bisectRight(slice []int, value int) int {
-	return sort.Search(len(slice), func(i int) bool { return slice[i] > value })
+// sliceの中でvalue以上の値が最初に現れるindexを返す
+func bisectLeft[T constraints.Ordered](slice []T, value T) int {
+	return bisect(slice, func(i int) bool { return slice[i] >= value })
+}
+// sliceの中でvalueより大きい値が最初に現れるindexを返す
+func bisectRight[T constraints.Ordered](slice []T, value T) int {
+	return bisect(slice, func(i int) bool { return slice[i] > value })
 }
 
 // sliceを一行で出力
