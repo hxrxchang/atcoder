@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"container/heap"
 	"fmt"
-	"math"
 	"math/big"
 	"os"
 	"sort"
@@ -33,39 +32,58 @@ func solve() {
 	graph := make([][]int, n)
 	for i := 0; i < n; i++ {
 		in := strToSlice(getStr(), "")
+		graph[i] = make([]int, n)
 		for j, v := range in {
 			if v == "Y" {
-				graph[i] = append(graph[i], a[j])
+				graph[i][j] = a[j]
 			}
 		}
 	}
 
-	graph = warshallFloyd(graph)
+	graph2 := warshallFloyd(graph)
 
-	fmt.Println(graph)
+	q := getInt()
+	for i := 0; i < q; i++ {
+		in := getInts()
+		u, v := in[0]-1, in[1]-1
+		if graph2[u][v].steps == BIGGEST {
+			fmt.Println("Impossible")
+		} else {
+			fmt.Println(graph2[u][v].steps, a[u] + graph2[u][v].value)
+		}
+	}
 }
 
-func warshallFloyd(graph [][]int) [][]int {
+type Node struct {
+	steps int
+	value int
+}
+
+func warshallFloyd(graph [][]int) [][]Node {
 	n := len(graph)
-	dist := make([][]int, n)
+	dist := make([][]Node, n)
 	for i := range dist {
-		dist[i] = make([]int, n)
+		dist[i] = make([]Node, n)
 		for j := range dist[i] {
 			if i == j {
-				dist[i][j] = 0
+				dist[i][j] = Node{0, 0}
 			} else if graph[i][j] == 0 {
-				dist[i][j] = math.MaxInt64
+				dist[i][j] = Node{BIGGEST, 0}
 			} else {
-				dist[i][j] = graph[i][j]
+				dist[i][j].steps = 1
+				dist[i][j].value = graph[i][j]
 			}
 		}
 	}
 
-	for k := 0; k < n; k++ {
-		for i := 0; i < n; i++ {
-			for j := 0; j < n; j++ {
-				if dist[i][k] != math.MaxInt64 && dist[k][j] != math.MaxInt64 && dist[i][j] < dist[i][k]+dist[k][j] {
-					dist[i][j] = dist[i][k] + dist[k][j]
+	for i := 0; i < n; i++ {
+		for j := 0; j < n; j++ {
+			for k := 0; k < n; k++ {
+				if dist[j][k].steps > dist[j][i].steps + dist[i][k].steps {
+					dist[j][k].steps = dist[j][i].steps + dist[i][k].steps
+					dist[j][k].value = dist[j][i].value + dist[i][k].value
+				} else if dist[j][k].steps == dist[j][i].steps + dist[i][k].steps && dist[j][k].value < dist[j][i].value + dist[i][k].value {
+					dist[j][k].value = dist[j][i].value + dist[i][k].value
 				}
 			}
 		}
