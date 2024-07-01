@@ -108,7 +108,7 @@ func floydWarshall(graph [][]int) [][]int {
 	for i := 0; i < n; i++ {
 		for j := 0; j < n; j++ {
 			for k := 0; k < n; k++ {
-				if dist[j][i] != BIGGEST && dist[i][k] != BIGGEST && dist[j][k] > dist[j][i]+dist[i][k] {
+				if dist[j][k] > dist[j][i]+dist[i][k] {
 					dist[j][k] = dist[j][i] + dist[i][k]
 				}
 			}
