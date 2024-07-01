@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"container/heap"
 	"fmt"
-	"math"
 	"math/big"
 	"os"
 	"sort"
@@ -99,7 +98,7 @@ func floydWarshall(graph [][]int) [][]int {
 			if i == j {
 				dist[i][j] = 0
 			} else if graph[i][j] == 0 {
-				dist[i][j] = math.MaxInt64
+				dist[i][j] = BIGGEST
 			} else {
 				dist[i][j] = graph[i][j]
 			}
@@ -109,7 +108,7 @@ func floydWarshall(graph [][]int) [][]int {
 	for i := 0; i < n; i++ {
 		for j := 0; j < n; j++ {
 			for k := 0; k < n; k++ {
-				if dist[j][i] != math.MaxInt64 && dist[i][k] != math.MaxInt64 && dist[j][k] > dist[j][i]+dist[i][k] {
+				if dist[j][i] != BIGGEST && dist[i][k] != BIGGEST && dist[j][k] > dist[j][i]+dist[i][k] {
 					dist[j][k] = dist[j][i] + dist[i][k]
 				}
 			}
