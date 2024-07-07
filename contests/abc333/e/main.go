@@ -26,15 +26,67 @@ func main() {
 	solve()
 }
 
+type Query struct {
+	t, x int
+}
+
 func solve() {
 	n := getInt()
 
+	queries := make([]Query, n)
 	for i := 0; i < n; i++ {
 		in := getInts()
 		t, x := in[0], in[1]
-		fmt.Println(t, x)
+		queries[i] = Query{t, x}
 	}
+
+	queries2 := reverse(queries)
+	monsters := make(map[int]int)
+	choicedPortions := newSet[int]()
+
+	for i, query := range queries2 {
+		t, x := query.t, query.x
+		if t == 2 {
+			monsters[x]++
+		} else {
+			if monsters[x] > 0 {
+				monsters[x]--
+				choicedPortions.add(n - i - 1)
+			}
+		}
+	}
+
+	monstersCnt := 0
+	for _, v := range monsters {
+		monstersCnt += v
+	}
+	if monstersCnt > 0 {
+		fmt.Println(-1)
+		return
+	}
+
+	tmp := 0
+	cnt := 0
+	viewData := make([]int, 0)
+
+	for i, query := range queries {
+		if query.t == 1 {
+			if choicedPortions.has(i) {
+				viewData = append(viewData, 1)
+				tmp++
+				cnt = max(cnt, tmp)
+			} else {
+				viewData = append(viewData, 0)
+			}
+		} else {
+			tmp--
+		}
+	}
+
+	fmt.Println(cnt)
+	fmt.Println(sliceToStr(viewData, " "))
 }
+
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -301,7 +353,7 @@ func sortSlice[T constraints.Ordered](slice []T) []T {
     return copiedSlice
 }
 
-func reverse[T constraints.Ordered](slice []T) []T {
+func reverse[T any](slice []T) []T {
 	copiedSlice := make([]T, len(slice))
 	copy(copiedSlice, slice)
 
