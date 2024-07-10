@@ -9,7 +9,11 @@
       "id": "abc296_a",
       "label": "A",
       "title": "Alternately",
-      "url": "https://atcoder.jp/contests/abc296/tasks/abc296_a"
+      "url": "https://atcoder.jp/contests/abc296/tasks/abc296_a",
+      "directory": {
+        "path": "a",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc296_b",
@@ -37,7 +41,11 @@
       "id": "abc296_e",
       "label": "E",
       "title": "Transition Game",
-      "url": "https://atcoder.jp/contests/abc296/tasks/abc296_e"
+      "url": "https://atcoder.jp/contests/abc296/tasks/abc296_e",
+      "directory": {
+        "path": "e",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc296_f",
