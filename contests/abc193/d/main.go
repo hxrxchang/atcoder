@@ -44,21 +44,31 @@ func solve() {
 		allCards[t2]++
 	}
 
+	var total float64
+
 	for i := 1; i <= 9; i++ {
-		// 高橋くんがiを引く確率
-		ip := float64((k - allCards[i])) / float64(9 * k)
+		for j := 1; j <= 9; j++ {
+			copiedTakahashiCards := copyMap(takahashiCards)
+			copiedAokiCards := copyMap(aokiCards)
+			copiedTakahashiCards[i]++
+			copiedAokiCards[j]++
 
-		copiedTakahashiCards := copyMap(takahashiCards)
-		copiedTakahashiCards[i]++
-		// 高橋くんのscore
-		ts := calc(copiedTakahashiCards)
-
-
-		fmt.Println(i, ip, ts)
-		// for j := 1; j <= 9; j++ {
-
-		// }
+			if calc(copiedTakahashiCards) > calc(copiedAokiCards) {
+				// 高橋くんがiを引く確率
+				propabilityI := float64(k - allCards[i]) / float64(9 * k - 8)
+				// 青木くんがjを引く確率
+				var propabilityJ float64
+				if i == j {
+					propabilityJ = float64(k - allCards[j] - 1) / float64(9 * k - 9)
+				} else {
+					propabilityJ = float64(k - allCards[j]) / float64(9 * k - 9)
+				}
+				total += propabilityI * propabilityJ
+			}
+		}
 	}
+
+	fmt.Println(total)
 }
 
 func calc(cards map[int]int) int {
