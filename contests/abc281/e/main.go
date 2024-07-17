@@ -31,6 +31,79 @@ func solve() {
 	in := getInts()
 	n, m, k := in[0], in[1], in[2]
 	a := getInts()
+
+	a2 := make([]int, 0)
+	for i := 0; i < m; i++ {
+		a2 = append(a2, a[i])
+	}
+	sortedA2 := sortSlice(a2)
+
+	// Kに含まれている要素
+	kset := newMultiset[int]()
+	cntK := make(map[int]int)
+	sumK := 0
+	for i := 0; i < k; i++ {
+		kset.Insert(sortedA2[i])
+		cntK[sortedA2[i]]++
+		sumK += sortedA2[i]
+	}
+
+	// K候補
+	candidateKSet := newMultiset[int]()
+	cntCandidateK := make(map[int]int)
+	for i := k; i < m; i++ {
+		candidateKSet.Insert(sortedA2[i])
+		cntCandidateK[sortedA2[i]]++
+	}
+
+	ans := make([]int, 0)
+	ans = append(ans, sumK)
+
+	for i := 1; i < n - m + 1; i++ {
+		rmItem := a[i - 1]
+		if kset.Contains(rmItem) {
+			cntK[rmItem]--
+			if cntK[rmItem] == 0 {
+				kset.Erase(rmItem)
+			}
+			sumK -= rmItem
+		} else {
+			cntCandidateK[rmItem]--
+			if cntCandidateK[rmItem] == 0 {
+				candidateKSet.Erase(rmItem)
+			}
+		}
+
+		newItem := a[i + m - 1]
+		candidateKSet.Insert(newItem)
+		cntCandidateK[newItem]++
+
+		addItem := candidateKSet.Begin().Value()
+		cntCandidateK[addItem]--
+		if cntCandidateK[addItem] == 0 {
+			candidateKSet.Erase(addItem)
+		}
+
+		kset.Insert(addItem)
+		cntK[addItem]++
+		sumK += addItem
+
+		if kset.Size() != k {
+			v := kset.Last().Value()
+			cntK[v]--
+			if cntK[v] == 0 {
+				kset.Erase(v)
+			}
+			sumK -= v
+
+			candidateKSet.Insert(v)
+			cntCandidateK[v]++
+		}
+
+		ans = append(ans, sumK)
+	}
+
+	printSlice(ans)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
