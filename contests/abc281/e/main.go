@@ -39,20 +39,20 @@ func solve() {
 	sortedA2 := sortSlice(a2)
 
 	// Kに含まれている要素
-	kset := newMultiset[int]()
+	kset := newSortedSet[int]()
 	cntK := make(map[int]int)
 	sumK := 0
 	for i := 0; i < k; i++ {
-		kset.Insert(sortedA2[i])
+		kset.add(sortedA2[i])
 		cntK[sortedA2[i]]++
 		sumK += sortedA2[i]
 	}
 
 	// K候補
-	candidateKSet := newMultiset[int]()
+	candidateKSet := newSortedSet[int]()
 	cntCandidateK := make(map[int]int)
 	for i := k; i < m; i++ {
-		candidateKSet.Insert(sortedA2[i])
+		candidateKSet.add(sortedA2[i])
 		cntCandidateK[sortedA2[i]]++
 	}
 
@@ -61,43 +61,51 @@ func solve() {
 
 	for i := 1; i < n - m + 1; i++ {
 		rmItem := a[i - 1]
-		if kset.Contains(rmItem) {
+		newItem := a[i + m - 1]
+		if kset.has(rmItem) {
 			cntK[rmItem]--
 			if cntK[rmItem] == 0 {
-				kset.Erase(rmItem)
+				kset.remove(rmItem)
 			}
 			sumK -= rmItem
+
+			cntK[newItem]++
+			kset.add(newItem)
+			sumK += newItem
 		} else {
 			cntCandidateK[rmItem]--
 			if cntCandidateK[rmItem] == 0 {
-				candidateKSet.Erase(rmItem)
+				candidateKSet.remove(rmItem)
 			}
+
+			cntCandidateK[newItem]++
+			candidateKSet.add(newItem)
 		}
 
-		newItem := a[i + m - 1]
-		candidateKSet.Insert(newItem)
-		cntCandidateK[newItem]++
-
-		addItem := candidateKSet.Begin().Value()
-		cntCandidateK[addItem]--
-		if cntCandidateK[addItem] == 0 {
-			candidateKSet.Erase(addItem)
+		ksetMax := kset.values.Last().Value()
+		if candidateKSet.size() == 0 {
+			ans = append(ans, sumK)
+			continue
 		}
+		candidateMin := candidateKSet.values.First().Value()
 
-		kset.Insert(addItem)
-		cntK[addItem]++
-		sumK += addItem
-
-		if kset.Size() != k {
-			v := kset.Last().Value()
-			cntK[v]--
-			if cntK[v] == 0 {
-				kset.Erase(v)
+		// 交換が必要
+		if ksetMax > candidateMin {
+			cntK[ksetMax]--
+			if cntK[ksetMax] == 0 {
+				kset.remove(ksetMax)
 			}
-			sumK -= v
+			cntCandidateK[ksetMax]++
+			candidateKSet.add(ksetMax)
+			sumK -= ksetMax
 
-			candidateKSet.Insert(v)
-			cntCandidateK[v]++
+			cntK[candidateMin]++
+			kset.add(candidateMin)
+			cntCandidateK[candidateMin]--
+			if cntCandidateK[candidateMin] == 0 {
+				candidateKSet.remove(candidateMin)
+			}
+			sumK += candidateMin
 		}
 
 		ans = append(ans, sumK)
