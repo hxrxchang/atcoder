@@ -31,14 +31,17 @@ func main() {
 func solve() {
 	in := getInts()
 	n, q := in[0], in[1]
-	segtree := newSegmentTree[int](n + 1, 0, func(a, b int) int { return a + b })
+	segtree := newSegmentTree[int](n, 0, func(a, b int) int { return a + b })
 
 	for i := 0; i < q; i++ {
 		in = getInts()
 		if in[0] == 1 {
-			segtree.Update(in[1], in[2])
+			pos := in[1] - 1
+			x := in[2]
+			segtree.Update(pos, x)
 		} else {
-			fmt.Println(segtree.Query(in[1], in[2]))
+			l, r := in[1] - 1, in[2] - 1
+			fmt.Println(segtree.Query(l, r))
 		}
 	}
 }
