@@ -343,13 +343,21 @@
       "id": "tessoku_book_bf",
       "label": "A58",
       "title": "RMQ (Range Maximum Queries)",
-      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bf"
+      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bf",
+      "directory": {
+        "path": "a58",
+        "testdir": "tests"
+      }
     },
     {
       "id": "tessoku_book_bg",
       "label": "A59",
       "title": "RSQ (Range Sum Queries)",
-      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bg"
+      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bg",
+      "directory": {
+        "path": "a59",
+        "testdir": "tests"
+      }
     },
     {
       "id": "tessoku_book_bh",
