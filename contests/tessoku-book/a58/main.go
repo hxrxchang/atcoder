@@ -31,33 +31,39 @@ func main() {
 func solve() {
 	in := getInts()
 	n, q := in[0], in[1]
-	segtree := newSegmentTree[int](n + 1, 0, func(a, b int) int { return max(a, b) })
+	segtree := NewSegmentTree[int](n, 0, func(a, b int) int { return max(a, b) })
 
 	for i := 0; i < q; i++ {
 		in = getInts()
 		if in[0] == 1 {
-			segtree.Update(in[1], in[2])
+			pos := in[1] - 1
+			x := in[2]
+			segtree.Update(pos, x)
 		} else {
-			fmt.Println(segtree.Query(in[1], in[2]))
+			l, r := in[1] - 1, in[2] - 1
+			fmt.Println(segtree.Query(l, r))
 		}
 	}
 }
 
 type SegmentTree[T any] struct {
 	data []T
-	n int
-	e T // 初期値
-	fn func(T, T) T
+	n    int
+	e    T
+	op   func(T, T) T
 }
 
-func newSegmentTree[T any](n int, e T, fn func(T, T) T) *SegmentTree[T] {
-	segtree := &SegmentTree[T]{n: 1, e: e, fn: fn}
+func NewSegmentTree[T any](n int, e T, op func(T, T) T) *SegmentTree[T] {
+	segtree := &SegmentTree[T]{}
+	segtree.e = e
+	segtree.op = op
+	segtree.n = 1
 	for segtree.n < n {
 		segtree.n *= 2
 	}
-	segtree.data = make([]T, 2*segtree.n-1)
-	for i := 0; i < 2*segtree.n-1; i++ {
-		segtree.data[i] = e
+	segtree.data = make([]T, segtree.n*2-1)
+	for i := 0; i < segtree.n*2-1; i++ {
+		segtree.data[i] = segtree.e
 	}
 	return segtree
 }
@@ -65,9 +71,9 @@ func newSegmentTree[T any](n int, e T, fn func(T, T) T) *SegmentTree[T] {
 func (segtree *SegmentTree[T]) Update(idx int, x T) {
 	idx += segtree.n - 1
 	segtree.data[idx] = x
-	for idx > 0 {
+	for 0 < idx {
 		idx = (idx - 1) / 2
-		segtree.data[idx] = segtree.fn(segtree.data[idx*2+1], segtree.data[idx*2+2])
+		segtree.data[idx] = segtree.op(segtree.data[idx*2+1], segtree.data[idx*2+2])
 	}
 }
 
@@ -78,15 +84,14 @@ func (segtree *SegmentTree[T]) query(begin, end, idx, a, b int) T {
 	if begin <= a && b <= end {
 		return segtree.data[idx]
 	}
-	v1 := segtree.query(begin, end, idx * 2 + 1, a, (a + b) / 2)
-	v2 := segtree.query(begin, end, idx * 2 + 2, (a + b) / 2, b)
-	return segtree.fn(v1, v2)
+	v1 := segtree.query(begin, end, idx*2+1, a, (a+b)/2)
+	v2 := segtree.query(begin, end, idx*2+2, (a+b)/2, b)
+	return segtree.op(v1, v2)
 }
 
-func (segtree *SegmentTree[T]) Query(begin, end int) T {
+func (segtree *SegmentTree[T]) Query(begin, end int) interface{} {
 	return segtree.query(begin, end, 0, 0, segtree.n)
 }
-
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
