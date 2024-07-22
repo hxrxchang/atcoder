@@ -71,16 +71,16 @@ func solve() {
 
 	que := newQueue[BfsItem]()
 	que.PushBack(BfsItem{Item{0, 0}, 0})
+	distances[0][0] = 0
 
 	for que.Size() > 0 {
 		current := que.PopFront()
 		x, y, dist := current.item.x, current.item.y, current.dist
-		distances[x][y] = dist
 		for _, next := range nextItems[Item{x, y}] {
 			if next.x < 0 || n <= next.x || next.y < 0 || n <= next.y {
 				continue
 			}
-			if distances[next.x][next.y] != -1 && distances[next.x][next.y] <= dist + 1 {
+			if distances[next.x][next.y] != -1 {
 				continue
 			}
 			distances[next.x][next.y] = dist + 1
