@@ -41,11 +41,31 @@ func solve() {
 	in := getInts()
 	n, m := in[0], in[1]
 
-	boards := make([][]int, n)
+	distances := make([][]int, n)
 	for i := 0; i < n; i++ {
-		boards[i] = make([]int, n)
+		distances[i] = make([]int, n)
 		for j := 0; j < n; j++ {
-			boards[i][j] = -1
+			distances[i][j] = -1
+		}
+	}
+
+	nextItems := make(map[Item][]Item)
+
+	squares := make(map[int]int)
+	for i := 0; i <= int(math.Sqrt(float64(m))); i++ {
+		squares[i * i] = i
+	}
+
+	for i := 0; i < n; i++ {
+		for j := 0; j < n; j++ {
+			for k := 0; k < n; k++ {
+				if _, ok := squares[m - pow(i - k, 2)]; ok {
+					l1 := j + squares[m - pow(i - k, 2)]
+					l2 := j - squares[m - pow(i - k, 2)]
+					nextItems[Item{i, j}] = append(nextItems[Item{i, j}], Item{k, l1})
+					nextItems[Item{i, j}] = append(nextItems[Item{i, j}], Item{k, l2})
+				}
+			}
 		}
 	}
 
@@ -55,41 +75,24 @@ func solve() {
 	for que.Size() > 0 {
 		current := que.PopFront()
 		x, y, dist := current.item.x, current.item.y, current.dist
-		boards[x][y] = dist
-		nextItems := ManhattanDistance(x, y, m)
-
-		for _, next := range nextItems {
+		distances[x][y] = dist
+		for _, next := range nextItems[Item{x, y}] {
 			if next.x < 0 || n <= next.x || next.y < 0 || n <= next.y {
 				continue
 			}
-			if boards[next.x][next.y] != -1 && boards[next.x][next.y] <= dist + 1 {
+			if distances[next.x][next.y] != -1 && distances[next.x][next.y] <= dist + 1 {
 				continue
 			}
-			boards[next.x][next.y] = dist + 1
+			distances[next.x][next.y] = dist + 1
 			que.PushBack(BfsItem{next, dist + 1})
 		}
 	}
 
 	for i := 0; i < n; i++ {
-		// fmt.Println(boards[i])
-		printSlice(boards[i])
+		printSlice(distances[i])
 	}
 }
 
-
-func ManhattanDistance(x0, y0, M int) []Item {
-    var points []Item
-
-    for dx := -M; dx <= M; dx++ {
-        dy := M - int(math.Abs(float64(dx)))
-        points = append(points, Item{x0 + dx, y0 + dy})
-        if dy != 0 {
-            points = append(points, Item{x0 + dx, y0 - dy})
-        }
-    }
-
-    return points
-}
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 func getInt() int {
@@ -143,6 +146,14 @@ func mapToIntSlice(input string) []int {
 	for _, v := range lines {
 		// s2iはstringをintに変換する関数(後述)
 		slice = append(slice, s2i(v))
+	}
+	return slice
+}
+
+func genIntSlice(start, end int) []int {
+	slice := make([]int, end - start + 1)
+	for i := start; i <= end; i++ {
+		slice[i - start] = i
 	}
 	return slice
 }
