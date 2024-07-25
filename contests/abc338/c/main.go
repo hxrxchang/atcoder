@@ -35,7 +35,7 @@ func solve() {
 	b := getInts()
 
 	ans := 0
-	// aをi個, bをj個作れるかどうか
+	// aをi個作るとするときに、bを何個作れるかを二分探索で求める
 	for i := 0; i <= pow(10, 6); i++ {
 		q2 := make([]int, n)
 		copy(q2, q)
