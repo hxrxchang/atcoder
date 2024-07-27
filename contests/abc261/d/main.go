@@ -42,13 +42,18 @@ func solve() {
 
 	// i: x[i]回までコイントスをしたとき
 	// j: カウンタがjとなるときの報酬
-	dp := make([][]int, n + 1)
+	dp := make([][]int, n+1)
 	for i := 0; i <= n; i++ {
-		dp[i] = make([]int, n + 1)
+		row := make([]int, n+1)
+		for j := 0; j <= n; j++ {
+			row[j] = -1
+		}
+		dp[i] = row
 	}
+	dp[0][0] = 0
 
 	for i := 1; i <= n; i++ {
-		for j := 0; j < i + 1; j++ {
+		for j := 0; j <= i; j++ {
 			if j == 0 {
 				dp[i][j] = max(dp[i-1]...)
 			} else {
@@ -60,6 +65,7 @@ func solve() {
 	// for i := 0; i <= n; i++ {
 	// 	fmt.Println(dp[i])
 	// }
+
 	fmt.Println(max(dp[n]...))
 }
 
