@@ -31,19 +31,39 @@ func main() {
 func solve() {
 	in := getStrs()
 	n := s2i(in[0])
-	t := in[1]
+	t := strToSlice(in[1], "")
 
 	ss := make([][]string, n)
 	for i := 0; i < n; i++ {
 		ss[i] = strToSlice(getStr(), "")
 	}
 
+	// left[i]: i番目の文字列がTを左から何文字まで作れるか
 	left := make([]int, n)
+	// right[i]: i番目の文字列がTを右から何文字まで作れるか
+	right := make([]int, n)
 	for i := 0; i < n; i++ {
 		s := ss[i]
 		for j := 0; j < len(s); j++ {
+			if left[i] < len(t) && s[j] == t[left[i]] {
+				left[i]++
+			}
+			if len(t)-1-right[i] >= 0 && s[len(s)-1-j] == t[len(t)-1-right[i]] {
+				right[i]++
+			}
 		}
 	}
+
+	right = sortSlice(right)
+
+	ans := 0
+	for i := 0; i < n; i++ {
+		target := len(t) - left[i]
+		idx := bisectLeft(right, target)
+		ans += n - idx
+	}
+
+	fmt.Println(ans)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
