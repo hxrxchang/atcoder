@@ -60,7 +60,7 @@ func solve() {
 			}
 			pointsOnSameLine := []int{a, b}
 			for c := b + 1; c < n; c++ {
-				if isOnSameLine(points[a], points[b], points[c]) {
+				if isOnSameLine(points[a].x, points[a].y, points[b].x, points[b].y, points[c].x, points[c].y) {
 					pointsOnSameLine = append(pointsOnSameLine, c)
 				}
 			}
@@ -78,8 +78,8 @@ func solve() {
 	fmt.Println(ans)
 }
 
-func isOnSameLine(p1, p2, p3 Point) bool {
-	return (p1.x-p2.x)*(p2.y-p3.y) == (p1.y-p2.y)*(p2.x-p3.x)
+func isOnSameLine(x1, y1, x2, y2, x3, y3 int) bool {
+	return (x1-x2)*(y2-y3) == (y1-y2)*(x2-x3)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
