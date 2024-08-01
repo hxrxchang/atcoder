@@ -23,26 +23,29 @@ func main() {
 
 func solve() {
 	n := getInt()
-	s := getStr()
+	s := strToSlice(getStr(), "")
 
+	//　res[i]: i文字目をlとして採用するときの個数
+	// しゃくとり法で求めていく
+	res := make(map[int]int)
 	l := 0
-	ans := make([]int, n)
-
 	for r := 1; r < n; r++ {
 		if s[l] == s[r] {
 			continue
 		}
-		for i := l; i < r; i++ {
-			ans[i] = n - r
+		// O(N**2)にならないのは、rとlそれぞれをn回動かすだけなので
+		for l2 := l; l2 < r; l2++ {
+			res[l2] = n - r
 		}
 		l = r
 	}
-	sumans := 0
-	for i := 0; i < n - 1; i++ {
-		sumans += ans[i]
+
+	ans := 0
+	for i := 0; i < n; i++ {
+		ans += res[i]
 	}
 
-	fmt.Println(sumans)
+	fmt.Println(ans)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
