@@ -31,7 +31,11 @@
       "id": "abc307_d",
       "label": "D",
       "title": "Mismatched Parentheses",
-      "url": "https://atcoder.jp/contests/abc307/tasks/abc307_d"
+      "url": "https://atcoder.jp/contests/abc307/tasks/abc307_d",
+      "directory": {
+        "path": "d",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc307_e",
