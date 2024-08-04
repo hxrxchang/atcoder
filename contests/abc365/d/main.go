@@ -42,24 +42,28 @@ func solve() {
 		dp[i] = row
 	}
 
+	takahashiChoice := map[int]string{0: "R", 1: "S", 2: "P"}
+
 	for i := 1; i <= n; i++ {
 		for j := 0; j < 3; j++ {
+			takahashi := takahashiChoice[j]
+			aoki := s[i-1]
 			if j == 0 {
-				if win(0, s, i-1) {
+				if win(takahashi, aoki) {
 					dp[i][j] = max(dp[i - 1][1] + 1, dp[i - 1][2] + 1)
-				} else if draw(0, s, i-1) {
+				} else if draw(takahashi, aoki) {
 					dp[i][j] = max(dp[i - 1][1], dp[i - 1][2])
 				}
 			} else if j == 1 {
-				if win(1, s, i-1) {
+				if win(takahashi, aoki) {
 					dp[i][j] = max(dp[i - 1][0] + 1, dp[i - 1][2] + 1)
-				} else if draw(1, s, i-1) {
+				} else if draw(takahashi, aoki) {
 					dp[i][j] = max(dp[i - 1][0], dp[i - 1][2])
 				}
 			} else {
-				if win(2, s, i-1) {
+				if win(takahashi, aoki) {
 					dp[i][j] = max(dp[i - 1][0] + 1, dp[i - 1][1] + 1)
-				} else if draw(2, s, i-1) {
+				} else if draw(takahashi, aoki) {
 					dp[i][j] = max(dp[i - 1][0], dp[i - 1][1])
 				}
 			}
@@ -70,29 +74,13 @@ func solve() {
 }
 
 
-func win(takahshi int, aokiChoices []string, i int) bool {
+func win(takahashi, aoki string) bool {
 	win := map[string]string{"R": "S", "S": "P", "P": "R"}
-	var takahashiChoice string
-	if takahshi == 0 {
-		takahashiChoice = "R"
-	} else if takahshi == 1 {
-		takahashiChoice = "S"
-	} else {
-		takahashiChoice = "P"
-	}
-	return aokiChoices[i] == win[takahashiChoice]
+	return aoki == win[takahashi]
 }
 
-func draw(takahshi int, aokiChoices []string, i int) bool {
-	var takahashiChoice string
-	if takahshi == 0 {
-		takahashiChoice = "R"
-	} else if takahshi == 1 {
-		takahashiChoice = "S"
-	} else {
-		takahashiChoice = "P"
-	}
-	return aokiChoices[i] == takahashiChoice
+func draw(takahshi, aoki string) bool {
+	return takahshi == aoki
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

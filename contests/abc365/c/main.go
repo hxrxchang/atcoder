@@ -39,10 +39,10 @@ func solve() {
 
 	for right - left > 1 {
 		mid := (left + right) / 2
-		if calc(a, mid) > m {
-			right = mid
-		} else {
+		if calc(a, mid) <= m {
 			left = mid
+		} else {
+			right = mid
 		}
 	}
 
