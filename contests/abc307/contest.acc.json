@@ -9,7 +9,11 @@
       "id": "abc307_a",
       "label": "A",
       "title": "Weekly Records",
-      "url": "https://atcoder.jp/contests/abc307/tasks/abc307_a"
+      "url": "https://atcoder.jp/contests/abc307/tasks/abc307_a",
+      "directory": {
+        "path": "a",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc307_b",

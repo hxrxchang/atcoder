@@ -19,7 +19,7 @@ import (
 )
 
 const BUFSIZE = 10000000
-const MOD = 1000000007
+const MOD = 998244353
 const BIGGEST = math.MaxInt64
 var rdr *bufio.Reader
 
@@ -32,7 +32,25 @@ func solve() {
 	in := getInts()
 	n, m := in[0], in[1]
 
+	// dp[i][j]: i-1番目までの人に対して、
+	// dp[i][0]: 先頭(i=0)の人と異なる数を渡したときのパターン数
+	// dp[i][1]: 先頭(i=0)の人と同じ数を渡したときのパターン数
+	dp := make([][]int, n)
+	for i := 0; i < n; i++ {
+		dp[i] = make([]int, 2)
+	}
+	// dp[0][0] は起こり得ないので0のまま
+	dp[0][1] = m
 
+	for i := 1; i < n; i++ {
+		dp[i][0] = dp[i-1][0] * (m-2) + dp[i-1][1] * (m-1)
+		dp[i][0] %= 998244353
+		dp[i][1] = dp[i-1][0]
+		dp[i][1] %= 998244353
+	}
+
+	// fmt.Println(dp)
+	fmt.Println(dp[n - 1][0])
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -103,6 +121,15 @@ func s2i(s string) int {
 
 func i2s(i int) string {
 	return strconv.Itoa(i)
+}
+
+func isPalindrome(s string) bool {
+	for i := 0; i < len(s)/2; i++ {
+		if s[i] != s[len(s)-1-i] {
+			return false
+		}
+	}
+	return true
 }
 
 // bool <-> int
