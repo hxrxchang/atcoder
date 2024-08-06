@@ -32,27 +32,34 @@ func solve() {
 	in := getInts()
 	n, m := in[0], in[1]
 	a := getInts()
-	a2 := make([]int, m)
-	for i, v := range a {
-		a2[i] = v - 1
+	a2 := zeroIndexedSlice(a)
+
+	// pos1[i]: a[i]まで使ったときの0の位置
+	pos1 := []int{0}
+	for i := 0; i < m; i++ {
+		x := pos1[len(pos1) - 1]
+		var next int
+		if x == a2[i] {
+			next = a2[i] + 1
+		} else if x == a2[i] + 1 {
+			next = a2[i]
+		} else {
+			next = x
+		}
+		pos1 = append(pos1, next)
 	}
 
-	for i := 0; i < m; i++ {
-		b := rangeSlice(n)
-		for j := 0; j < m; j++ {
-			if i == j {
-				continue
-			}
-			target := a2[j]
-			b[target], b[target + 1] = b[target + 1], b[target]
-		}
+	ans := make([]int, m)
+	s := rangeSlice(n)
 
-		for k := 0; k < n; k++ {
-			if b[k] == 0 {
-				fmt.Println(k + 1)
-				break
-			}
-		}
+	for i := m - 1; i >= 0; i-- {
+		ai := a2[i]
+		ans[i] = s[pos1[i]]
+		s[ai], s[ai+1] = s[ai+1], s[ai]
+	}
+
+	for _, v := range ans {
+		fmt.Println(v + 1)
 	}
 }
 
@@ -372,6 +379,14 @@ func rangeSlice2(start, end int) []int {
 		slice[i - start] = i
 	}
 	return slice
+}
+
+func zeroIndexedSlice(origin []int) []int {
+	slice2 := make([]int, len(origin))
+	for i, v := range origin {
+		slice2[i] = v - 1
+	}
+	return slice2
 }
 
 // 2次元スライスのコピー
