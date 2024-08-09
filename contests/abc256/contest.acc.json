@@ -27,7 +27,11 @@
       "id": "abc256_d",
       "label": "D",
       "title": "Union of Interval",
-      "url": "https://atcoder.jp/contests/abc256/tasks/abc256_d"
+      "url": "https://atcoder.jp/contests/abc256/tasks/abc256_d",
+      "directory": {
+        "path": "d",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc256_e",
