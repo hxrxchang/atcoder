@@ -21,7 +21,11 @@
       "id": "abc171_c",
       "label": "C",
       "title": "One Quadrillion and One Dalmatians",
-      "url": "https://atcoder.jp/contests/abc171/tasks/abc171_c"
+      "url": "https://atcoder.jp/contests/abc171/tasks/abc171_c",
+      "directory": {
+        "path": "c",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc171_d",
