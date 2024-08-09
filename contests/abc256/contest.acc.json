@@ -21,7 +21,11 @@
       "id": "abc256_c",
       "label": "C",
       "title": "Filling 3x3 array",
-      "url": "https://atcoder.jp/contests/abc256/tasks/abc256_c"
+      "url": "https://atcoder.jp/contests/abc256/tasks/abc256_c",
+      "directory": {
+        "path": "c",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc256_d",
