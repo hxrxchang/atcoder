@@ -9,7 +9,11 @@
       "id": "abc338_a",
       "label": "A",
       "title": "Capitalized?",
-      "url": "https://atcoder.jp/contests/abc338/tasks/abc338_a"
+      "url": "https://atcoder.jp/contests/abc338/tasks/abc338_a",
+      "directory": {
+        "path": "a",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc338_b",
