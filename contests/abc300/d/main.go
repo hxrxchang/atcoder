@@ -31,9 +31,36 @@ func main() {
 func solve() {
 	n := getInt()
 
-	pns := primeNumbers(n)
+	maxN := pow(10, 6) + 10
+	isPrime := getIsPrime(maxN)
 
-	fmt.Println(pns)
+	// cum[i]: 0~iまでの素数の個数
+	cum := make([]int, maxN + 1)
+	for i := 1; i <= maxN; i++ {
+		cum[i] = cum[i - 1]
+		if isPrime[i] {
+			cum[i]++
+		}
+	}
+
+	ans := 0
+	for a := 1; a <= 300; a++ {
+		if !isPrime[a] {
+			continue
+		}
+		for b := a + 1; b <= 10000; b++ {
+			if !isPrime[b] {
+				continue
+			}
+			maxC := sqrt(n / a / a / b)
+			// cはbより大きい必要がある
+			if maxC > b {
+				ans += cum[maxC] - cum[b]
+			}
+		}
+	}
+
+	fmt.Println(ans)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -172,6 +199,10 @@ func pow(base, exp int) int {
 		exp /= 2
 	}
 	return result
+}
+
+func sqrt(x int) int {
+	return int(math.Sqrt(float64(x)))
 }
 
 func modPow(base, exp, mod int) int {
@@ -530,6 +561,19 @@ func getComb(n, k int) int {
 
 // n以下の素数を列挙
 func primeNumbers(n int) []int {
+	isPrime := getIsPrime(n)
+
+	primes := make([]int, 0)
+	for i, b := range isPrime {
+		if b {
+			primes = append(primes, i)
+		}
+	}
+
+	return primes
+}
+
+func getIsPrime(n int) []bool {
 	isPrime := make([]bool, n+1)
 	for i := 0; i <= n; i++ {
 		isPrime[i] = true
@@ -544,15 +588,7 @@ func primeNumbers(n int) []int {
 			}
 		}
 	}
-
-	primes := make([]int, 0)
-	for i, b := range isPrime {
-		if b {
-			primes = append(primes, i)
-		}
-	}
-
-	return primes
+	return isPrime
 }
 
 // bit全探索
