@@ -28,10 +28,6 @@ func main() {
 	solve()
 }
 
-type MoreThanK struct {
-	left, right int
-}
-
 func solve() {
 	in := getInts()
 	n, m, k := in[0], in[1], in[2]
@@ -47,42 +43,29 @@ func solve() {
 		dp[0][i] = 1
 	}
 
-	moreThanK := make(map[int]MoreThanK)
-
-	for i := 1; i <= m; i++ {
-		left, right := i, i
-		for left >= 1 {
-			if abs(i - left) >= k {
-				break
-			}
-			left--
-		}
-
-		for right <= m {
-			if abs(i - right) >= k {
-				break
-			}
-			right++
-		}
-		moreThanK[i] = MoreThanK{left, right}
-	}
-
 	for i := 0; i < n-1; i++ {
+		// cum:[j]: dp[i][1]~dp[i][j]までの累積和
+		cum := make([]int, m+1)
+		for j := 1; j <= m; j++ {
+			cum[j] = cum[j-1] + dp[i][j]
+			cum[j] %= MOD
+		}
+
 		for j := 1; j <= m; j++ {
 			if k == 0 {
-				dp[i + 1][j] = dp[i][j] * m % MOD
+				dp[i+1][j] += cum[m]
 				continue
 			}
 
-			left, right := moreThanK[j].left, moreThanK[j].right
-			var leftCnt, rightCnt int
-			if left >= 1 {
-				leftCnt = left
+			if j - k >= 1 {
+				dp[i+1][j] += cum[j-k]
 			}
-			if right <= m {
-				rightCnt = m - right + 1
+
+			if j + k <= m {
+				dp[i+1][j] += cum[m] - cum[j+k-1] + MOD // 累積和を取るときにmodにしているので、マイナスにならないようにmodを足しておく
 			}
-			dp[i + 1][j] = (dp[i][j] * ((leftCnt + rightCnt))) % MOD
+
+			dp[i+1][j] %= MOD
 		}
 	}
 
