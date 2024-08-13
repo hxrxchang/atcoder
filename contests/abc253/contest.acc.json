@@ -37,7 +37,11 @@
       "id": "abc253_e",
       "label": "E",
       "title": "Distance Sequence",
-      "url": "https://atcoder.jp/contests/abc253/tasks/abc253_e"
+      "url": "https://atcoder.jp/contests/abc253/tasks/abc253_e",
+      "directory": {
+        "path": "e",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc253_f",
