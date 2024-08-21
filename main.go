@@ -4,23 +4,28 @@ import (
 	"bufio"
 	"container/heap"
 	"fmt"
+	"math"
 	"math/big"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
 
+	"github.com/liyue201/gostl/ds/deque"
 	"github.com/liyue201/gostl/ds/set"
 	"github.com/liyue201/gostl/utils/comparator"
 	"golang.org/x/exp/constraints"
+	"golang.org/x/exp/maps"
 )
 
 const BUFSIZE = 10000000
 const MOD = 1000000007
-const BIGGEST = int(1e18)
+const BIGGEST = math.MaxInt64
 var rdr *bufio.Reader
 
 func main() {
-	fmt.Println("Hello, World!")
+	rdr = bufio.NewReaderSize(os.Stdin, BUFSIZE)
+	solve()
 }
 
 func solve() {
@@ -96,6 +101,15 @@ func i2s(i int) string {
 	return strconv.Itoa(i)
 }
 
+func isPalindrome(s string) bool {
+	for i := 0; i < len(s)/2; i++ {
+		if s[i] != s[len(s)-1-i] {
+			return false
+		}
+	}
+	return true
+}
+
 // bool <-> int
 func b2i(b bool) int {
 	if b {
@@ -167,6 +181,11 @@ func modPow(base, exp, mod int) int {
 	return result
 }
 
+// intのまま計算できるように
+func sqrt(x int) int {
+	return int(math.Sqrt(float64(x)))
+}
+
 func gcd(v1, v2 int) int {
 	if v1 > v2 {
 		v1, v2 = v2, v1
@@ -195,15 +214,21 @@ type Set[V comparable] struct {
 func newSet[V comparable]() *Set[V] {
 	return &Set[V]{values: make(map[V]struct{})}
 }
-func (s *Set[V]) add(v V) {
+func (s *Set[V]) Add(v V) {
 	s.values[v] = struct{}{}
 }
-func (s *Set[V]) remove(v V) {
+func (s *Set[V]) Remove(v V) {
 	delete(s.values, v)
 }
-func (s *Set[V]) has(v V) bool {
+func (s *Set[V]) Has(v V) bool {
 	_, ok := s.values[v]
 	return ok
+}
+func (s *Set[V]) Values() []V {
+	return maps.Keys(s.values)
+}
+func (s *Set[V]) Size() int {
+	return len(s.values)
 }
 
 // sorted set
@@ -233,8 +258,14 @@ func (s *SortedSet[T]) upperBound(v T) *set.SetIterator[T] {
 	return s.values.UpperBound(v)
 }
 
+// multiset
+func newMultiset[T comparator.Ordered]() *set.MultiSet[T] {
+	var comparatorFn comparator.Comparator[T] = comparator.OrderedTypeCmp[T]
+	return set.NewMultiSet[T](comparatorFn, set.WithGoroutineSafe())
+}
+
 // heap (priority queue)
-// 1.21 以上になったら comp.Ordered に変更する
+// 1.21 以上になったら cmp.Ordered に変更する
 type Heap[T constraints.Ordered] []T
 func (h Heap[T]) Len() int {
 	return len(h)
@@ -285,7 +316,7 @@ func sortSlice[T constraints.Ordered](slice []T) []T {
     return copiedSlice
 }
 
-func reverse[T constraints.Ordered](slice []T) []T {
+func reverse[T any](slice []T) []T {
 	copiedSlice := make([]T, len(slice))
 	copy(copiedSlice, slice)
 
@@ -305,35 +336,57 @@ func sliceContains[T comparable](slice []T, v T) bool {
 	return false
 }
 
+// 0~n-1までのスライスを作成
+func rangeSlice(n int) []int {
+	slice := make([]int, n)
+	for i := 0; i < n; i++ {
+		slice[i] = i
+	}
+	return slice
+}
+
+// 開区間でstart~endまでのスライスを作成
+func rangeSlice2(start, end int) []int {
+	slice := make([]int, end - start + 1)
+	for i := start; i <= end; i++ {
+		slice[i - start] = i
+	}
+	return slice
+}
+
+// intのsliceを0indexに変換
+func zeroIndexedSlice(origin []int) []int {
+	slice2 := make([]int, len(origin))
+	for i, v := range origin {
+		slice2[i] = v - 1
+	}
+	return slice2
+}
+
+// 2次元スライスのコピー
+func copy2DSlice(original [][]int) [][]int {
+    newSlice := make([][]int, len(original))
+    for i := range original {
+        newSlice[i] = make([]int, len(original[i]))
+        copy(newSlice[i], original[i])
+    }
+    return newSlice
+}
+
+// スライスを文字列に変換
+func sliceToStr[T any](data []T, separator string) string {
+	var strSlice []string
+    for _, v := range data {
+        strSlice = append(strSlice, fmt.Sprintf("%v", v))
+    }
+    return strings.Join(strSlice, separator)
+}
+
 // queue
-type Queue[T any] struct {
-	values []T
+func newQueue[T any]() *deque.Deque[T] {
+	return deque.New[T]()
 }
-func newQueue[T any]() *Queue[T] {
-	return &Queue[T]{}
-}
-func (q *Queue[T]) push(v T) {
-	q.values = append(q.values, v)
-}
-func (q *Queue[T]) popLeft() T {
-	v := q.values[0]
-	q.values = q.values[1:]
-	return v
-}
-func (q *Queue[T]) pop() T {
-	v := q.values[len(q.values)-1]
-	q.values = q.values[:len(q.values)-1]
-	return v
-}
-func (q *Queue[T]) front() T {
-	return q.values[0]
-}
-func (q *Queue[T]) size() int {
-	return len(q.values)
-}
-func (q *Queue[T]) empty() bool {
-	return len(q.values) == 0
-}
+
 
 // UnionFind
 type UnionFind struct {
@@ -465,45 +518,32 @@ func getCombinationsCh(list []int, k int) (c chan []int) {
 }
 
 // nCr
-func getComb(n, k int) [][]int {
-	res := make([][]int, 0)
-	combs := getCombCh(n, k)
-	for comb := range combs {
-		res = append(res, comb)
+func getComb(n, k int) int {
+	numerator := 1
+	denominator := 1
+	for i := 0; i < k; i++ {
+		numerator *= n - i
+		denominator *= i + 1
 	}
-	return res
-}
-func getCombCh(n, k int) (c chan []int) {
-	pat := make([]int, k)
-	c = make(chan []int, 1)
-
-	var rec func(pos, start int)
-
-	rec = func(pos, start int) {
-		// k個選んでいれば、それを出力する
-		if pos == k {
-			tmp := make([]int, k)
-			copy(tmp, pat)
-			c <- tmp
-			return
-		}
-		// 選んでいない場合は、追加して再帰
-		// 次に選べるのは、startからn-1までの値のいずれか
-		for i := start; i < n; i++ {
-			pat[pos] = i    // posに選んだ数字をセットして
-			rec(pos+1, i+1) // pos, startを１つずつ進める
-		}
-	}
-	go func() {
-		defer close(c)
-		rec(0, 0)
-	}()
-
-	return
+	return numerator / denominator
 }
 
 // n以下の素数を列挙
 func primeNumbers(n int) []int {
+	isPrime := getIsPrime(n)
+
+	primes := make([]int, 0)
+	for i, b := range isPrime {
+		if b {
+			primes = append(primes, i)
+		}
+	}
+
+	return primes
+}
+
+// n以下の数字がそれぞれ素数かどうかを列挙
+func getIsPrime(n int) []bool {
 	isPrime := make([]bool, n+1)
 	for i := 0; i <= n; i++ {
 		isPrime[i] = true
@@ -518,15 +558,7 @@ func primeNumbers(n int) []int {
 			}
 		}
 	}
-
-	primes := make([]int, 0)
-	for i, b := range isPrime {
-		if b {
-			primes = append(primes, i)
-		}
-	}
-
-	return primes
+	return isPrime
 }
 
 // bit全探索
@@ -548,16 +580,101 @@ func generateSubsets[T any](elements []T) [][]T {
 	return subsets
 }
 
-
 // binary search
-func bisectLeft(slice []int, value int) int {
-	return sort.Search(len(slice), func(i int) bool { return slice[i] >= value })
+func bisect[T constraints.Ordered](slice []T, fn func(int) bool) int {
+	return sort.Search(len(slice), fn)
 }
-func bisectRight(slice []int, value int) int {
-	return sort.Search(len(slice), func(i int) bool { return slice[i] > value })
+// sliceの中でvalue以上の値が最初に現れるindexを返す
+func bisectLeft[T constraints.Ordered](slice []T, value T) int {
+	return bisect(slice, func(i int) bool { return slice[i] >= value })
 }
+// sliceの中でvalueより大きい値が最初に現れるindexを返す
+func bisectRight[T constraints.Ordered](slice []T, value T) int {
+	return bisect(slice, func(i int) bool { return slice[i] > value })
+}
+
+// Segment Tree
+type SegmentTree[T any] struct {
+	data []T
+	n    int // 葉の数(全区間の要素数)
+	e    T // 単位元
+	op   func(T, T) T
+}
+
+func NewSegmentTree[T any](n int, e T, op func(T, T) T) *SegmentTree[T] {
+	segtree := &SegmentTree[T]{}
+	segtree.e = e
+	segtree.op = op
+	segtree.n = 1
+	for segtree.n < n {
+		segtree.n *= 2
+	}
+	segtree.data = make([]T, segtree.n*2-1)
+	for i := 0; i < segtree.n*2-1; i++ {
+		segtree.data[i] = segtree.e
+	}
+	return segtree
+}
+
+func (segtree *SegmentTree[T]) Update(idx int, x T) {
+	idx += segtree.n - 1
+	segtree.data[idx] = x
+	for 0 < idx {
+		idx = (idx - 1) / 2
+		segtree.data[idx] = segtree.op(segtree.data[idx*2+1], segtree.data[idx*2+2])
+	}
+}
+
+func (segtree *SegmentTree[T]) query(begin, end, idx, a, b int) T {
+	if b <= begin || end <= a {
+		return segtree.e
+	}
+	if begin <= a && b <= end {
+		return segtree.data[idx]
+	}
+	v1 := segtree.query(begin, end, idx*2+1, a, (a+b)/2)
+	v2 := segtree.query(begin, end, idx*2+2, (a+b)/2, b)
+	return segtree.op(v1, v2)
+}
+// endは閉区間であることに注意
+func (segtree *SegmentTree[T]) Query(begin, end int) T {
+	return segtree.query(begin, end, 0, 0, segtree.n)
+}
+
 
 // sliceを一行で出力
 func printSlice[T any](data []T) {
 	fmt.Println(strings.Trim(fmt.Sprint(data), "[]"))
+}
+
+// 部分文字列判定
+// 非連続の部分文字列も対応
+// isSubstring("abcd", "ad") -> true
+func isSubstring(s, t string) bool {
+	ok := false
+	iter := 0
+	for i := 0; i < len(s); i++ {
+		if s[i] == t[iter] {
+			iter++
+		}
+		if iter == len(t) {
+			ok = true
+			break
+		}
+	}
+	return ok
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//　幾何ゾーン
+
+// 2点間の距離の2乗
+// 平方根を取ると距離になるが、誤差が出るので距離の比較は距離の2乗で行う
+func distanceSquared(x1, y1, x2, y2 int) int {
+	return pow(x1-x2, 2) + pow(y1-y2, 2)
+}
+
+// 3点が同一直線上にあるか判定
+func isOnSameLine(x1, y1, x2, y2, x3, y3 int) bool {
+	return (x1-x2)*(y2-y3) == (y1-y2)*(x2-x3)
 }
