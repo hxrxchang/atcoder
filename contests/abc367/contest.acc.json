@@ -29,7 +29,11 @@
       "id": "abc367_c",
       "label": "C",
       "title": "Enumerate Sequences",
-      "url": "https://atcoder.jp/contests/abc367/tasks/abc367_c"
+      "url": "https://atcoder.jp/contests/abc367/tasks/abc367_c",
+      "directory": {
+        "path": "c",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc367_d",
