@@ -28,33 +28,33 @@ func main() {
 	solve()
 }
 
+type Item struct {
+	v int
+	c int
+}
+
 func solve() {
 	n := getInt()
 	a := getInts()
 
-	// どの順番で入っているか
-	que := []int{a[0]}
-
-	// 各値が連続して何回続いているか
-	que2 := make(map[int][]int)
-	que2[a[0]] = append(que2[a[0]], 1)
-
+	que := newQueue[Item]()
+	que.PushBack(Item{v: a[0], c: 1})
 	cnt := 1
+
 	fmt.Println(cnt)
 
 	for i := 1; i < n; i++ {
 		cnt++
 		x := a[i]
-		que = append(que, x)
-		if len(que) >= 2 && que[len(que)-2] == x {
-			que2[x][len(que2[x])-1]++
-			if que2[x][len(que2[x])-1] == x {
+		if !que.Empty() && que.Back().v == x {
+			item := que.PopBack()
+			if item.c + 1 == x {
 				cnt -= x
-				que = que[:len(que) - x]
-				que2[x] = que2[x][:len(que2[x]) - 1]
+			} else {
+				que.PushBack(Item{v: x, c: item.c + 1})
 			}
 		} else {
-			que2[x] = append(que2[x], 1)
+			que.PushBack(Item{v: x, c: 1})
 		}
 		fmt.Println(cnt)
 	}
