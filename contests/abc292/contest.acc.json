@@ -21,7 +21,11 @@
       "id": "abc292_c",
       "label": "C",
       "title": "Four Variables",
-      "url": "https://atcoder.jp/contests/abc292/tasks/abc292_c"
+      "url": "https://atcoder.jp/contests/abc292/tasks/abc292_c",
+      "directory": {
+        "path": "c",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc292_d",
