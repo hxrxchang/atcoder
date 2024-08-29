@@ -19,7 +19,11 @@
       "id": "tessoku_book_b",
       "label": "A02",
       "title": "Linear Search",
-      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_b"
+      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_b",
+      "directory": {
+        "path": "a02",
+        "testdir": "tests"
+      }
     },
     {
       "id": "tessoku_book_c",
@@ -331,7 +335,11 @@
       "id": "tessoku_book_bd",
       "label": "A56",
       "title": "String Hash",
-      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bd"
+      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bd",
+      "directory": {
+        "path": "a56",
+        "testdir": "tests"
+      }
     },
     {
       "id": "tessoku_book_be",
