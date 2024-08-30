@@ -395,7 +395,11 @@
       "id": "tessoku_book_bl",
       "label": "A64",
       "title": "Shortest Path 2",
-      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bl"
+      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bl",
+      "directory": {
+        "path": "a64",
+        "testdir": "tests"
+      }
     },
     {
       "id": "tessoku_book_bm",
