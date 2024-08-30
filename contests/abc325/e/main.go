@@ -37,35 +37,31 @@ func solve() {
 		d[i] = getInts()
 	}
 
-	graph := make([][]int, n*2)
-	for i := range graph {
-		graph[i] = make([]int, n*2)
-		for j := range graph[i] {
-			graph[i][j] = BIGGEST
-		}
-	}
+	graph := make([][]dijkstraItem, n*2)
 
 	// 社用車モードでの移動
 	for i := 0; i < n; i++ {
 		for j := 0; j < n; j++ {
-			if i != j {
-				graph[i][j] = d[i][j] * a
+			if i == j {
+				continue
 			}
+			graph[i] = append(graph[i], dijkstraItem{node: j, dist: d[i][j] * a})
 		}
 	}
 
 	// 電車モードでの移動
-	for i := n; i < n*2; i++ {
-		for j := n; j < n*2; j++ {
-			if i != j {
-				graph[i][j] = d[i-n][j-n] * b + c
+	for i := n; i < 2*n; i++ {
+		for j := n; j < 2*n; j++ {
+			if i == j {
+				continue
 			}
+			graph[i] = append(graph[i], dijkstraItem{node: j, dist: d[i-n][j-n] * b + c})
 		}
 	}
 
 	// 社用車モードから電車モードへの切り替え
 	for i := 0; i < n; i++ {
-		graph[i][i+n] = 0
+		graph[i] = append(graph[i], dijkstraItem{node: i + n, dist: 0})
 	}
 
 	dist := dijkstra(graph, 0)
@@ -724,7 +720,7 @@ func warshallFloyd(graph [][]int) [][]int {
 	return dist
 }
 
-func dijkstra(graph [][]int, start int) []int {
+func dijkstra(graph [][]dijkstraItem, start int) []int {
 	n := len(graph)
 	dist := make([]int, n)
 	for i := range dist {
@@ -734,32 +730,34 @@ func dijkstra(graph [][]int, start int) []int {
 
 	pq := &dijkstraPriorityQueue{}
 	heap.Init(pq)
-	heap.Push(pq, &dijkstraItem{vertex: start, dist: 0})
+	heap.Push(pq, &dijkstraItem{node: start, dist: 0})
 
 	for pq.Len() > 0 {
 		u := heap.Pop(pq).(*dijkstraItem)
-		if u.dist > dist[u.vertex] {
+		if u.dist > dist[u.node] {
 			continue
 		}
 
-		for v := 0; v < n; v++ {
-			if graph[u.vertex][v] != BIGGEST {
-				alt := u.dist + graph[u.vertex][v]
-				if alt < dist[v] {
-					dist[v] = alt
-					heap.Push(pq, &dijkstraItem{vertex: v, dist: alt})
-				}
+		for _, edge := range graph[u.node] {
+			v := edge.node
+			alt := u.dist + edge.dist
+			if alt < dist[v] {
+				dist[v] = alt
+				heap.Push(pq, &dijkstraItem{node: v, dist: alt})
 			}
 		}
 	}
 
 	return dist
 }
+
 type dijkstraItem struct {
-	vertex int
+	node int
 	dist   int
 }
+
 type dijkstraPriorityQueue []*dijkstraItem
+
 func (pq dijkstraPriorityQueue) Len() int { return len(pq) }
 func (pq dijkstraPriorityQueue) Less(i, j int) bool {
 	return pq[i].dist < pq[j].dist
@@ -777,6 +775,7 @@ func (pq *dijkstraPriorityQueue) Pop() interface{} {
 	*pq = old[0 : n-1]
 	return item
 }
+
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //　幾何ゾーン
