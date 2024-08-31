@@ -781,7 +781,11 @@
       "id": "abc007_3",
       "label": "B63",
       "title": "幅優先探索",
-      "url": "https://atcoder.jp/contests/tessoku-book/tasks/abc007_3"
+      "url": "https://atcoder.jp/contests/tessoku-book/tasks/abc007_3",
+      "directory": {
+        "path": "b63",
+        "testdir": "tests"
+      }
     },
     {
       "id": "tessoku_book_ek",
