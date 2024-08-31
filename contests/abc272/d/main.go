@@ -29,68 +29,73 @@ func main() {
 }
 
 type BfsItem struct {
-	item Item
+	item BfsNode
 	dist int
 }
 
-type Item struct {
-	x, y int
+type BfsNode struct {
+	y, x int
 }
 
 func solve() {
 	in := getInts()
 	n, m := in[0], in[1]
 
-	distances := make([][]int, n)
-	for i := 0; i < n; i++ {
-		distances[i] = make([]int, n)
-		for j := 0; j < n; j++ {
-			distances[i][j] = -1
-		}
-	}
-
-	nextItems := make(map[Item][]Item)
-
 	squares := make(map[int]int)
 	for i := 0; i <= int(math.Sqrt(float64(m))); i++ {
 		squares[i * i] = i
 	}
 
+	nextItems := make(map[BfsNode][]BfsNode)
 	for i := 0; i < n; i++ {
 		for j := 0; j < n; j++ {
 			for k := 0; k < n; k++ {
 				if _, ok := squares[m - pow(i - k, 2)]; ok {
 					l1 := j + squares[m - pow(i - k, 2)]
 					l2 := j - squares[m - pow(i - k, 2)]
-					nextItems[Item{i, j}] = append(nextItems[Item{i, j}], Item{k, l1})
-					nextItems[Item{i, j}] = append(nextItems[Item{i, j}], Item{k, l2})
+					nextItems[BfsNode{i, j}] = append(nextItems[BfsNode{i, j}], BfsNode{k, l1})
+					nextItems[BfsNode{i, j}] = append(nextItems[BfsNode{i, j}], BfsNode{k, l2})
 				}
 			}
 		}
 	}
 
+	graph := bfs(n, n, nextItems, BfsNode{0, 0})
+	for _, row := range graph {
+		printSlice(row)
+	}
+}
+
+func bfs(height, width int, next map[BfsNode][]BfsNode, start BfsNode) [][]int {
+	graph := make([][]int, height)
+	for i := 0; i < height; i++ {
+		graph[i] = make([]int, width)
+		for j := 0; j < width; j++ {
+			graph[i][j] = -1
+		}
+	}
+
+	graph[start.x][start.y] = 0
+
 	que := newQueue[BfsItem]()
-	que.PushBack(BfsItem{Item{0, 0}, 0})
-	distances[0][0] = 0
+	que.PushBack(BfsItem{BfsNode{0, 0}, 0})
 
 	for que.Size() > 0 {
 		current := que.PopFront()
 		x, y, dist := current.item.x, current.item.y, current.dist
-		for _, next := range nextItems[Item{x, y}] {
-			if next.x < 0 || n <= next.x || next.y < 0 || n <= next.y {
+		for _, next := range next[BfsNode{x, y}] {
+			if next.x < 0 || width <= next.x || next.y < 0 || height <= next.y {
 				continue
 			}
-			if distances[next.x][next.y] != -1 {
+			if graph[next.x][next.y] != -1 {
 				continue
 			}
-			distances[next.x][next.y] = dist + 1
+			graph[next.x][next.y] = dist + 1
 			que.PushBack(BfsItem{next, dist + 1})
 		}
 	}
 
-	for i := 0; i < n; i++ {
-		printSlice(distances[i])
-	}
+	return graph
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
