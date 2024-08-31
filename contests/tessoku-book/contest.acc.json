@@ -389,7 +389,11 @@
       "id": "math_and_algorithm_an",
       "label": "A63",
       "title": "Shortest Path 1",
-      "url": "https://atcoder.jp/contests/tessoku-book/tasks/math_and_algorithm_an"
+      "url": "https://atcoder.jp/contests/tessoku-book/tasks/math_and_algorithm_an",
+      "directory": {
+        "path": "a63",
+        "testdir": "tests"
+      }
     },
     {
       "id": "tessoku_book_bl",

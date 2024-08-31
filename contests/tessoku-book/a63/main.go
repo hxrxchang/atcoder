@@ -32,67 +32,39 @@ func solve() {
 	in := getInts()
 	n, m := in[0], in[1]
 
-	squares := make(map[int]int)
-	for i := 0; i <= int(math.Sqrt(float64(m))); i++ {
-		squares[i * i] = i
+	graph := make([][]int, n)
+	for i := 0; i < m; i++ {
+		in := getInts()
+		a, b := in[0], in[1]
+		a--
+		b--
+		graph[a] = append(graph[a], b)
+		graph[b] = append(graph[b], a)
 	}
 
-	nextItems := make(map[GridBfsNode][]GridBfsNode)
-	for i := 0; i < n; i++ {
-		for j := 0; j < n; j++ {
-			for k := 0; k < n; k++ {
-				if _, ok := squares[m - pow(i - k, 2)]; ok {
-					l1 := j + squares[m - pow(i - k, 2)]
-					l2 := j - squares[m - pow(i - k, 2)]
-					nextItems[GridBfsNode{i, j}] = append(nextItems[GridBfsNode{i, j}], GridBfsNode{k, l1})
-					nextItems[GridBfsNode{i, j}] = append(nextItems[GridBfsNode{i, j}], GridBfsNode{k, l2})
-				}
-			}
-		}
-	}
-
-	graph := gridBfs(n, n, nextItems, GridBfsNode{0, 0})
-	for _, row := range graph {
-		printSlice(row)
+	distances := graphBfs(graph, n, 0)
+	for _, v := range distances {
+		fmt.Println(v)
 	}
 }
 
-type GridBfsNode struct {
-	y, x int
-}
-func gridBfs(height, width int, nextNodes map[GridBfsNode][]GridBfsNode, start GridBfsNode) [][]int {
-	type Item struct {
-		item GridBfsNode
-		dist int
+func graphBfs(nextNodes [][]int, size, start int) []int {
+	que := newQueue[int]()
+	distances := make([]int, size)
+	for i := 1; i < size; i++ {
+		distances[i] = -1
 	}
-	distances := make([][]int, height)
-	for i := 0; i < height; i++ {
-		distances[i] = make([]int, width)
-		for j := 0; j < width; j++ {
-			distances[i][j] = -1
-		}
-	}
-
-	distances[start.x][start.y] = 0
-
-	que := newQueue[Item]()
-	que.PushBack(Item{GridBfsNode{0, 0}, 0})
-
+	que.PushBack(start)
 	for que.Size() > 0 {
-		current := que.PopFront()
-		x, y, dist := current.item.x, current.item.y, current.dist
-		for _, next := range nextNodes[GridBfsNode{x, y}] {
-			if next.x < 0 || width <= next.x || next.y < 0 || height <= next.y {
+		v := que.PopFront()
+		for _, next := range nextNodes[v] {
+			if distances[next] != -1 {
 				continue
 			}
-			if distances[next.x][next.y] != -1 {
-				continue
-			}
-			distances[next.x][next.y] = dist + 1
-			que.PushBack(Item{next, dist + 1})
+			distances[next] = distances[v] + 1
+			que.PushBack(next)
 		}
 	}
-
 	return distances
 }
 
@@ -153,25 +125,34 @@ func mapToIntSlice(input string) []int {
 	return slice
 }
 
-func genIntSlice(start, end int) []int {
-	slice := make([]int, end - start + 1)
-	for i := start; i <= end; i++ {
-		slice[i - start] = i
-	}
-	return slice
-}
-
 // string <-> int
 func s2i(s string) int {
-	v, ok := strconv.Atoi(s)
-	if ok != nil {
+	v, err := strconv.Atoi(s)
+	if err != nil {
 		panic("Faild : " + s + " can't convert to int")
+	}
+	return v
+}
+
+func s2float64(s string) float64 {
+	v, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		panic("Faild : " + s + " can't convert to float64")
 	}
 	return v
 }
 
 func i2s(i int) string {
 	return strconv.Itoa(i)
+}
+
+func isPalindrome(s string) bool {
+	for i := 0; i < len(s)/2; i++ {
+		if s[i] != s[len(s)-1-i] {
+			return false
+		}
+	}
+	return true
 }
 
 // bool <-> int
@@ -245,6 +226,12 @@ func modPow(base, exp, mod int) int {
 	return result
 }
 
+// intのまま計算できるように
+func sqrt(x int) int {
+	return int(math.Sqrt(float64(x)))
+}
+
+// 最大公約数
 func gcd(v1, v2 int) int {
 	if v1 > v2 {
 		v1, v2 = v2, v1
@@ -255,6 +242,7 @@ func gcd(v1, v2 int) int {
 	return v2
 }
 
+// 最小公倍数
 func lcm(v1, v2 int) int {
 	return v1 * v2 / gcd(v1, v2)
 }
@@ -285,6 +273,9 @@ func (s *Set[V]) Has(v V) bool {
 }
 func (s *Set[V]) Values() []V {
 	return maps.Keys(s.values)
+}
+func (s *Set[V]) Size() int {
+	return len(s.values)
 }
 
 // sorted set
@@ -399,6 +390,24 @@ func rangeSlice(n int) []int {
 		slice[i] = i
 	}
 	return slice
+}
+
+// 開区間でstart~endまでのスライスを作成
+func rangeSlice2(start, end int) []int {
+	slice := make([]int, end - start + 1)
+	for i := start; i <= end; i++ {
+		slice[i - start] = i
+	}
+	return slice
+}
+
+// intのsliceを0indexに変換
+func zeroIndexedSlice(origin []int) []int {
+	slice2 := make([]int, len(origin))
+	for i, v := range origin {
+		slice2[i] = v - 1
+	}
+	return slice2
 }
 
 // 2次元スライスのコピー
@@ -568,6 +577,20 @@ func getComb(n, k int) int {
 
 // n以下の素数を列挙
 func primeNumbers(n int) []int {
+	isPrime := getIsPrime(n)
+
+	primes := make([]int, 0)
+	for i, b := range isPrime {
+		if b {
+			primes = append(primes, i)
+		}
+	}
+
+	return primes
+}
+
+// n以下の数字がそれぞれ素数かどうかを列挙
+func getIsPrime(n int) []bool {
 	isPrime := make([]bool, n+1)
 	for i := 0; i <= n; i++ {
 		isPrime[i] = true
@@ -582,15 +605,7 @@ func primeNumbers(n int) []int {
 			}
 		}
 	}
-
-	primes := make([]int, 0)
-	for i, b := range isPrime {
-		if b {
-			primes = append(primes, i)
-		}
-	}
-
-	return primes
+	return isPrime
 }
 
 // bit全探索
@@ -673,8 +688,171 @@ func (segtree *SegmentTree[T]) Query(begin, end int) T {
 	return segtree.query(begin, end, 0, 0, segtree.n)
 }
 
+// ワーシャルフロイド法
+func warshallFloyd(graph [][]int) [][]int {
+	n := len(graph)
+	dist := make([][]int, n)
+	for i := range dist {
+		dist[i] = make([]int, n)
+		for j := range dist[i] {
+			if i == j {
+				dist[i][j] = 0
+			} else if graph[i][j] == 0 {
+				dist[i][j] = BIGGEST
+			} else {
+				dist[i][j] = graph[i][j]
+			}
+		}
+	}
+
+	for i := 0; i < n; i++ {
+		for j := 0; j < n; j++ {
+			for k := 0; k < n; k++ {
+				if dist[j][k] > dist[j][i]+dist[i][k] {
+					dist[j][k] = dist[j][i] + dist[i][k]
+				}
+			}
+		}
+	}
+
+	return dist
+}
+
+// ダイクストラ法
+func dijkstra(graph [][]dijkstraItem, start int) []int {
+	n := len(graph)
+	dist := make([]int, n)
+	for i := range dist {
+		dist[i] = BIGGEST
+	}
+	dist[start] = 0
+
+	pq := &dijkstraPriorityQueue{}
+	heap.Init(pq)
+	heap.Push(pq, &dijkstraItem{node: start, dist: 0})
+
+	for pq.Len() > 0 {
+		u := heap.Pop(pq).(*dijkstraItem)
+		if u.dist > dist[u.node] {
+			continue
+		}
+
+		for _, edge := range graph[u.node] {
+			v := edge.node
+			alt := u.dist + edge.dist
+			if alt < dist[v] {
+				dist[v] = alt
+				heap.Push(pq, &dijkstraItem{node: v, dist: alt})
+			}
+		}
+	}
+
+	return dist
+}
+type dijkstraItem struct {
+	node int
+	dist   int
+}
+type dijkstraPriorityQueue []*dijkstraItem
+func (pq dijkstraPriorityQueue) Len() int { return len(pq) }
+func (pq dijkstraPriorityQueue) Less(i, j int) bool {
+	return pq[i].dist < pq[j].dist
+}
+func (pq dijkstraPriorityQueue) Swap(i, j int) {
+	pq[i], pq[j] = pq[j], pq[i]
+}
+func (pq *dijkstraPriorityQueue) Push(x interface{}) {
+	*pq = append(*pq, x.(*dijkstraItem))
+}
+func (pq *dijkstraPriorityQueue) Pop() interface{} {
+	old := *pq
+	n := len(old)
+	item := old[n-1]
+	*pq = old[0 : n-1]
+	return item
+}
+
+// ローリングハッシュ
+func NewRollingHash(S string) *RollingHash {
+	const base1, base2 = 1007, 2009
+	const mod1, mod2 = 1000000007, 1000000009
+
+	n := len(S)
+	hash1 := make([]int64, n+1)
+	hash2 := make([]int64, n+1)
+	power1 := make([]int64, n+1)
+	power2 := make([]int64, n+1)
+	power1[0], power2[0] = 1, 1
+
+	for i := 0; i < n; i++ {
+		hash1[i+1] = (hash1[i]*base1 + int64(S[i])) % mod1
+		hash2[i+1] = (hash2[i]*base2 + int64(S[i])) % mod2
+		power1[i+1] = (power1[i] * base1) % mod1
+		power2[i+1] = (power2[i] * base2) % mod2
+	}
+
+	return &RollingHash{
+		base1:  base1,
+		base2:  base2,
+		mod1:   mod1,
+		mod2:   mod2,
+		hash1:  hash1,
+		hash2:  hash2,
+		power1: power1,
+		power2: power2,
+	}
+}
+type RollingHash struct {
+	base1, base2 int64
+	mod1, mod2   int64
+	hash1, hash2 []int64
+	power1, power2 []int64
+}
+type RollingHashPair struct {
+	Hash1 int64
+	Hash2 int64
+}
+// S[left:right] のハッシュ値を取得
+func (rh *RollingHash) Get(l, r int) RollingHashPair {
+	res1 := (rh.hash1[r] - rh.hash1[l]*rh.power1[r-l]%rh.mod1 + rh.mod1) % rh.mod1
+	res2 := (rh.hash2[r] - rh.hash2[l]*rh.power2[r-l]%rh.mod2 + rh.mod2) % rh.mod2
+	return RollingHashPair{res1, res2}
+}
+
 
 // sliceを一行で出力
 func printSlice[T any](data []T) {
 	fmt.Println(strings.Trim(fmt.Sprint(data), "[]"))
+}
+
+// 部分文字列判定
+// 非連続の部分文字列も対応
+// isSubstring("abcd", "ad") -> true
+func isSubstring(s, t string) bool {
+	ok := false
+	iter := 0
+	for i := 0; i < len(s); i++ {
+		if s[i] == t[iter] {
+			iter++
+		}
+		if iter == len(t) {
+			ok = true
+			break
+		}
+	}
+	return ok
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//　幾何ゾーン
+
+// 2点間の距離の2乗
+// 平方根を取ると距離になるが、誤差が出るので距離の比較は距離の2乗で行う
+func distanceSquared(x1, y1, x2, y2 int) int {
+	return pow(x1-x2, 2) + pow(y1-y2, 2)
+}
+
+// 3点が同一直線上にあるか判定
+func isOnSameLine(x1, y1, x2, y2, x3, y3 int) bool {
+	return (x1-x2)*(y2-y3) == (y1-y2)*(x2-x3)
 }
