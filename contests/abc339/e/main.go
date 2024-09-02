@@ -30,22 +30,21 @@ func main() {
 }
 
 func solve() {
-	MAX := 500001
 	in := getInts()
 	_, d := in[0], in[1]
 	a := getInts()
+	maxA := max(a...) + 1
 
-
-	seg := NewSegmentTree(MAX, 0, func(x, y int) int { return max(x, y) })
+	seg := NewSegmentTree(maxA, 0, func(x, y int) int { return max(x, y) })
 
 	for _, value := range a {
 		l := max(0, value-d)
-		r := min(MAX-1, value+d)
+		r := min(maxA-1, value+d)
 		maxLen := seg.Query(l, r+1) + 1
 		seg.Update(value, maxLen)
 	}
 
-	ans := seg.Query(0, MAX)
+	ans := seg.Query(0, maxA)
 	fmt.Println(ans)
 }
 
