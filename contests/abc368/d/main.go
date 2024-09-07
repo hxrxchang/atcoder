@@ -21,6 +21,7 @@ import (
 const BUFSIZE = 10000000
 const MOD = 1000000007
 const BIGGEST = math.MaxInt64
+const MINIMUM = math.MinInt64
 var rdr *bufio.Reader
 
 func main() {
@@ -30,23 +31,24 @@ func main() {
 
 func solve() {
 	in := getInts()
-	n, _ := in[0], in[1]
+	n, k := in[0], in[1]
 
 	graph := make([]*Set[int], n)
 	for i := 0; i < n; i++ {
 		graph[i] = newSet[int]()
 	}
-	for i := 0; i < n - 1; i++ {
+
+	for i := 0; i < n-1; i++ {
 		in := getInts()
-		a, b := in[0] - 1, in[1] - 1
+		a, b := in[0]-1, in[1]-1
 		graph[a].Add(b)
 		graph[b].Add(a)
 	}
 
 	v := getInts()
-	vset := newSet[int]()
-	for _, x := range v {
-		vset.Add(x - 1)
+	vSet := newSet[int]()
+	for i := 0; i < k; i++ {
+		vSet.Add(v[i]-1)
 	}
 
 	leaves := newQueue[int]()
@@ -59,18 +61,22 @@ func solve() {
 	ans := n
 	for leaves.Size() > 0 {
 		leaf := leaves.PopFront()
-		if !vset.Has(leaf) {
-			nextNode := graph[leaf].Pop()
-			graph[nextNode].Remove(leaf)
-			if graph[nextNode].Size() == 1 {
-				leaves.PushBack(nextNode)
-			}
-			ans--
+		// 残す必要があれば何もしない
+		if vSet.Has(leaf) {
+			continue
+		}
+		// 消す必要があれば消す
+		ans--
+		nextNode := graph[leaf].Pop()
+		graph[nextNode].Remove(leaf)
+		if graph[nextNode].Size() == 1 {
+			leaves.PushBack(nextNode)
 		}
 	}
 
 	fmt.Println(ans)
 }
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 func getInt() int {
@@ -234,6 +240,7 @@ func sqrt(x int) int {
 	return int(math.Sqrt(float64(x)))
 }
 
+// 最大公約数
 func gcd(v1, v2 int) int {
 	if v1 > v2 {
 		v1, v2 = v2, v1
@@ -244,6 +251,7 @@ func gcd(v1, v2 int) int {
 	return v2
 }
 
+// 最小公倍数
 func lcm(v1, v2 int) int {
 	return v1 * v2 / gcd(v1, v2)
 }
@@ -286,6 +294,7 @@ func(s *Set[V]) Pop() V {
 	s.Remove(v)
 	return v
 }
+
 
 // sorted set
 type SortedSet[T comparator.Ordered] struct {
@@ -360,6 +369,67 @@ func (h *MyHeap[T]) pop() T {
 func (h *MyHeap[T]) len() int {
 	return h.heap.Len()
 }
+
+// tuple heap
+type TupleHeap[T constraints.Ordered] [][]T
+func (th TupleHeap[T]) Len() int {
+	return len(th)
+}
+func (th TupleHeap[T]) Less(i, j int) bool {
+	return th.compareSlices(i, j, 0)
+}
+func (th TupleHeap[T]) Swap(i, j int) {
+	th[i], th[j] = th[j], th[i]
+}
+func (th *TupleHeap[T]) Push(x any) {
+	*th = append(*th, x.([]T))
+}
+func (h *TupleHeap[T]) Pop() interface{} {
+	old := *h
+	n := len(old)
+	x := old[n-1]
+	*h = old[0 : n-1]
+	return x
+}
+func (th TupleHeap[T]) compareSlices(i, j, idx int) bool {
+	a := th[i]
+	b := th[j]
+	// 片方のスライスが他方よりも短ければ、その時点で比較を終了
+	if len(a) <= idx && len(b) > idx {
+		return true
+	} else if len(a) > idx && len(b) <= idx {
+		return false
+	} else if len(a) <= idx && len(b) <= idx {
+		return false // どちらも同じ長さで全ての要素が等しい場合
+	}
+
+	// 現在のインデックスの値を比較
+	if a[idx] != b[idx] {
+		return a[idx] < b[idx]
+	}
+
+	// 同じ値の場合、次のインデックスを再帰的に比較
+	return th.compareSlices(i, j, idx+1)
+}
+
+type MyTupleHeap[T constraints.Ordered] struct {
+	heap TupleHeap[T]
+}
+func newMyTupleHeap[T constraints.Ordered]() *MyTupleHeap[T] {
+	myTupleHeap := &MyTupleHeap[T]{}
+	heap.Init(&myTupleHeap.heap)
+	return myTupleHeap
+}
+func (h *MyTupleHeap[T]) push(x []T) {
+	heap.Push(&h.heap, x)
+}
+func (h *MyTupleHeap[T]) pop() []T {
+	return heap.Pop(&h.heap).([]T)
+}
+func (h *MyTupleHeap[T]) len() int {
+	return h.heap.Len()
+}
+
 
 func sortSlice[T constraints.Ordered](slice []T) []T {
     copiedSlice := make([]T, len(slice))
@@ -695,6 +765,199 @@ func (segtree *SegmentTree[T]) query(begin, end, idx, a, b int) T {
 // endは閉区間であることに注意
 func (segtree *SegmentTree[T]) Query(begin, end int) T {
 	return segtree.query(begin, end, 0, 0, segtree.n)
+}
+
+// 単純なgraphのDFS
+func graphBfs(nextNodes [][]int, size, start int) []int {
+	que := newQueue[int]()
+	distances := make([]int, size)
+	for i := 1; i < size; i++ {
+		distances[i] = -1
+	}
+	que.PushBack(start)
+	for que.Size() > 0 {
+		v := que.PopFront()
+		for _, next := range nextNodes[v] {
+			if distances[next] != -1 {
+				continue
+			}
+			distances[next] = distances[v] + 1
+			que.PushBack(next)
+		}
+	}
+	return distances
+}
+
+// gridのDFS
+type GridBfsNode struct {
+	y, x int
+}
+func gridBfs(height, width int, nextNodes map[GridBfsNode][]GridBfsNode, start GridBfsNode) [][]int {
+	type Item struct {
+		item GridBfsNode
+		dist int
+	}
+	distances := make([][]int, height)
+	for i := 0; i < height; i++ {
+		distances[i] = make([]int, width)
+		for j := 0; j < width; j++ {
+			distances[i][j] = -1
+		}
+	}
+
+	distances[start.y][start.x] = 0
+
+	que := newQueue[Item]()
+	que.PushBack(Item{GridBfsNode{start.y, start.x}, 0})
+
+	for que.Size() > 0 {
+		current := que.PopFront()
+		y, x, dist := current.item.y, current.item.x, current.dist
+		for _, next := range nextNodes[GridBfsNode{y, x}] {
+			if next.y < 0 || next.y >= height || next.x < 0 || next.x >= width {
+				continue
+			}
+			if distances[next.y][next.x] != -1 {
+				continue
+			}
+			distances[next.y][next.x] = dist + 1
+			que.PushBack(Item{next, dist + 1})
+		}
+	}
+
+	return distances
+}
+
+
+// ワーシャルフロイド法
+func warshallFloyd(graph [][]int) [][]int {
+	n := len(graph)
+	dist := make([][]int, n)
+	for i := range dist {
+		dist[i] = make([]int, n)
+		for j := range dist[i] {
+			if i == j {
+				dist[i][j] = 0
+			} else if graph[i][j] == 0 {
+				dist[i][j] = BIGGEST
+			} else {
+				dist[i][j] = graph[i][j]
+			}
+		}
+	}
+
+	for i := 0; i < n; i++ {
+		for j := 0; j < n; j++ {
+			for k := 0; k < n; k++ {
+				if dist[j][k] > dist[j][i]+dist[i][k] {
+					dist[j][k] = dist[j][i] + dist[i][k]
+				}
+			}
+		}
+	}
+
+	return dist
+}
+
+// ダイクストラ法
+func dijkstra(graph [][]dijkstraItem, start int) []int {
+	n := len(graph)
+	dist := make([]int, n)
+	for i := range dist {
+		dist[i] = BIGGEST
+	}
+	dist[start] = 0
+
+	pq := &dijkstraPriorityQueue{}
+	heap.Init(pq)
+	heap.Push(pq, &dijkstraItem{node: start, dist: 0})
+
+	for pq.Len() > 0 {
+		u := heap.Pop(pq).(*dijkstraItem)
+		if u.dist > dist[u.node] {
+			continue
+		}
+
+		for _, edge := range graph[u.node] {
+			v := edge.node
+			alt := u.dist + edge.dist
+			if alt < dist[v] {
+				dist[v] = alt
+				heap.Push(pq, &dijkstraItem{node: v, dist: alt})
+			}
+		}
+	}
+
+	return dist
+}
+type dijkstraItem struct {
+	node int
+	dist   int
+}
+type dijkstraPriorityQueue []*dijkstraItem
+func (pq dijkstraPriorityQueue) Len() int { return len(pq) }
+func (pq dijkstraPriorityQueue) Less(i, j int) bool {
+	return pq[i].dist < pq[j].dist
+}
+func (pq dijkstraPriorityQueue) Swap(i, j int) {
+	pq[i], pq[j] = pq[j], pq[i]
+}
+func (pq *dijkstraPriorityQueue) Push(x interface{}) {
+	*pq = append(*pq, x.(*dijkstraItem))
+}
+func (pq *dijkstraPriorityQueue) Pop() interface{} {
+	old := *pq
+	n := len(old)
+	item := old[n-1]
+	*pq = old[0 : n-1]
+	return item
+}
+
+// ローリングハッシュ
+func NewRollingHash(S string) *RollingHash {
+	const base1, base2 = 1007, 2009
+	const mod1, mod2 = 1000000007, 1000000009
+
+	n := len(S)
+	hash1 := make([]int64, n+1)
+	hash2 := make([]int64, n+1)
+	power1 := make([]int64, n+1)
+	power2 := make([]int64, n+1)
+	power1[0], power2[0] = 1, 1
+
+	for i := 0; i < n; i++ {
+		hash1[i+1] = (hash1[i]*base1 + int64(S[i])) % mod1
+		hash2[i+1] = (hash2[i]*base2 + int64(S[i])) % mod2
+		power1[i+1] = (power1[i] * base1) % mod1
+		power2[i+1] = (power2[i] * base2) % mod2
+	}
+
+	return &RollingHash{
+		base1:  base1,
+		base2:  base2,
+		mod1:   mod1,
+		mod2:   mod2,
+		hash1:  hash1,
+		hash2:  hash2,
+		power1: power1,
+		power2: power2,
+	}
+}
+type RollingHash struct {
+	base1, base2 int64
+	mod1, mod2   int64
+	hash1, hash2 []int64
+	power1, power2 []int64
+}
+type RollingHashPair struct {
+	Hash1 int64
+	Hash2 int64
+}
+// S[left:right] のハッシュ値を取得
+func (rh *RollingHash) Get(l, r int) RollingHashPair {
+	res1 := (rh.hash1[r] - rh.hash1[l]*rh.power1[r-l]%rh.mod1 + rh.mod1) % rh.mod1
+	res2 := (rh.hash2[r] - rh.hash2[l]*rh.power2[r-l]%rh.mod2 + rh.mod2) % rh.mod2
+	return RollingHashPair{res1, res2}
 }
 
 
