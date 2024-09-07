@@ -30,13 +30,17 @@ func main() {
 
 func solve() {
 	in := getInts()
-	n, k := in[0], in[1]
+	n, _ := in[0], in[1]
 
-	graph := make([][]int, n)
-	for i := 0; i < k; i++ {
+	graph := make([]*Set[int], n)
+	for i := 0; i < n; i++ {
+		graph[i] = newSet[int]()
+	}
+	for i := 0; i < n - 1; i++ {
 		in := getInts()
 		a, b := in[0] - 1, in[1] - 1
-		graph[a] = append(graph[a], b)
+		graph[a].Add(b)
+		graph[b].Add(a)
 	}
 
 	v := getInts()
@@ -45,29 +49,28 @@ func solve() {
 		vset.Add(x - 1)
 	}
 
-	path := []int{}
-	dfs(graph, 0, path)
-
-	fmt.Println(path)
-}
-
-func dfs(graph [][]int, v int, path []int) {
-	path = append(path, v)
-
-	// 葉に到達したらルートを表示する
-	if len(graph[v]) == 0 {
-		fmt.Println(path)
-	} else {
-		// 全ての子ノードを訪問する
-		for _, u := range graph[v] {
-			dfs(graph, u, path)
+	leaves := newQueue[int]()
+	for i := 0; i < n; i++ {
+		if graph[i].Size() == 1 {
+			leaves.PushBack(i)
 		}
 	}
 
-	// ルートから戻る
-	path = path[:len(path)-1]
-}
+	ans := n
+	for leaves.Size() > 0 {
+		leaf := leaves.PopFront()
+		if !vset.Has(leaf) {
+			nextNode := graph[leaf].Pop()
+			graph[nextNode].Remove(leaf)
+			if graph[nextNode].Size() == 1 {
+				leaves.PushBack(nextNode)
+			}
+			ans--
+		}
+	}
 
+	fmt.Println(ans)
+}
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 func getInt() int {
@@ -274,6 +277,14 @@ func (s *Set[V]) Values() []V {
 }
 func (s *Set[V]) Size() int {
 	return len(s.values)
+}
+func(s *Set[V]) Pop() V {
+	if len(s.values) == 0 {
+		panic("set is empty")
+	}
+	v := s.Values()[0]
+	s.Remove(v)
+	return v
 }
 
 // sorted set
