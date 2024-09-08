@@ -49,6 +49,7 @@ func solve() {
 		}
 	}
 
+	ans := h * w
 	for i := 0; i < q; i++ {
 		in := getInts()
 		r, c := in[0]-1, in[1]-1
@@ -56,6 +57,7 @@ func solve() {
 		if wSet[r].has(c) {
 			wSet[r].remove(c)
 			hSet[c].remove(r)
+			ans--
 			continue
 		}
 
@@ -63,33 +65,28 @@ func solve() {
 		if err == nil {
 			hSet[c].remove(*hUp)
 			wSet[*hUp].remove(c)
+			ans--
 		}
 
 		if hSet[c].upperBound(r).IsValid() {
 			hDown := hSet[c].upperBound(r).Value()
 			hSet[c].remove(hDown)
 			wSet[hDown].remove(c)
+			ans--
 		}
 
 		wLeft, err := wSet[r].lessThan(c)
 		if err == nil {
 			wSet[r].remove(*wLeft)
 			hSet[*wLeft].remove(r)
+			ans--
 		}
 
 		if wSet[r].upperBound(c).IsValid() {
 			wRight := wSet[r].upperBound(c).Value()
 			wSet[r].remove(wRight)
 			hSet[wRight].remove(r)
-		}
-	}
-
-	ans := 0
-	for i := 0; i < h; i++ {
-		for j := 0; j < w; j++ {
-			if hSet[j].has(i) {
-				ans++
-			}
+			ans--
 		}
 	}
 
