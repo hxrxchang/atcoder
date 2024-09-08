@@ -29,46 +29,71 @@ func main() {
 	solve()
 }
 
-type PointY struct {
-	up, down int
-}
-
-type PointX struct {
-	left, right int
-}
-
 func solve() {
 	in := getInts()
 	h, w, q := in[0], in[1], in[2]
 
-	graph := make([][]int, h)
-
+	wSet := make([]*SortedSet[int], h)
 	for i := 0; i < h; i++ {
-		graph[i] = make([]int, w)
+		wSet[i] = newSortedSet[int]()
+		for j := 0; j < w; j++ {
+			wSet[i].add(j)
+		}
 	}
 
-	mpy := make(map[int]PointY)
-	for i := 0; i < h; i++ {
-		mpy[i] = PointY{up: MINIMUM, down: BIGGEST}
-	}
-
-	mpx := make(map[int]PointX)
+	hSet := make([]*SortedSet[int], w)
 	for i := 0; i < w; i++ {
-		mpx[i] = PointX{left: MINIMUM, right: BIGGEST}
+		hSet[i] = newSortedSet[int]()
+		for j := 0; j < h; j++ {
+			hSet[i].add(j)
+		}
 	}
 
 	for i := 0; i < q; i++ {
 		in := getInts()
 		r, c := in[0]-1, in[1]-1
-		if graph[r][c] == 0 {
-			graph[r][c] = true
-			graph
+
+		if wSet[r].has(c) {
+			wSet[r].remove(c)
+			hSet[c].remove(r)
+			continue
+		}
+
+		hUp, err := hSet[c].lessThan(r)
+		if err == nil {
+			hSet[c].remove(*hUp)
+			wSet[*hUp].remove(c)
+		}
+
+		if hSet[c].upperBound(r).IsValid() {
+			hDown := hSet[c].upperBound(r).Value()
+			hSet[c].remove(hDown)
+			wSet[hDown].remove(c)
+		}
+
+		wLeft, err := wSet[r].lessThan(c)
+		if err == nil {
+			wSet[r].remove(*wLeft)
+			hSet[*wLeft].remove(r)
+		}
+
+		if wSet[r].upperBound(c).IsValid() {
+			wRight := wSet[r].upperBound(c).Value()
+			wSet[r].remove(wRight)
+			hSet[wRight].remove(r)
 		}
 	}
-}
 
-func key(y, x int) string {
-	return fmt.Sprintf("%d %d", y, x)
+	ans := 0
+	for i := 0; i < h; i++ {
+		for j := 0; j < w; j++ {
+			if hSet[j].has(i) {
+				ans++
+			}
+		}
+	}
+
+	fmt.Println(ans)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -315,6 +340,21 @@ func (s *SortedSet[T]) lowerBound(v T) *set.SetIterator[T] {
 }
 func (s *SortedSet[T]) upperBound(v T) *set.SetIterator[T] {
 	return s.values.UpperBound(v)
+}
+// 指定した値未満の最大の値を取得
+func (s *SortedSet[T]) lessThan(v T) (*T, error) {
+	if s.lowerBound(v).Prev().IsValid() {
+		res := s.lowerBound(v).Prev().Value()
+		return &res, nil
+	}
+	if s.values.Last().IsValid() {
+		res := s.values.Last().Value()
+		if res < v {
+			return &res, nil
+		}
+		return nil, fmt.Errorf("not found")
+	}
+	return nil, fmt.Errorf("not found")
 }
 
 // multiset
