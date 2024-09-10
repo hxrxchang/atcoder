@@ -744,16 +744,18 @@ func (segtree *SegmentTree[T]) Query(begin, end int) T {
 }
 
 // 単純なgraphのDFS
-func graphBfs(nextNodes [][]int, size, start int) []int {
+func graphBfs(graph [][]int, start int) []int {
+	size := len(graph)
 	que := newQueue[int]()
 	distances := make([]int, size)
-	for i := 1; i < size; i++ {
+	for i := 0; i < size; i++ {
 		distances[i] = -1
 	}
+	distances[start] = 0
 	que.PushBack(start)
 	for que.Size() > 0 {
 		v := que.PopFront()
-		for _, next := range nextNodes[v] {
+		for _, next := range graph[v] {
 			if distances[next] != -1 {
 				continue
 			}
