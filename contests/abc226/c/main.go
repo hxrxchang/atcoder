@@ -45,25 +45,11 @@ func solve() {
 		}
 	}
 
-	visited := make([]bool, n)
-	que := newQueue[int]()
-	que.PushBack(n-1)
-	visited[n-1] = true
-
-	for que.Size() > 0 {
-		v := que.PopFront()
-		for _, next := range graph[v] {
-			if visited[next] {
-				continue
-			}
-			visited[next] = true
-			que.PushBack(next)
-		}
-	}
+	res := graphBfs(graph, n-1)
 
 	ans := 0
 	for i := 0; i < n; i++ {
-		if visited[i] {
+		if res[i] != -1 {
 			ans += time[i]
 		}
 	}
@@ -783,16 +769,18 @@ func (segtree *SegmentTree[T]) Query(begin, end int) T {
 }
 
 // 単純なgraphのDFS
-func graphBfs(nextNodes [][]int, size, start int) []int {
+func graphBfs(graph [][]int, start int) []int {
+	size := len(graph)
 	que := newQueue[int]()
 	distances := make([]int, size)
-	for i := 1; i < size; i++ {
+	for i := 0; i < size; i++ {
 		distances[i] = -1
 	}
 	que.PushBack(start)
+	distances[start] = 0
 	for que.Size() > 0 {
 		v := que.PopFront()
-		for _, next := range nextNodes[v] {
+		for _, next := range graph[v] {
 			if distances[next] != -1 {
 				continue
 			}
