@@ -155,7 +155,11 @@
       "id": "tessoku_book_x",
       "label": "A24",
       "title": "LIS",
-      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_x"
+      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_x",
+      "directory": {
+        "path": "a24",
+        "testdir": "tests"
+      }
     },
     {
       "id": "tessoku_book_y",
