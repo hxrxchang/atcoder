@@ -31,20 +31,21 @@ func main() {
 
 func solve() {
 	in := getInts()
-	_, d := in[0], in[1]
+	n, d := in[0], in[1]
 	a := getInts()
-	maxA := max(a...) + 1
 
-	seg := NewSegmentTree(maxA, 0, func(x, y int) int { return max(x, y) })
+	maxi := 500001
+	segTree := NewSegmentTree(maxi, 0, func(a, b int) int { return max(a, b) })
 
-	for _, value := range a {
-		l := max(0, value-d)
-		r := min(maxA-1, value+d)
-		maxLen := seg.Query(l, r+1) + 1
-		seg.Update(value, maxLen)
+	for i := 0; i < n; i++ {
+		target := a[i]
+		pre := segTree.Query(target - d, target)
+		after := segTree.Query(target, target + d + 1)
+		v := max(pre, after) + 1
+		segTree.Update(target, v)
 	}
 
-	ans := seg.Query(0, maxA)
+	ans := segTree.Query(0, maxi)
 	fmt.Println(ans)
 }
 
@@ -257,6 +258,15 @@ func (s *Set[V]) Values() []V {
 func (s *Set[V]) Size() int {
 	return len(s.values)
 }
+func(s *Set[V]) Pop() V {
+	if len(s.values) == 0 {
+		panic("set is empty")
+	}
+	v := s.Values()[0]
+	s.Remove(v)
+	return v
+}
+
 
 // sorted set
 type SortedSet[T comparator.Ordered] struct {
@@ -283,6 +293,21 @@ func (s *SortedSet[T]) lowerBound(v T) *set.SetIterator[T] {
 }
 func (s *SortedSet[T]) upperBound(v T) *set.SetIterator[T] {
 	return s.values.UpperBound(v)
+}
+// 指定した値未満の最大の値を取得
+func (s *SortedSet[T]) lessThan(v T) (*T, error) {
+	if s.lowerBound(v).Prev().IsValid() {
+		res := s.lowerBound(v).Prev().Value()
+		return &res, nil
+	}
+	if s.values.Last().IsValid() {
+		res := s.values.Last().Value()
+		if res < v {
+			return &res, nil
+		}
+		return nil, fmt.Errorf("not found")
+	}
+	return nil, fmt.Errorf("not found")
 }
 
 // multiset
@@ -331,6 +356,67 @@ func (h *MyHeap[T]) pop() T {
 func (h *MyHeap[T]) len() int {
 	return h.heap.Len()
 }
+
+// tuple heap
+type TupleHeap[T constraints.Ordered] [][]T
+func (th TupleHeap[T]) Len() int {
+	return len(th)
+}
+func (th TupleHeap[T]) Less(i, j int) bool {
+	return th.compareSlices(i, j, 0)
+}
+func (th TupleHeap[T]) Swap(i, j int) {
+	th[i], th[j] = th[j], th[i]
+}
+func (th *TupleHeap[T]) Push(x any) {
+	*th = append(*th, x.([]T))
+}
+func (h *TupleHeap[T]) Pop() interface{} {
+	old := *h
+	n := len(old)
+	x := old[n-1]
+	*h = old[0 : n-1]
+	return x
+}
+func (th TupleHeap[T]) compareSlices(i, j, idx int) bool {
+	a := th[i]
+	b := th[j]
+	// 片方のスライスが他方よりも短ければ、その時点で比較を終了
+	if len(a) <= idx && len(b) > idx {
+		return true
+	} else if len(a) > idx && len(b) <= idx {
+		return false
+	} else if len(a) <= idx && len(b) <= idx {
+		return false // どちらも同じ長さで全ての要素が等しい場合
+	}
+
+	// 現在のインデックスの値を比較
+	if a[idx] != b[idx] {
+		return a[idx] < b[idx]
+	}
+
+	// 同じ値の場合、次のインデックスを再帰的に比較
+	return th.compareSlices(i, j, idx+1)
+}
+
+type MyTupleHeap[T constraints.Ordered] struct {
+	heap TupleHeap[T]
+}
+func newMyTupleHeap[T constraints.Ordered]() *MyTupleHeap[T] {
+	myTupleHeap := &MyTupleHeap[T]{}
+	heap.Init(&myTupleHeap.heap)
+	return myTupleHeap
+}
+func (h *MyTupleHeap[T]) push(x []T) {
+	heap.Push(&h.heap, x)
+}
+func (h *MyTupleHeap[T]) pop() []T {
+	return heap.Pop(&h.heap).([]T)
+}
+func (h *MyTupleHeap[T]) len() int {
+	return h.heap.Len()
+}
+
 
 func sortSlice[T constraints.Ordered](slice []T) []T {
     copiedSlice := make([]T, len(slice))
@@ -388,6 +474,12 @@ func zeroIndexedSlice(origin []int) []int {
 		slice2[i] = v - 1
 	}
 	return slice2
+}
+
+func copySlice[T any](original []T) []T {
+	newSlice := make([]T, len(original))
+	copy(newSlice, original)
+	return newSlice
 }
 
 // 2次元スライスのコピー
@@ -669,16 +761,18 @@ func (segtree *SegmentTree[T]) Query(begin, end int) T {
 }
 
 // 単純なgraphのDFS
-func graphBfs(nextNodes [][]int, size, start int) []int {
+func graphBfs(graph [][]int, start int) []int {
+	size := len(graph)
 	que := newQueue[int]()
 	distances := make([]int, size)
-	for i := 1; i < size; i++ {
+	for i := 0; i < size; i++ {
 		distances[i] = -1
 	}
+	distances[start] = 0
 	que.PushBack(start)
 	for que.Size() > 0 {
 		v := que.PopFront()
-		for _, next := range nextNodes[v] {
+		for _, next := range graph[v] {
 			if distances[next] != -1 {
 				continue
 			}
