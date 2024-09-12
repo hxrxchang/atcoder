@@ -720,6 +720,7 @@ func bisectRight[T constraints.Ordered](slice []T, value T) int {
 	return bisect(slice, func(i int) bool { return slice[i] > value })
 }
 
+// sliceの中で指定した値以上の要素を返す
 func lowerBound[T constraints.Ordered](slice []T, value T) *T {
 	idx := bisectLeft(slice, value)
 	if slice[idx] == value {
@@ -730,12 +731,23 @@ func lowerBound[T constraints.Ordered](slice []T, value T) *T {
 	}
 	return &slice[idx-1]
 }
+
+// sliceの中で指定した値より大きい要素を返す
 func upperBound[T constraints.Ordered](slice []T, value T) *T {
 	idx := bisectRight(slice, value)
 	if idx == len(slice) {
 		return nil
 	}
 	return &slice[idx]
+}
+
+// sliceの中で指定した値未満の中で最大の要素を返す
+func lessThan[T constraints.Ordered](slice []T, value T) *T {
+	idx := bisectLeft(slice, value)
+	if idx == 0 {
+		return nil
+	}
+	return &slice[idx-1]
 }
 
 // Segment Tree
