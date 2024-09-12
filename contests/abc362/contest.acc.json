@@ -9,7 +9,11 @@
       "id": "abc362_a",
       "label": "A",
       "title": "Buy a Pen",
-      "url": "https://atcoder.jp/contests/abc362/tasks/abc362_a"
+      "url": "https://atcoder.jp/contests/abc362/tasks/abc362_a",
+      "directory": {
+        "path": "a",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc362_b",
