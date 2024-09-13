@@ -9,7 +9,11 @@
       "id": "abc249_a",
       "label": "A",
       "title": "Jogging",
-      "url": "https://atcoder.jp/contests/abc249/tasks/abc249_a"
+      "url": "https://atcoder.jp/contests/abc249/tasks/abc249_a",
+      "directory": {
+        "path": "a",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc249_b",
@@ -21,7 +25,11 @@
       "id": "abc249_c",
       "label": "C",
       "title": "Just K",
-      "url": "https://atcoder.jp/contests/abc249/tasks/abc249_c"
+      "url": "https://atcoder.jp/contests/abc249/tasks/abc249_c",
+      "directory": {
+        "path": "c",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc249_d",
