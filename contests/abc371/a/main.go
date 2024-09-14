@@ -31,59 +31,41 @@ func main() {
 
 func solve() {
 	in := getStrs()
-	res := make(map[string]int)
+
+	a, b, c := 0, 0, 0
 
 	if in[0] == ">" {
-		res["A"] = 1
-		res["B"] = 2
+		a++
 	} else {
-		res["A"] = 2
-		res["B"] = 1
+		b++
 	}
 
 	if in[1] == ">" {
-		if res["A"] == 1 {
-			res["A"] = 1
-			res["C"] = 3
-		} else {
-			res["A"] = 2
-			res["C"] = 3
-		}
+		a++
 	} else {
-		if res["A"] == 1 {
-			res["A"] = 2
-			res["C"] = 1
-		} else {
-			res["A"] = 3
-			res["C"] = 2
-		}
+		c++
 	}
 
-	if in[2] == ">" {
-		if res["B"] == 1 {
-			res["B"] = 1
-			res["C"] = 3
-		} else {
-			res["B"] = 2
-			res["C"] = 3
-		}
+	if in[2] == ">"  {
+		b++
 	} else {
-		if res["B"] == 1 {
-			res["B"] = 2
-			res["C"] = 1
-		} else {
-			res["B"] = 3
-			res["C"] = 2
-		}
+		c++
 	}
 
-	if res["A"] == 2 {
-		fmt.Println("A")
-	} else if res["B"] == 2 {
-		fmt.Println("B")
-	} else {
-		fmt.Println("C")
+	type Rank struct {
+		v int
+		name string
 	}
+	rank := make([]Rank, 0)
+	rank = append(rank, Rank{a, "A"})
+	rank = append(rank, Rank{b, "B"})
+	rank = append(rank, Rank{c, "C"})
+
+	sort.Slice(rank, func(i, j int) bool {
+		return rank[i].v > rank[j].v
+	})
+
+	fmt.Println(rank[1].name)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
