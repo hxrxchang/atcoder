@@ -131,6 +131,10 @@ func i2b(i int) bool {
   return i != 0
 }
 
+func i2bit(i int) []string {
+	return strToSlice(strconv.FormatInt(int64(i), 2), "")
+}
+
 func abs(v int) int {
 	if v < 0 {
 		return -v
