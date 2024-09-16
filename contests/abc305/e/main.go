@@ -59,9 +59,6 @@ func solve() {
 		item := heap.pop()
 		power := -item[0]
 		node := item[1]
-		if res[node] > power {
-			continue
-		}
 		nextPower := power - 1
 		for _, next := range graph[node] {
 			if res[next] < nextPower {
