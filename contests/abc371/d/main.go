@@ -31,70 +31,28 @@ func main() {
 
 func solve() {
 	n := getInt()
-	x := getInts()
-	p := getInts()
-
-	villages := make([][]int, 0)
+	villades := getInts()
+	peopleCnt := getInts()
+	peopleCntMap := make(map[int]int)
 	for i := 0; i < n; i++ {
-		villages = append(villages, []int{x[i], p[i]})
+		peopleCntMap[villades[i]] = peopleCnt[i]
 	}
 
-	coords := make([]int, len(villages))
-	for i, v := range villages {
-		coords[i] = v[0]
-	}
-
-	sort.Ints(coords)
-	uniqueCoords := unique(coords)
-
-	compressMap := make(map[int]int)
-	for i, v := range uniqueCoords {
-		compressMap[v] = i
-	}
-
-	num := len(uniqueCoords)
-	segTree := NewSegmentTree[int](num, 0, func(a, b int) int { return a + b })
-
-	for _, v := range villages {
-		pos := compressMap[v[0]]
-		segTree.Update(pos, v[1])
+	compressedVillages := newZaatsu(villades)
+	compressedCnt := compressedVillages.Count()
+	segTree := NewSegmentTree(compressedCnt, 0, func(a, b int) int { return a+b })
+	for i := 0; i < compressedCnt; i++ {
+		segTree.Update(i, peopleCntMap[compressedVillages.GetOriginalValue(i)])
 	}
 
 	q := getInt()
 	for i := 0; i < q; i++ {
 		in := getInts()
 		l, r := in[0], in[1]
-
-		left, leftOk := compressMap[l]
-		right, rightOk := compressMap[r]
-
-		if !leftOk {
-			left = bisectLeft(uniqueCoords, l)
-		}
-		if !rightOk {
-			right = bisectRight(uniqueCoords, r) - 1
-		}
-
-		if left > right {
-			fmt.Println(0)
-		} else {
-			res := segTree.Query(left, right+1)
-			fmt.Println(res)
-		}
+		left := compressedVillages.BisectLeft(l)
+		right := compressedVillages.BisectRight(r) - 1
+		fmt.Println(segTree.Query(left, right+1))
 	}
-}
-
-func unique(arr []int) []int {
-	if len(arr) == 0 {
-		return arr
-	}
-	uniqueArr := []int{arr[0]}
-	for i := 1; i < len(arr); i++ {
-		if arr[i] != arr[i-1] {
-			uniqueArr = append(uniqueArr, arr[i])
-		}
-	}
-	return uniqueArr
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -194,6 +152,10 @@ func b2i(b bool) int {
 
 func i2b(i int) bool {
   return i != 0
+}
+
+func i2bit(i int) []string {
+	return strToSlice(strconv.FormatInt(int64(i), 2), "")
 }
 
 func abs(v int) int {
@@ -800,6 +762,47 @@ func lessThan[T constraints.Ordered](slice []T, value T) *T {
 		return nil
 	}
 	return &slice[idx-1]
+}
+
+// 座標圧縮
+type Zaatsu struct {
+	values []int
+	mapping map[int]int
+}
+func newZaatsu(params []int) *Zaatsu {
+	s := newSet[int]()
+	for _, v := range params {
+		s.Add(v)
+	}
+	sorted := sortSlice(s.Values())
+
+	mapping := make(map[int]int)
+	for i, v := range sorted {
+		mapping[v] = i
+	}
+
+	return &Zaatsu{
+		values: sorted,
+		mapping: mapping,
+	}
+}
+func (z *Zaatsu) GetCompressedValue(v int) int {
+	return z.mapping[v]
+}
+func (z *Zaatsu) GetOriginalValue(compressedIndex int) int {
+	if compressedIndex < 0 || compressedIndex >= len(z.values) {
+		panic("Index out of range")
+	}
+	return z.values[compressedIndex]
+}
+func (z *Zaatsu) Count() int {
+	return len(z.values)
+}
+func (z *Zaatsu) BisectLeft(v int) int {
+	return bisectLeft(z.values, v)
+}
+func (z *Zaatsu) BisectRight(v int) int {
+	return bisectRight(z.values, v)
 }
 
 // Segment Tree
