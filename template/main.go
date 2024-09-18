@@ -763,9 +763,11 @@ func newZaatsu(params []int) *Zaatsu {
 		mapping: mapping,
 	}
 }
+// 圧縮後の値を取得
 func (z *Zaatsu) GetCompressedValue(v int) int {
 	return z.mapping[v]
 }
+// 圧縮後の値から元の値を取得
 func (z *Zaatsu) GetOriginalValue(compressedIndex int) int {
 	if compressedIndex < 0 || compressedIndex >= len(z.values) {
 		panic("Index out of range")
