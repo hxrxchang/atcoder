@@ -772,6 +772,15 @@ func (z *Zaatsu) GetOriginalValue(compressedIndex int) int {
 	}
 	return z.values[compressedIndex]
 }
+func (z *Zaatsu) Count() int {
+	return len(z.values)
+}
+func (z *Zaatsu) BisectLeft(v int) int {
+	return bisectLeft(z.values, v)
+}
+func (z *Zaatsu) BisectRight(v int) int {
+	return bisectRight(z.values, v)
+}
 
 // Segment Tree
 type SegmentTree[T any] struct {
