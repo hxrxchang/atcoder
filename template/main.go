@@ -741,6 +741,38 @@ func lessThan[T constraints.Ordered](slice []T, value T) *T {
 	return &slice[idx-1]
 }
 
+// 座標圧縮
+type Zaatsu struct {
+	values []int
+	mapping map[int]int
+}
+func newZaatsu(params []int) *Zaatsu {
+	s := newSet[int]()
+	for _, v := range params {
+		s.Add(v)
+	}
+	sorted := sortSlice(s.Values())
+
+	mapping := make(map[int]int)
+	for i, v := range sorted {
+		mapping[v] = i
+	}
+
+	return &Zaatsu{
+		values: sorted,
+		mapping: mapping,
+	}
+}
+func (z *Zaatsu) GetCompressedValue(v int) int {
+	return z.mapping[v]
+}
+func (z *Zaatsu) GetOriginalValue(compressedIndex int) int {
+	if compressedIndex < 0 || compressedIndex >= len(z.values) {
+		panic("Index out of range")
+	}
+	return z.values[compressedIndex]
+}
+
 // Segment Tree
 type SegmentTree[T any] struct {
 	data []T
