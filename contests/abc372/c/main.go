@@ -31,29 +31,33 @@ func main() {
 
 func solve() {
 	in := getInts()
-	_, q := in[0], in[1]
+	n, q := in[0], in[1]
 	s := strToSlice(getStr(), "")
+	cnt := getCnt(s)
 
 	for i := 0; i < q; i++ {
 		in := getStrs()
 		idx := s2i(in[0]) - 1
-		s[idx] = in[1]
 
-		cnt := getCnt(s)
+		targetStart := max(idx - 2, 0)
+		targetEnd := min(idx + 2, n - 1)
+		cnt -= getCnt(s[targetStart:targetEnd + 1])
+
+		s[idx] = in[1]
+		cnt += getCnt(s[targetStart:targetEnd + 1])
+
 		fmt.Println(cnt)
 	}
 }
 
 func getCnt(s []string) int {
-	i := 0
 	cnt := 0
+	i := 0
 	for i + 2 < len(s) {
-		if s[i] == "A" && s[i+1] == "B" && s[i+2] == "C" {
+		if s[i] == "A" && s[i + 1] == "B" && s[i + 2] == "C" {
 			cnt++
-			i += 3
-		} else {
-			i++
 		}
+		i++
 	}
 	return cnt
 }
