@@ -32,56 +32,59 @@ func main() {
 func solve() {
 	getInt()
 	s := strToSlice(getStr(), "")
-
 	q := getInt()
+
 	type Operation struct {
 		t int
-		idx int
-		s string
+		x int
+		c string
 	}
 	operations := make([]Operation, q)
-
 	for i := 0; i < q; i++ {
 		in := getStrs()
 		t := s2i(in[0])
-		idx := s2i(in[1]) - 1
+		x := s2i(in[1])	- 1
+		c := in[2]
+		operations[i] = Operation{t, x, c}
 
-		operations[i] = Operation{t, idx, in[2]}
 		if t == 1 {
-			s[idx] = in[2]
+			s[x] = c
 		}
 	}
 
 	if operations[q-1].t == 2 {
-		fmt.Println(strings.ToLower(strings.Join(s, "")))
-		return
-	} else if operations[q-1].t == 3 {
-		fmt.Println(strings.ToUpper(strings.Join(s, "")))
+		ans := strings.ToLower(sliceToStr(s, ""))
+		fmt.Println(ans)
 		return
 	}
 
-	idx := 0
+	if operations[q-1].t == 3 {
+		ans := strings.ToUpper(sliceToStr(s, ""))
+		fmt.Println(ans)
+		return
+	}
+
+	lastAllChangeOperationIdx := -1
 	for i := q - 1; i >= 0; i-- {
 		if operations[i].t == 2 {
-			s2 := strings.ToLower(strings.Join(s, ""))
-			s = strToSlice(s2, "")
-			idx = i
+			lastAllChangeOperationIdx = i
+			s = strToSlice(strings.ToLower(sliceToStr(s, "")), "")
 			break
-		} else if operations[i].t == 3 {
-			s2 := strings.ToUpper(strings.Join(s, ""))
-			s = strToSlice(s2, "")
-			idx = i
+		}
+		if operations[i].t == 3 {
+			lastAllChangeOperationIdx = i
+			s = strToSlice(strings.ToUpper(sliceToStr(s, "")), "")
 			break
 		}
 	}
 
-	for i := idx + 1; i < q; i++ {
-		if operations[i].t == 1 {
-			s[operations[i].idx] = operations[i].s
-		}
+	for i := lastAllChangeOperationIdx + 1; i < q; i++ {
+		operation := operations[i]
+		s[operation.x] = operation.c
 	}
 
-	fmt.Println(strings.Join(s, ""))
+	ans := sliceToStr(s, "")
+	fmt.Println(ans)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -246,6 +249,11 @@ func modPow(base, exp, mod int) int {
 	return result
 }
 
+// logXのYを求める
+func logXY(x, y int) int {
+	return int(math.Log(float64(y)) / math.Log(float64(x)))
+}
+
 // intのまま計算できるように
 func sqrt(x int) int {
 	return int(math.Sqrt(float64(x)))
@@ -267,11 +275,97 @@ func lcm(v1, v2 int) int {
 	return v1 * v2 / gcd(v1, v2)
 }
 
+// 切り上げ除算
 func ceilDiv(a, b int) int {
 	if a + b - 1 < 0 && (a + b - 1) % b != 0 {
 		return (a + b - 1) / b - 1
 	}
 	return (a + b - 1) / b
+}
+
+// nCr
+func getComb(n, k int) int {
+	numerator := 1
+	denominator := 1
+	for i := 0; i < k; i++ {
+		numerator *= n - i
+		denominator *= i + 1
+	}
+	return numerator / denominator
+}
+
+// nを素因数分解
+func primeFactorize(n int) []int {
+	var factors []int
+
+	// 2で割り切れる間、2を追加
+	for n%2 == 0 {
+		factors = append(factors, 2)
+		n /= 2
+	}
+
+	// 3以降の奇数で割り切れるか確認
+	for f := 3; f*f <= n; f += 2 {
+		for n%f == 0 {
+			factors = append(factors, f)
+			n /= f
+		}
+	}
+
+	// nが1でない場合は、n自身を追加
+	if n > 1 {
+		factors = append(factors, n)
+	}
+
+	return factors
+}
+
+// n以下の素数を列挙
+func primeNumbers(n int) []int {
+	isPrime := getIsPrime(n)
+
+	primes := make([]int, 0)
+	for i, b := range isPrime {
+		if b {
+			primes = append(primes, i)
+		}
+	}
+
+	return primes
+}
+
+// n以下の数字がそれぞれ素数かどうかを列挙
+func getIsPrime(n int) []bool {
+	isPrime := make([]bool, n+1)
+	for i := 0; i <= n; i++ {
+		isPrime[i] = true
+	}
+	isPrime[0] = false
+	isPrime[1] = false
+
+	for i := 2; i <= n; i++ {
+		if isPrime[i] {
+			for j := i * 2; j <= n; j += i {
+				isPrime[j] = false
+			}
+		}
+	}
+	return isPrime
+}
+
+// nが素数かどうかを判定
+func isPrime(n int) bool {
+	if n == 2 {
+		return true
+	} else if n < 2 || n%2 == 0 {
+		return false
+	}
+	for i := 3; i*i <= n; i += 2 {
+		if n%i == 0 {
+			return false
+		}
+	}
+	return true
 }
 
 // set
@@ -673,65 +767,6 @@ func getCombinationsCh(list []int, k int) (c chan []int) {
 	}()
 
 	return
-}
-
-// nCr
-func getComb(n, k int) int {
-	numerator := 1
-	denominator := 1
-	for i := 0; i < k; i++ {
-		numerator *= n - i
-		denominator *= i + 1
-	}
-	return numerator / denominator
-}
-
-// n以下の素数を列挙
-func primeNumbers(n int) []int {
-	isPrime := getIsPrime(n)
-
-	primes := make([]int, 0)
-	for i, b := range isPrime {
-		if b {
-			primes = append(primes, i)
-		}
-	}
-
-	return primes
-}
-
-// n以下の数字がそれぞれ素数かどうかを列挙
-func getIsPrime(n int) []bool {
-	isPrime := make([]bool, n+1)
-	for i := 0; i <= n; i++ {
-		isPrime[i] = true
-	}
-	isPrime[0] = false
-	isPrime[1] = false
-
-	for i := 2; i <= n; i++ {
-		if isPrime[i] {
-			for j := i * 2; j <= n; j += i {
-				isPrime[j] = false
-			}
-		}
-	}
-	return isPrime
-}
-
-// nが素数かどうかを判定
-func isPrime(n int) bool {
-	if n == 2 {
-		return true
-	} else if n < 2 || n%2 == 0 {
-		return false
-	}
-	for i := 3; i*i <= n; i += 2 {
-		if n%i == 0 {
-			return false
-		}
-	}
-	return true
 }
 
 // bit全探索
