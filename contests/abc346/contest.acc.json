@@ -37,7 +37,11 @@
       "id": "abc346_e",
       "label": "E",
       "title": "Paint",
-      "url": "https://atcoder.jp/contests/abc346/tasks/abc346_e"
+      "url": "https://atcoder.jp/contests/abc346/tasks/abc346_e",
+      "directory": {
+        "path": "e",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc346_f",
