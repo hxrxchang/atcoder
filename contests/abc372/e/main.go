@@ -30,6 +30,26 @@ func main() {
 }
 
 func solve() {
+	in := getInts()
+	n, q := in[0], in[1]
+
+	uf := newUnionFind(n)
+
+	for i := 0; i < q; i++ {
+		in := getInts()
+		if in[0] == 1 {
+			u, v := in[1]-1, in[2]-1
+			uf.unit(u, v)
+		} else {
+			v := in[1] - 1
+			k := in[2]
+			if len(uf.rootAndNodes[uf.root(v)]) < k {
+				fmt.Println(-1)
+			} else {
+				fmt.Println(uf.rootAndNodes[uf.root(v)][k-1] + 1)
+			}
+		}
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -194,6 +214,11 @@ func modPow(base, exp, mod int) int {
 	return result
 }
 
+// logXのYを求める
+func logXY(x, y int) int {
+	return int(math.Log(float64(y)) / math.Log(float64(x)))
+}
+
 // intのまま計算できるように
 func sqrt(x int) int {
 	return int(math.Sqrt(float64(x)))
@@ -215,11 +240,97 @@ func lcm(v1, v2 int) int {
 	return v1 * v2 / gcd(v1, v2)
 }
 
+// 切り上げ除算
 func ceilDiv(a, b int) int {
 	if a + b - 1 < 0 && (a + b - 1) % b != 0 {
 		return (a + b - 1) / b - 1
 	}
 	return (a + b - 1) / b
+}
+
+// nCr
+func getComb(n, k int) int {
+	numerator := 1
+	denominator := 1
+	for i := 0; i < k; i++ {
+		numerator *= n - i
+		denominator *= i + 1
+	}
+	return numerator / denominator
+}
+
+// nを素因数分解
+func primeFactorize(n int) []int {
+	var factors []int
+
+	// 2で割り切れる間、2を追加
+	for n%2 == 0 {
+		factors = append(factors, 2)
+		n /= 2
+	}
+
+	// 3以降の奇数で割り切れるか確認
+	for f := 3; f*f <= n; f += 2 {
+		for n%f == 0 {
+			factors = append(factors, f)
+			n /= f
+		}
+	}
+
+	// nが1でない場合は、n自身を追加
+	if n > 1 {
+		factors = append(factors, n)
+	}
+
+	return factors
+}
+
+// n以下の素数を列挙
+func primeNumbers(n int) []int {
+	isPrime := getIsPrime(n)
+
+	primes := make([]int, 0)
+	for i, b := range isPrime {
+		if b {
+			primes = append(primes, i)
+		}
+	}
+
+	return primes
+}
+
+// n以下の数字がそれぞれ素数かどうかを列挙
+func getIsPrime(n int) []bool {
+	isPrime := make([]bool, n+1)
+	for i := 0; i <= n; i++ {
+		isPrime[i] = true
+	}
+	isPrime[0] = false
+	isPrime[1] = false
+
+	for i := 2; i <= n; i++ {
+		if isPrime[i] {
+			for j := i * 2; j <= n; j += i {
+				isPrime[j] = false
+			}
+		}
+	}
+	return isPrime
+}
+
+// nが素数かどうかを判定
+func isPrime(n int) bool {
+	if n == 2 {
+		return true
+	} else if n < 2 || n%2 == 0 {
+		return false
+	}
+	for i := 3; i*i <= n; i += 2 {
+		if n%i == 0 {
+			return false
+		}
+	}
+	return true
 }
 
 // set
@@ -499,6 +610,7 @@ type UnionFind struct {
 	// parentsは要素が正の値のときはそのインデックスのルートを表す。
 	// 負の値のときはそのインデックスはルートであり絶対値がそのルートが持つ要素数を表す。
 	parents []int
+	rootAndNodes map[int][]int
 }
 func (uf *UnionFind) root(x int) int {
 	if uf.parents[x] < 0 {
@@ -519,6 +631,11 @@ func (uf *UnionFind) unit(x, y int) {
 	}
 	// ルートの要素数を更新
 	uf.parents[x] += uf.parents[y]
+	uf.rootAndNodes[uf.root(x)] = append(uf.rootAndNodes[uf.root(x)], uf.rootAndNodes[uf.root(y)]...)
+	maxi := min(10, len(uf.rootAndNodes[uf.root(x)]))
+	uf.rootAndNodes[uf.root(x)] = reverse(sortSlice(uf.rootAndNodes[uf.root(x)]))[:maxi]
+	uf.rootAndNodes[uf.root(y)] = []int{}
+
 	// サイズが小さい方のルートを大きい方のルートに繋げる
 	uf.parents[y] = x
 }
@@ -530,10 +647,12 @@ func (uf *UnionFind) size(x int) int {
 }
 func newUnionFind(n int) *UnionFind {
 	parents := make([]int, n)
+	rootHasNodes := make(map[int][]int)
 	for i := 0; i < n; i++ {
 		parents[i] = -1
+		rootHasNodes[i] = []int{i}
 	}
-	return &UnionFind{parents: parents}
+	return &UnionFind{parents: parents, rootAndNodes: rootHasNodes}
 }
 
 // algorithm
@@ -621,65 +740,6 @@ func getCombinationsCh(list []int, k int) (c chan []int) {
 	}()
 
 	return
-}
-
-// nCr
-func getComb(n, k int) int {
-	numerator := 1
-	denominator := 1
-	for i := 0; i < k; i++ {
-		numerator *= n - i
-		denominator *= i + 1
-	}
-	return numerator / denominator
-}
-
-// n以下の素数を列挙
-func primeNumbers(n int) []int {
-	isPrime := getIsPrime(n)
-
-	primes := make([]int, 0)
-	for i, b := range isPrime {
-		if b {
-			primes = append(primes, i)
-		}
-	}
-
-	return primes
-}
-
-// n以下の数字がそれぞれ素数かどうかを列挙
-func getIsPrime(n int) []bool {
-	isPrime := make([]bool, n+1)
-	for i := 0; i <= n; i++ {
-		isPrime[i] = true
-	}
-	isPrime[0] = false
-	isPrime[1] = false
-
-	for i := 2; i <= n; i++ {
-		if isPrime[i] {
-			for j := i * 2; j <= n; j += i {
-				isPrime[j] = false
-			}
-		}
-	}
-	return isPrime
-}
-
-// nが素数かどうかを判定
-func isPrime(n int) bool {
-	if n == 2 {
-		return true
-	} else if n < 2 || n%2 == 0 {
-		return false
-	}
-	for i := 3; i*i <= n; i += 2 {
-		if n%i == 0 {
-			return false
-		}
-	}
-	return true
 }
 
 // bit全探索
