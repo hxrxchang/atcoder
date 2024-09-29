@@ -30,44 +30,25 @@ func main() {
 }
 
 func solve() {
-	n := getInt()
-	ls := make([]int, n)
-	rs := make([]int, n)
+	in := getInts()
+	n, m := in[0], in[1]
+	a := getInts()
 
-	for i := 0; i < n; i++ {
+	graph := make([][]dijkstraItem, n)
+	for i := 0; i < m; i++ {
 		in := getInts()
-		l, r := in[0], in[1]
-		ls[i] = l
-		rs[i] = r
+		u, v, m := in[0]-1, in[1]-1, in[2]
+		graph[u] = append(graph[u], dijkstraItem{node: v, dist: m + a[v]})
+		graph[v] = append(graph[v], dijkstraItem{node: u, dist: m + a[u]})
 	}
 
-	sumLs := sum(ls)
-	sumRs := sum(rs)
-
-	if sumLs > 0 || sumRs <  0 {
-		fmt.Println("No")
-		return
+	dist := dijkstra(graph, 0)
+	res := make([]int, 0)
+	for i := 1; i < n; i++ {
+		res = append(res, dist[i] + a[0])
 	}
 
-	tmp := sumLs
-	res := make([]int, n)
-	for i := 0; i < n; i++ {
-		l, r := ls[i], rs[i]
-		diff := min(r-l, -tmp)
-		tmp += diff
-		res[i] = l + diff
-	}
-
-	fmt.Println("Yes")
 	printSlice(res)
-}
-
-func sum(slice []int) int {
-	sum := 0
-	for _, v := range slice {
-		sum += v
-	}
-	return sum
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -198,6 +179,14 @@ func max(values ...int) int {
 		}
 	}
 	return ret
+}
+
+func sum(slice []int) int {
+	sum := 0
+	for _, v := range slice {
+		sum += v
+	}
+	return sum
 }
 
 func mod(x, y int) int {
