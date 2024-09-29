@@ -30,14 +30,29 @@ func main() {
 }
 
 func solve() {
-	s := getStr()
+	s := strToSlice(getStr(), "")
+	mapping := make(map[string]int)
+
+	for i := 0; i < len(s); i++ {
+		mapping[s[i]] = i
+	}
+
 	cnt := 0
-	for i := 1; i < len(s); i++ {
-		diff := abs(int(s[i-1]) - int(s[i]))
-		cnt += diff
+	alphabets := createAlphabetSlice()
+	for i := 1; i < len(alphabets); i++ {
+		a, b := alphabets[i-1], alphabets[i]
+		cnt += abs(mapping[a] - mapping[b])
 	}
 
 	fmt.Println(cnt)
+}
+
+func createAlphabetSlice() []string {
+    alphabet := make([]string, 26)
+    for i := 0; i < 26; i++ {
+        alphabet[i] = string('A' + i)
+    }
+    return alphabet
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
