@@ -162,6 +162,14 @@ func max(values ...int) int {
 	return ret
 }
 
+func sum(slice []int) int {
+	sum := 0
+	for _, v := range slice {
+		sum += v
+	}
+	return sum
+}
+
 func mod(x, y int) int {
 	m := x % y
 	if m < 0 {

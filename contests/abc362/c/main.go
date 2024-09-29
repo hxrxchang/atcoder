@@ -44,27 +44,12 @@ func solve() {
 	sumLs := sum(ls)
 	sumRs := sum(rs)
 
-	if sumLs > 0 || sumRs < 0 {
+	if sumLs > 0 || sumRs <  0 {
 		fmt.Println("No")
 		return
 	}
 
-	s := sumLs
-	ans := make([]int, n)
-
-	for i := 0; i < n; i++ {
-		l, r := ls[i], rs[i]
-		d := min(r-l, -s)
-		s += d
-		ans[i] = l + d
-	}
-
-	if s != 0 {
-		fmt.Println("No")
-	} else {
-		fmt.Println("Yes")
-		printSlice(ans)
-	}
+	fmt.Println("Yes")
 }
 
 func sum(slice []int) int {
