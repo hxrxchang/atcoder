@@ -21,7 +21,11 @@
       "id": "abc329_c",
       "label": "C",
       "title": "Count xxx",
-      "url": "https://atcoder.jp/contests/abc329/tasks/abc329_c"
+      "url": "https://atcoder.jp/contests/abc329/tasks/abc329_c",
+      "directory": {
+        "path": "c",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc329_d",
