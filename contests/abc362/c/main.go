@@ -53,6 +53,7 @@ func solve() {
 	res := make([]int, n)
 	for i := 0; i < n; i++ {
 		l, r := ls[i], rs[i]
+		// lを0方向に動かす。動かす量がなるべく少ないようにする
 		diff := min(r-l, -tmp)
 		tmp += diff
 		res[i] = l + diff
