@@ -21,7 +21,11 @@
       "id": "abc342_c",
       "label": "C",
       "title": "Many Replacement",
-      "url": "https://atcoder.jp/contests/abc342/tasks/abc342_c"
+      "url": "https://atcoder.jp/contests/abc342/tasks/abc342_c",
+      "directory": {
+        "path": "c",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc342_d",
