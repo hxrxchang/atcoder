@@ -1020,6 +1020,56 @@ func (pq *dijkstraPriorityQueue) Pop() interface{} {
 	return item
 }
 
+// functional graphのサイクルを検出
+func findCycle(n int, graph []int) (*[]int, error) {
+	visited := make([]int, n) // 0: 未訪問, 1: 訪問中, 2: 訪問完了
+	start, end := -1, -1
+
+	// DFSでサイクルを検出
+	var dfs func(v int) bool
+	dfs = func(v int) bool {
+		if visited[v] == 1 { // サイクル検出
+			start = v
+			end = v
+			return true
+		}
+		if visited[v] == 2 { // 訪問済み
+			return false
+		}
+		visited[v] = 1
+		next := graph[v]
+		if dfs(next) {
+			if start != -1 {
+				if v == end { // サイクル終了点
+					start = -1 // 全サイクルを検出終了
+				}
+				return true
+			}
+		}
+		visited[v] = 2
+		return false
+	}
+
+	// 全頂点についてDFSを試みる
+	for i := 0; i < n; i++ {
+		if visited[i] == 0 {
+			if dfs(i) {
+				break
+			}
+		}
+	}
+
+	// サイクルの頂点を抽出
+	if end == -1 {
+		return nil, fmt.Errorf("No cycle") // サイクルが存在しない場合
+	}
+	cycle := []int{end}
+	for v := graph[end]; v != end; v = graph[v] {
+		cycle = append(cycle, v)
+	}
+	return &cycle, nil
+}
+
 // ローリングハッシュ
 func NewRollingHash(S string) *RollingHash {
 	const base1, base2 = 1007, 2009
