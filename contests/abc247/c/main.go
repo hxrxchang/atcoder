@@ -31,22 +31,26 @@ func main() {
 
 func solve() {
 	n := getInt()
+	memo := make(map[int][]int)
 
-	memo := make(map[int]int)
-	ans := recursive(&memo, n)
-	fmt.Println(ans)
+	res := recursive(n, &memo)
+	printSlice(res)
 }
 
 // メモ化再帰
-func recursive(memo *map[int]int, n int) int {
-	if _, ok := (*memo)[n]; ok {
-		return (*memo)[n]
+func recursive(n int, memo *map[int][]int) []int {
+	if v, ok := (*memo)[n]; ok {
+		return v
 	}
-	if n == 0 || n == 1 {
-		return 0
+	if n == 1 {
+		return []int{1}
 	}
-	(*memo)[n] = recursive(memo, n/2) + recursive(memo, ceilDiv(n, 2)) + n
-	return (*memo)[n]
+	res := make([]int, 0)
+	res = append(res, recursive(n-1, memo)...)
+	res = append(res, n)
+	res = append(res, recursive(n-1, memo)...)
+	(*memo)[n] = res
+	return res
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -148,6 +152,10 @@ func i2b(i int) bool {
   return i != 0
 }
 
+func i2bit(i int) []string {
+	return strToSlice(strconv.FormatInt(int64(i), 2), "")
+}
+
 func abs(v int) int {
 	if v < 0 {
 		return -v
@@ -173,6 +181,14 @@ func max(values ...int) int {
 		}
 	}
 	return ret
+}
+
+func sum(slice []int) int {
+	sum := 0
+	for _, v := range slice {
+		sum += v
+	}
+	return sum
 }
 
 func mod(x, y int) int {
@@ -207,6 +223,11 @@ func modPow(base, exp, mod int) int {
 	return result
 }
 
+// logXのYを求める
+func logXY(x, y int) int {
+	return int(math.Log(float64(y)) / math.Log(float64(x)))
+}
+
 // intのまま計算できるように
 func sqrt(x int) int {
 	return int(math.Sqrt(float64(x)))
@@ -228,11 +249,97 @@ func lcm(v1, v2 int) int {
 	return v1 * v2 / gcd(v1, v2)
 }
 
+// 切り上げ除算
 func ceilDiv(a, b int) int {
 	if a + b - 1 < 0 && (a + b - 1) % b != 0 {
 		return (a + b - 1) / b - 1
 	}
 	return (a + b - 1) / b
+}
+
+// nCr
+func getComb(n, k int) int {
+	numerator := 1
+	denominator := 1
+	for i := 0; i < k; i++ {
+		numerator *= n - i
+		denominator *= i + 1
+	}
+	return numerator / denominator
+}
+
+// nを素因数分解
+func primeFactorize(n int) []int {
+	var factors []int
+
+	// 2で割り切れる間、2を追加
+	for n%2 == 0 {
+		factors = append(factors, 2)
+		n /= 2
+	}
+
+	// 3以降の奇数で割り切れるか確認
+	for f := 3; f*f <= n; f += 2 {
+		for n%f == 0 {
+			factors = append(factors, f)
+			n /= f
+		}
+	}
+
+	// nが1でない場合は、n自身を追加
+	if n > 1 {
+		factors = append(factors, n)
+	}
+
+	return factors
+}
+
+// n以下の素数を列挙
+func primeNumbers(n int) []int {
+	isPrime := getIsPrime(n)
+
+	primes := make([]int, 0)
+	for i, b := range isPrime {
+		if b {
+			primes = append(primes, i)
+		}
+	}
+
+	return primes
+}
+
+// n以下の数字がそれぞれ素数かどうかを列挙
+func getIsPrime(n int) []bool {
+	isPrime := make([]bool, n+1)
+	for i := 0; i <= n; i++ {
+		isPrime[i] = true
+	}
+	isPrime[0] = false
+	isPrime[1] = false
+
+	for i := 2; i <= n; i++ {
+		if isPrime[i] {
+			for j := i * 2; j <= n; j += i {
+				isPrime[j] = false
+			}
+		}
+	}
+	return isPrime
+}
+
+// nが素数かどうかを判定
+func isPrime(n int) bool {
+	if n == 2 {
+		return true
+	} else if n < 2 || n%2 == 0 {
+		return false
+	}
+	for i := 3; i*i <= n; i += 2 {
+		if n%i == 0 {
+			return false
+		}
+	}
+	return true
 }
 
 // set
@@ -636,65 +743,6 @@ func getCombinationsCh(list []int, k int) (c chan []int) {
 	return
 }
 
-// nCr
-func getComb(n, k int) int {
-	numerator := 1
-	denominator := 1
-	for i := 0; i < k; i++ {
-		numerator *= n - i
-		denominator *= i + 1
-	}
-	return numerator / denominator
-}
-
-// n以下の素数を列挙
-func primeNumbers(n int) []int {
-	isPrime := getIsPrime(n)
-
-	primes := make([]int, 0)
-	for i, b := range isPrime {
-		if b {
-			primes = append(primes, i)
-		}
-	}
-
-	return primes
-}
-
-// n以下の数字がそれぞれ素数かどうかを列挙
-func getIsPrime(n int) []bool {
-	isPrime := make([]bool, n+1)
-	for i := 0; i <= n; i++ {
-		isPrime[i] = true
-	}
-	isPrime[0] = false
-	isPrime[1] = false
-
-	for i := 2; i <= n; i++ {
-		if isPrime[i] {
-			for j := i * 2; j <= n; j += i {
-				isPrime[j] = false
-			}
-		}
-	}
-	return isPrime
-}
-
-// nが素数かどうかを判定
-func isPrime(n int) bool {
-	if n == 2 {
-		return true
-	} else if n < 2 || n%2 == 0 {
-		return false
-	}
-	for i := 3; i*i <= n; i += 2 {
-		if n%i == 0 {
-			return false
-		}
-	}
-	return true
-}
-
 // bit全探索
 func generateSubsets[T any](elements []T) [][]T {
 	n := len(elements)
@@ -752,6 +800,49 @@ func lessThan[T constraints.Ordered](slice []T, value T) *T {
 		return nil
 	}
 	return &slice[idx-1]
+}
+
+// 座標圧縮
+type Zaatsu struct {
+	values []int
+	mapping map[int]int
+}
+func newZaatsu(params []int) *Zaatsu {
+	s := newSet[int]()
+	for _, v := range params {
+		s.Add(v)
+	}
+	sorted := sortSlice(s.Values())
+
+	mapping := make(map[int]int)
+	for i, v := range sorted {
+		mapping[v] = i
+	}
+
+	return &Zaatsu{
+		values: sorted,
+		mapping: mapping,
+	}
+}
+// 圧縮後の値を取得
+func (z *Zaatsu) GetCompressedValue(v int) int {
+	return z.mapping[v]
+}
+// 圧縮後の値から元の値を取得
+func (z *Zaatsu) GetOriginalValue(compressedIndex int) int {
+	if compressedIndex < 0 || compressedIndex >= len(z.values) {
+		panic("Index out of range")
+	}
+	return z.values[compressedIndex]
+}
+func (z *Zaatsu) Count() int {
+	return len(z.values)
+}
+func (z *Zaatsu) BisectLeft(v int) int {
+	return bisectLeft(z.values, v)
+}
+func (z *Zaatsu) BisectRight(v int) int {
+	return bisectRight(z.values, v)
 }
 
 // Segment Tree
@@ -948,6 +1039,56 @@ func (pq *dijkstraPriorityQueue) Pop() interface{} {
 	item := old[n-1]
 	*pq = old[0 : n-1]
 	return item
+}
+
+// functional graphのサイクルを検出
+func findCycle(n int, graph []int) (*[]int, error) {
+	visited := make([]int, n) // 0: 未訪問, 1: 訪問中, 2: 訪問完了
+	start, end := -1, -1
+
+	// DFSでサイクルを検出
+	var dfs func(v int) bool
+	dfs = func(v int) bool {
+		if visited[v] == 1 { // サイクル検出
+			start = v
+			end = v
+			return true
+		}
+		if visited[v] == 2 { // 訪問済み
+			return false
+		}
+		visited[v] = 1
+		next := graph[v]
+		if dfs(next) {
+			if start != -1 {
+				if v == end { // サイクル終了点
+					start = -1 // 全サイクルを検出終了
+				}
+				return true
+			}
+		}
+		visited[v] = 2
+		return false
+	}
+
+	// 全頂点についてDFSを試みる
+	for i := 0; i < n; i++ {
+		if visited[i] == 0 {
+			if dfs(i) {
+				break
+			}
+		}
+	}
+
+	// サイクルの頂点を抽出
+	if end == -1 {
+		return nil, fmt.Errorf("No cycle") // サイクルが存在しない場合
+	}
+	cycle := []int{end}
+	for v := graph[end]; v != end; v = graph[v] {
+		cycle = append(cycle, v)
+	}
+	return &cycle, nil
 }
 
 // ローリングハッシュ
