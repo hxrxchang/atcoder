@@ -26,7 +26,7 @@ var rdr *bufio.Reader
 
 func main() {
 	rdr = bufio.NewReaderSize(os.Stdin, BUFSIZE)
-	solve()
+	solve2()
 }
 
 func solve() {
@@ -40,6 +40,34 @@ func solve() {
 		ans = min(ans, max(sumK - sum(v), sum(v)))
 	}
 
+	fmt.Println(ans)
+}
+
+// 再帰のパターン。
+// bit全探索はA,Bのように2つのグループに分ける場合にしか使えないが、再帰は任意の分割が可能。
+func solve2() {
+	n := getInt()
+	k := getInts()
+
+	ans := BIGGEST
+	a, b := 0, 0
+
+	var rec func(x int)
+	rec = func(x int) {
+		if x == n {
+			ans = min(ans, max(a, b))
+			return
+		}
+		a += k[x]
+		rec(x+1)
+		a -= k[x]
+
+		b += k[x]
+		rec(x+1)
+		b -= k[x]
+	}
+
+	rec(0)
 	fmt.Println(ans)
 }
 
