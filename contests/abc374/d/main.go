@@ -41,83 +41,46 @@ type Line struct {
 func solve() {
 	in := getInts()
 	n, s, t := in[0], in[1], in[2]
-
-	remainds := make([]Point, 0)
-	sameLine := make([]Line, 0)
+	lines := make([]Line, n)
 	for i := 0; i < n; i++ {
-		in := getInts()
-		a, b, c, d := in[0], in[1], in[2], in[3]
-		remainds = append(remainds, Point{a, b})
-		remainds = append(remainds, Point{c, d})
-		sameLine = append(sameLine, Line{Point{a, b}, Point{c, d}})
+		in = getInts()
+		lines[i] = Line{Point{in[0], in[1]}, Point{in[2], in[3]}}
 	}
 
-	current := Point{0, 0}
-	var cnt float64
-
-	for len(remainds) > 0 {
-		_, nearestPoint, time := nearestRemaind(current, remainds, s)
-		cnt += time
-
-		var targetLine Line
-		for i, line := range sameLine {
-			if line.start == nearestPoint || line.end == nearestPoint {
-				targetLine = line
-				sameLine = append(sameLine[:i], sameLine[i+1:]...)
-				break
+	lineIndexes := rangeSlice(n)
+	ans := math.MaxFloat64
+	for {
+		subsets := generateSubsets(rangeSlice(n))
+		for _, subset := range subsets {
+			var tmp float64
+			current := Point{0, 0}
+			for _, lineIdx := range lineIndexes {
+				line := lines[lineIdx]
+				if sliceContains(subset, lineIdx) {
+					tmp += move(current, line.start, s)
+					tmp += move(line.start, line.end, t)
+					current = line.end
+				} else {
+					tmp += move(current, line.end, s)
+					tmp += move(line.end, line.start, t)
+					current = line.start
+				}
+			}
+			if tmp < ans {
+				ans = tmp
 			}
 		}
 
-		if nearestPoint == targetLine.start {
-			cnt += moveFromToEnd(nearestPoint, targetLine.end, t)
-			current = targetLine.end
-		} else {
-			cnt += moveFromToEnd(nearestPoint, targetLine.start, t)
-			current = targetLine.start
-		}
-
-		remainds = removePoint(remainds, nearestPoint)
-		remainds = removePoint(remainds, current)
-	}
-
-	cnt = math.Round(cnt*1e9) / 1e9
-	fmt.Println(cnt)
-}
-
-func nearestRemaind(current Point, remainds []Point, s int) (int, Point, float64) {
-	minDist := BIGGESTF
-	var minIdx int
-	var minPoint Point
-	for i, p := range remainds {
-		dist := math.Sqrt(float64((current.x-p.x)*(current.x-p.x) + (current.y-p.y)*(current.y-p.y)))
-		if dist < float64(minDist) {
-			minDist = dist
-			minIdx = i
-			minPoint = p
+		if !nextPermutation(sort.IntSlice(lineIndexes)) {
+			break
 		}
 	}
-	time := minDist / float64(s)
-	return minIdx, minPoint, time
+
+	fmt.Println(ans)
 }
 
-
-func moveFromToEnd(current Point, end Point, t int) float64 {
-	dist := math.Sqrt(float64((current.x-end.x)*(current.x-end.x) + (current.y-end.y)*(current.y-end.y)))
-	time := dist / float64(t)
-	return time
-}
-
-func removePoint(points []Point, target Point) []Point {
-	tmp := make([]Point, 0)
-	removed := false
-	for _, p := range points {
-		if p == target && !removed {
-			removed = true
-			continue
-		}
-		tmp = append(tmp, p)
-	}
-	return tmp
+func move(from Point, to Point, t int) float64 {
+	return math.Sqrt(float64((from.x-to.x)*(from.x-to.x) + (from.y-to.y)*(from.y-to.y))) / float64(t)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
