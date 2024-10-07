@@ -30,50 +30,17 @@ func main() {
 }
 
 func solve() {
-	in := getInts()
-	n, m := in[0], in[1]
-
-	type Node struct {
-		to, x, y int
-	}
-	graph := make([][]Node, n)
-	for i := 0; i < m; i++ {
-		in = getInts()
-		a, b, x, y := in[0], in[1], in[2], in[3]
-		a--
-		b--
-
-		graph[a] = append(graph[a], Node{to: b, x: x, y: y})
-		graph[b] = append(graph[b], Node{to: a, x: -x, y: -y})
-	}
-
-	type Cordinate struct {
-		x, y int
-	}
-	cordinates := make(map[int]*Cordinate)
-	cordinates[0] = &Cordinate{x: 0, y: 0}
-
-	que := newQueue[int]()
-	que.PushBack(0)
-
-	for que.Size() > 0 {
-		v := que.PopFront()
-		for _, next := range graph[v] {
-			if cordinates[next.to] != nil {
-				continue
+	s := strToSlice(getStr(), "")
+	ans := 0
+	for i := 0; i < len(s); i++ {
+		for j := i; j < len(s); j++ {
+			if isPalindrome(sliceToStr(s[i:j+1], "")) {
+				ans = max(ans, j-i+1)
 			}
-			cordinates[next.to] = &Cordinate{x: cordinates[v].x + next.x, y: cordinates[v].y + next.y}
-			que.PushBack(next.to)
 		}
 	}
 
-	for i := 0; i < n; i++ {
-		if cordinates[i] == nil {
-			fmt.Println("undecidable")
-		} else {
-			fmt.Println(cordinates[i].x, cordinates[i].y)
-		}
-	}
+	fmt.Println(ans)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -9,13 +9,21 @@
       "id": "abc320_a",
       "label": "A",
       "title": "Leyland Number",
-      "url": "https://atcoder.jp/contests/abc320/tasks/abc320_a"
+      "url": "https://atcoder.jp/contests/abc320/tasks/abc320_a",
+      "directory": {
+        "path": "a",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc320_b",
       "label": "B",
       "title": "Longest Palindrome",
-      "url": "https://atcoder.jp/contests/abc320/tasks/abc320_b"
+      "url": "https://atcoder.jp/contests/abc320/tasks/abc320_b",
+      "directory": {
+        "path": "b",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc320_c",
