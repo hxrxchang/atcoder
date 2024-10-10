@@ -9,7 +9,11 @@
       "id": "dp_a",
       "label": "A",
       "title": "Frog 1",
-      "url": "https://atcoder.jp/contests/dp/tasks/dp_a"
+      "url": "https://atcoder.jp/contests/dp/tasks/dp_a",
+      "directory": {
+        "path": "a",
+        "testdir": "tests"
+      }
     },
     {
       "id": "dp_b",
