@@ -30,6 +30,23 @@ func main() {
 }
 
 func solve() {
+	in := getInts()
+	a, b, w := in[0], in[1], in[2] * 1000
+	a2, b2, w2 := float64(a), float64(b), float64(w)
+
+	res := make([]int, 0)
+	for i := 1; i <= 1000000; i++ {
+		avr := w2 / float64(i)
+		if a2 <= avr && avr <= b2 {
+			res = append(res, i)
+		}
+	}
+
+	if len(res) == 0 {
+		fmt.Println("UNSATISFIABLE")
+	} else {
+		fmt.Println(res[0], res[len(res)-1])
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
