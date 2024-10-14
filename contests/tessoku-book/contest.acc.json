@@ -149,7 +149,11 @@
       "id": "tessoku_book_w",
       "label": "A23",
       "title": "All Free",
-      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_w"
+      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_w",
+      "directory": {
+        "path": "a23",
+        "testdir": "tests"
+      }
     },
     {
       "id": "tessoku_book_x",
