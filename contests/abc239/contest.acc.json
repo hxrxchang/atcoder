@@ -9,7 +9,11 @@
       "id": "abc239_a",
       "label": "A",
       "title": "Horizon",
-      "url": "https://atcoder.jp/contests/abc239/tasks/abc239_a"
+      "url": "https://atcoder.jp/contests/abc239/tasks/abc239_a",
+      "directory": {
+        "path": "a",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc239_b",
