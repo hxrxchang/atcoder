@@ -41,7 +41,11 @@
       "id": "abc292_e",
       "label": "E",
       "title": "Transitivity",
-      "url": "https://atcoder.jp/contests/abc292/tasks/abc292_e"
+      "url": "https://atcoder.jp/contests/abc292/tasks/abc292_e",
+      "directory": {
+        "path": "e",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc292_f",
