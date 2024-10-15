@@ -429,7 +429,11 @@
       "id": "tessoku_book_bo",
       "label": "A67",
       "title": "MST (Minimum Spanning Tree)",
-      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bo"
+      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bo",
+      "directory": {
+        "path": "a67",
+        "testdir": "tests"
+      }
     },
     {
       "id": "tessoku_book_bp",
