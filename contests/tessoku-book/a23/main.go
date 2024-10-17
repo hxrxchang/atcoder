@@ -35,47 +35,46 @@ func solve() {
 
 	coupons := make([][]int, m)
 	for i := 0; i < m; i++ {
-		coupons[i] = getInts()
+		coupons[i] =getInts()
 	}
 
-	dp := make([][]int, m+1)
-	for i := 0; i <= m; i++ {
-		dp[i] = make([]int, 1<<n)
-		for j := 0; j < 1<<n; j++ {
-			dp[i][j] = BIGGEST
+	ans := minCoupons(n, m, coupons)
+	fmt.Println(ans)
+}
+
+func minCoupons(N int, M int, coupons [][]int) int {
+	// 各クーポンをビットマスクで表現する
+	mask := make([]int, M)
+	for i := 0; i < M; i++ {
+		for j := 0; j < N; j++ {
+			if coupons[i][j] == 1 {
+				mask[i] |= (1 << j)
+			}
 		}
 	}
 
-	dp[0][0] = 0
-	for i := 1; i <= m; i++ {
-		for j := 0; j < 1<<n; j++ {
-			already := make([]bool, n)
-			for k := 0; k < n; k++ {
-				if (j / 1 << k) % 2 == 0 {
-					already[k] = false
-				} else {
-					already[k] = true
-				}
-			}
-			v := 0
-			for k := 0; k < n; k++ {
-				if already[k] || coupons[i-1][k] == 1 {
-					v += 1 << k
-				}
-			}
+	// dp配列を用意し、初期化
+	INF := math.MaxInt32
+	dp := make([]int, 1<<N)
+	for i := range dp {
+		dp[i] = INF
+	}
+	dp[0] = 0
 
-			dp[i][j] = min(dp[i][j], dp[i-1][j])
-			dp[i][v] = min(dp[i][v], dp[i-1][j] + 1)
+	// ビットDP
+	for i := 0; i < (1 << N); i++ {
+		for j := 0; j < M; j++ {
+			next := i | mask[j]
+			dp[next] = min(dp[next], dp[i]+1)
 		}
 	}
 
-	fmt.Println(dp)
-
-	if dp[m][(1<<n)-1] == BIGGEST {
-		fmt.Println(-1)
-	} else {
-		fmt.Println(dp[m][(1<<n)-1])
+	// 全ての品物を買うためのマスク
+	fullMask := (1 << N) - 1
+	if dp[fullMask] == INF {
+		return -1 // 全ての品物を買うことが不可能
 	}
+	return dp[fullMask]
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
