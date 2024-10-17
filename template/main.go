@@ -212,6 +212,11 @@ func sqrt(x int) int {
 	return int(math.Sqrt(float64(x)))
 }
 
+// xのn乗根
+func rootN(x, n int) float64 {
+	return math.Pow(float64(x), 1.0/float64(n))
+}
+
 // 最大公約数
 func gcd(v1, v2 int) int {
 	if v1 > v2 {
