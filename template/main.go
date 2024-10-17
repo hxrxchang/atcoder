@@ -946,7 +946,7 @@ func warshallFloyd(graph [][]int) [][]int {
 			if i == j {
 				dist[i][j] = 0
 			} else if graph[i][j] == 0 {
-				dist[i][j] = BIGGEST
+				dist[i][j] = 1 << 60
 			} else {
 				dist[i][j] = graph[i][j]
 			}
