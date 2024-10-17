@@ -37,7 +37,11 @@
       "id": "abc328_e",
       "label": "E",
       "title": "Modulo MST",
-      "url": "https://atcoder.jp/contests/abc328/tasks/abc328_e"
+      "url": "https://atcoder.jp/contests/abc328/tasks/abc328_e",
+      "directory": {
+        "path": "e",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc328_f",
