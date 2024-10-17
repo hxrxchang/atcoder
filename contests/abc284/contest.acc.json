@@ -21,13 +21,21 @@
       "id": "abc284_c",
       "label": "C",
       "title": "Count Connected Components",
-      "url": "https://atcoder.jp/contests/abc284/tasks/abc284_c"
+      "url": "https://atcoder.jp/contests/abc284/tasks/abc284_c",
+      "directory": {
+        "path": "c",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc284_d",
       "label": "D",
       "title": "Happy New Year 2023 ",
-      "url": "https://atcoder.jp/contests/abc284/tasks/abc284_d"
+      "url": "https://atcoder.jp/contests/abc284/tasks/abc284_d",
+      "directory": {
+        "path": "d",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc284_e",
