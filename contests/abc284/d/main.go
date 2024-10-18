@@ -33,11 +33,24 @@ func solve() {
 	t := getInt()
 	for i := 0; i < t; i++ {
 		n := getInt()
-		for j := 2; j < int(rootN(n, 3)) + 1; j++ {
+		var j int
+		for j = 2; j < int(rootN(n, 3)) + 1; j++ {
 			if n % j == 0 {
 				break
 			}
 		}
+
+		var p, q int
+		if n % pow(j, 2) == 0 {
+			p = j
+			q = n / pow(j, 2)
+		} else {
+			q = j
+			p2 := n / j
+			p = sqrt(p2)
+		}
+
+		fmt.Println(p, q)
 	}
 }
 
