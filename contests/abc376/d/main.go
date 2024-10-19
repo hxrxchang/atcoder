@@ -39,12 +39,35 @@ func solve() {
 		graph[a] = append(graph[a], b)
 	}
 
-	for _, v := range graph[0] {
-		if !dfs(v, graph) {
-			fmt.Println("POSSIBLE")
-			return
+	ans := bfsShortestCycle(graph, 0)
+	fmt.Println(ans)
+}
+
+
+func bfsShortestCycle(graph [][]int, start int) int {
+	dist := make([]int, len(graph))
+	for i := 0; i < len(graph); i++ {
+		dist[i] = -1
+	}
+
+	que := newQueue[int]()
+	que.PushBack(start)
+	dist[start] = 0
+	for que.Size() > 0 {
+		v := que.PopFront()
+		for _, next := range graph[v] {
+			if dist[next] == start {
+				return dist[v] + 1
+			}
+			if dist[next] != -1 {
+				continue
+			}
+			dist[next] = dist[v] + 1
+			que.PushBack(next)
 		}
 	}
+
+	return -1
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
