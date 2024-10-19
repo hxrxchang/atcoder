@@ -520,6 +520,17 @@ func sortSlice[T constraints.Ordered](slice []T) []T {
     return copiedSlice
 }
 
+func descendingSortSlice[T constraints.Ordered](slice []T) []T {
+	copiedSlice := make([]T, len(slice))
+	copy(copiedSlice, slice)
+
+	sort.Slice(copiedSlice, func(i, j int) bool {
+		return copiedSlice[i] > copiedSlice[j]
+	})
+
+	return copiedSlice
+}
+
 func reverse[T any](slice []T) []T {
 	copiedSlice := make([]T, len(slice))
 	copy(copiedSlice, slice)
