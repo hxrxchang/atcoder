@@ -32,6 +32,27 @@ func main() {
 func solve() {
 	n := getInt()
 	a := getInts()
+
+	idxA := make(map[int][]int)
+	for i, v := range a {
+		idxA[v] = append(idxA[v], i)
+	}
+
+	res := 0
+	// Aの各要素の値を見ていく。
+	// A[i] <= N なので、n以下まで。
+	for i := 1; i <= n; i++ {
+		lenI := len(idxA[i])
+		if lenI == 0 {
+			continue
+		}
+		for j := 0; j < lenI - 1; j++ {
+			diff := idxA[i][j+1] - idxA[i][j] - 1
+			res += diff * (j + 1) * (lenI - j - 1)
+		}
+	}
+
+	fmt.Println(res)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
