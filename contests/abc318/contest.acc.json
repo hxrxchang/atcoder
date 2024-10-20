@@ -25,7 +25,11 @@
       "id": "abc318_c",
       "label": "C",
       "title": "Blue Spring",
-      "url": "https://atcoder.jp/contests/abc318/tasks/abc318_c"
+      "url": "https://atcoder.jp/contests/abc318/tasks/abc318_c",
+      "directory": {
+        "path": "c",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc318_d",
