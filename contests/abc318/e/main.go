@@ -30,29 +30,27 @@ func main() {
 }
 
 func solve() {
-	n := getInt()
+	getInt()
 	a := getInts()
 
 	idxA := make(map[int][]int)
 	for i, v := range a {
 		idxA[v] = append(idxA[v], i)
 	}
+	maxA := max(a...)
 
-	res := 0
-	// Aの各要素の値を見ていく。
-	// A[i] <= N なので、n以下まで。
-	for i := 1; i <= n; i++ {
-		lenI := len(idxA[i])
-		if lenI == 0 {
-			continue
-		}
-		for j := 0; j < lenI - 1; j++ {
-			diff := idxA[i][j+1] - idxA[i][j] - 1
-			res += diff * (j + 1) * (lenI - j - 1)
+	ans := 0
+	for i := 1; i <= maxA; i++ {
+		idxs := idxA[i]
+		for i := 0; i < len(idxs)-1; i++ {
+			betweenSize := idxs[i+1] - idxs[i] - 1 // 同じ数字に挟まれている数
+			beforeItemsSize := len(idxs[:i+1]) // iとして選べる数
+			afterItemsSize := len(idxs[i+1:]) // kとして選べる数
+			ans += beforeItemsSize * afterItemsSize * betweenSize
 		}
 	}
 
-	fmt.Println(res)
+	fmt.Println(ans)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
