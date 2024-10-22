@@ -39,7 +39,11 @@
       "id": "abc338_d",
       "label": "D",
       "title": "Island Tour",
-      "url": "https://atcoder.jp/contests/abc338/tasks/abc338_d"
+      "url": "https://atcoder.jp/contests/abc338/tasks/abc338_d",
+      "directory": {
+        "path": "d",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc338_e",
