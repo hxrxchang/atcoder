@@ -30,6 +30,28 @@ func main() {
 }
 
 func solve() {
+	in := getInts()
+	n, m := in[0], in[1]
+
+	uf := newUnionFind(n)
+	for i := 0; i < m; i++ {
+		in := getInts()
+		a, b := in[0]-1, in[1]-1
+		uf.unit(a, b)
+	}
+
+	// 連結成分を探し、各連結成分の頂点数から、その連結成分の辺の最大数を求める
+	// 連結成分には最大でn(n-1)/2本の辺がある
+	connectedComponentEdges := 0
+	for i := 0; i < n; i++ {
+		if uf.parents[i] < 0 {
+			size := uf.size(uf.root(i))
+			connectedComponentEdges += size * (size - 1) / 2
+		}
+	}
+
+	ans := connectedComponentEdges - m
+	fmt.Println(ans)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
