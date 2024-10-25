@@ -41,7 +41,11 @@
       "id": "abc340_e",
       "label": "E",
       "title": "Mancala 2",
-      "url": "https://atcoder.jp/contests/abc340/tasks/abc340_e"
+      "url": "https://atcoder.jp/contests/abc340/tasks/abc340_e",
+      "directory": {
+        "path": "e",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc340_f",
