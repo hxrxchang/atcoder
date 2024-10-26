@@ -46,11 +46,9 @@ func solve() {
 		segtree.UpdateRange(i, i+1, a[i])
 	}
 
-	printState(segtree, n)
 	for i := 0; i < m; i++ {
 		itemCnt := segtree.Query(b[i], b[i]+1)
-		fmt.Println(itemCnt, b[i])
-		segtree.UpdateRange(b[i], b[i]+1, 0)
+		segtree.UpdateRange(b[i], b[i]+1, -itemCnt)
 		if itemCnt / n > 0 {
 			segtree.UpdateRange(0, n, itemCnt / n)
 		}
@@ -63,19 +61,14 @@ func solve() {
 			segtree.UpdateRange(b[i] + 1, n, 1)
 			segtree.UpdateRange(0, b[i] + remainder - n + 1, 1)
 		}
-
-		printState(segtree, n)
 	}
-}
 
-func printState(segtree *LazySegmentTree, n int) {
 	ans := make([]int, n)
 	for i := 0; i < n; i++ {
 		ans[i] = segtree.Query(i, i+1)
 	}
 	printSlice(ans)
 }
-
 
 type LazySegmentTree struct {
 	data   []int
