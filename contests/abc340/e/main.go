@@ -93,7 +93,6 @@ func NewLazySegmentTree(n int, noop int, op, lazyOp func(int, int) int, isNoop f
 	for seg.n < n {
 		seg.n *= 2
 	}
-<<<<<<< HEAD
 	seg.data = make([]int, seg.n*2-1)
 	seg.lazy = make([]int, seg.n*2-1)
 	seg.noop = noop
@@ -129,59 +128,10 @@ func (seg *LazySegmentTree) updateRange(begin, end, idx, l, r, x int) {
 	} else {
 		seg.updateRange(begin, end, idx*2+1, l, (l+r)/2, x)
 		seg.updateRange(begin, end, idx*2+2, (l+r)/2, r, x)
-=======
-	seg.data = make([]T, seg.n*2-1)
-	seg.lazy = make([]T, seg.n*2-1)
-	seg.lazyFlag = make([]bool, seg.n*2-1) // Initialize lazy flags to false
-	for i := 0; i < seg.n*2-1; i++ {
-		seg.data[i] = seg.e
-	}
-	return seg
-}
-
-// UpdateRange applies a value to all elements in the range [begin, end).
-func (seg *LazySegmentTree[T]) UpdateRange(begin, end int, x T) {
-	seg.updateRange(begin, end, 0, 0, seg.n, x)
-}
-
-// queryRange is a helper function for range queries with lazy propagation.
-func (seg *LazySegmentTree[T]) queryRange(begin, end, idx, a, b int) T {
-	seg.evaluate(idx, a, b)
-	if b <= begin || end <= a {
-		return seg.e
-	}
-	if begin <= a && b <= end {
-		return seg.data[idx]
-	}
-	v1 := seg.queryRange(begin, end, idx*2+1, a, (a+b)/2)
-	v2 := seg.queryRange(begin, end, idx*2+2, (a+b)/2, b)
-	return seg.op(v1, v2)
-}
-
-// QueryRange queries the segment tree in the range [begin, end).
-func (seg *LazySegmentTree[T]) QueryRange(begin, end int) T {
-	return seg.queryRange(begin, end, 0, 0, seg.n)
-}
-
-// updateRange applies the operation to the range [begin, end).
-func (seg *LazySegmentTree[T]) updateRange(begin, end, idx, a, b int, x T) {
-	seg.evaluate(idx, a, b)
-	if b <= begin || end <= a {
-		return
-	}
-	if begin <= a && b <= end {
-		seg.lazy[idx] = seg.lazyOp(seg.lazy[idx], x)
-		seg.lazyFlag[idx] = true // Mark this index as needing lazy update
-		seg.evaluate(idx, a, b)
-	} else {
-		seg.updateRange(begin, end, idx*2+1, a, (a+b)/2, x)
-		seg.updateRange(begin, end, idx*2+2, (a+b)/2, b, x)
->>>>>>> 39a2f30750d552dcec6fc49abf69c3e2c299e583
 		seg.data[idx] = seg.op(seg.data[idx*2+1], seg.data[idx*2+2])
 	}
 }
 
-<<<<<<< HEAD
 func (seg *LazySegmentTree) Query(begin, end int) int {
 	return seg.query(begin, end, 0, 0, seg.n)
 }
@@ -197,21 +147,6 @@ func (seg *LazySegmentTree) query(begin, end, idx, l, r int) int {
 	v1 := seg.query(begin, end, idx*2+1, l, (l+r)/2)
 	v2 := seg.query(begin, end, idx*2+2, (l+r)/2, r)
 	return seg.op(v1, v2)
-=======
-// evaluate applies any pending lazy updates at the given index.
-func (seg *LazySegmentTree[T]) evaluate(idx, a, b int) {
-	if seg.lazyFlag[idx] {
-		seg.data[idx] = seg.lazyOp(seg.data[idx], seg.lazy[idx])
-		if b-a > 1 {
-			seg.lazy[idx*2+1] = seg.lazyOp(seg.lazy[idx*2+1], seg.lazy[idx])
-			seg.lazy[idx*2+2] = seg.lazyOp(seg.lazy[idx*2+2], seg.lazy[idx])
-			seg.lazyFlag[idx*2+1] = true
-			seg.lazyFlag[idx*2+2] = true
-		}
-		seg.lazy[idx] = seg.e // Reset lazy value
-		seg.lazyFlag[idx] = false // Reset lazy flag
-	}
->>>>>>> 39a2f30750d552dcec6fc49abf69c3e2c299e583
 }
 
 
