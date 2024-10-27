@@ -32,45 +32,28 @@ func main() {
 func solve() {
 	in := getInts()
 	n, m := in[0], in[1]
-	intervals := make([][]int, n)
+	d := make([]int, m+1)
+	for i := 0; i < m+1; i++ {
+		d[i] = 1
+	}
+
 	for i := 0; i < n; i++ {
-		intervals[i] = getInts()
+		in := getInts()
+		l, r := in[0], in[1]
+		d[r] = max(d[r], l+1)
 	}
 
-	sort.Slice(intervals, func(i, j int) bool {
-		return intervals[i][0] < intervals[j][0]
-	})
-
-	count := 0
-	right := 1
-
-	for l := 1; l <= m; l++ {
-		for right <= m {
-			fullyContains := false
-			for _, interval := range intervals {
-				if interval[0] > right {
-					break
-				}
-				if l <= interval[0] && right >= interval[1] {
-					fullyContains = true
-					break
-				}
-			}
-			if !fullyContains {
-				right++
-			} else {
-				break
-			}
-		}
-		count += right - l
-		if right == l {
-			right++
-		}
+	for r := 1; r <= m; r++ {
+		d[r] = max(d[r], d[r-1])
 	}
-	fmt.Println(count)
+
+	ans := 0
+	for r := 1; r <= m; r++ {
+		ans += r - d[r] + 1
+	}
+
+	fmt.Println(ans)
 }
-
-
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
