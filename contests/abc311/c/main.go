@@ -31,74 +31,32 @@ func main() {
 
 func solve() {
 	n := getInt()
-	graph := make([]int, n)
-
 	a := getInts()
+	graph := make([][]int, n)
 	for i := 0; i < n; i++ {
-		graph[i] = a[i] - 1
+		graph[i] = append(graph[i], a[i]-1)
+	}
+	sccs := findSCCs(graph)
+	var scc []int
+	for _, v := range sccs {
+		if len(v) > 1 {
+			scc = v
+			break
+		}
+	}
+	ans := []int{scc[0]+1}
+	for {
+		next := graph[ans[len(ans)-1]-1][0]
+		if next == scc[0] {
+			break
+		}
+		ans = append(ans, next+1)
 	}
 
-	cycle, err := findCycle(n, graph)
-	if err != nil {
-		panic("No cycle")
-	}
-	cycle2 := make([]int, len(*cycle))
-	for i, v := range *cycle {
-		cycle2[i] = v + 1
-	}
-	fmt.Println(len(cycle2))
-	printSlice(cycle2)
+	fmt.Println(len(ans))
+	printSlice(ans)
 }
 
-// functional graphのサイクルを検出
-func findCycle(n int, graph []int) (*[]int, error) {
-	visited := make([]int, n) // 0: 未訪問, 1: 訪問中, 2: 訪問完了
-	start, end := -1, -1
-
-	// DFSでサイクルを検出
-	var dfs func(v int) bool
-	dfs = func(v int) bool {
-		if visited[v] == 1 { // サイクル検出
-			start = v
-			end = v
-			return true
-		}
-		if visited[v] == 2 { // 訪問済み
-			return false
-		}
-		visited[v] = 1
-		next := graph[v]
-		if dfs(next) {
-			if start != -1 {
-				if v == end { // サイクル終了点
-					start = -1 // 全サイクルを検出終了
-				}
-				return true
-			}
-		}
-		visited[v] = 2
-		return false
-	}
-
-	// 全頂点についてDFSを試みる
-	for i := 0; i < n; i++ {
-		if visited[i] == 0 {
-			if dfs(i) {
-				break
-			}
-		}
-	}
-
-	// サイクルの頂点を抽出
-	if end == -1 {
-		return nil, fmt.Errorf("No cycle") // サイクルが存在しない場合
-	}
-	cycle := []int{end}
-	for v := graph[end]; v != end; v = graph[v] {
-		cycle = append(cycle, v)
-	}
-	return &cycle, nil
-}
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 func getInt() int {
@@ -277,6 +235,11 @@ func logXY(x, y int) int {
 // intのまま計算できるように
 func sqrt(x int) int {
 	return int(math.Sqrt(float64(x)))
+}
+
+// xのn乗根
+func rootN(x, n int) float64 {
+	return math.Pow(float64(x), 1.0/float64(n))
 }
 
 // 最大公約数
@@ -580,6 +543,17 @@ func sortSlice[T constraints.Ordered](slice []T) []T {
     })
 
     return copiedSlice
+}
+
+func descendingSortSlice[T constraints.Ordered](slice []T) []T {
+	copiedSlice := make([]T, len(slice))
+	copy(copiedSlice, slice)
+
+	sort.Slice(copiedSlice, func(i, j int) bool {
+		return copiedSlice[i] > copiedSlice[j]
+	})
+
+	return copiedSlice
 }
 
 func reverse[T any](slice []T) []T {
@@ -891,7 +865,7 @@ func (z *Zaatsu) BisectRight(v int) int {
 	return bisectRight(z.values, v)
 }
 
-// Segment Tree
+// セグメント木
 type SegmentTree[T any] struct {
 	data []T
 	n    int // 葉の数(全区間の要素数)
@@ -938,6 +912,80 @@ func (segtree *SegmentTree[T]) query(begin, end, idx, a, b int) T {
 func (segtree *SegmentTree[T]) Query(begin, end int) T {
 	return segtree.query(begin, end, 0, 0, segtree.n)
 }
+
+// 遅延評価セグメント木
+type LazySegmentTree struct {
+	data   []int
+	lazy   []int
+	n      int
+	op     func(int, int) int
+	noop   int
+	lazyOp func(int, int) int
+	isNoop func(int) bool
+}
+
+func NewLazySegmentTree(n int, noop int, op, lazyOp func(int, int) int, isNoop func(int) bool) *LazySegmentTree {
+	seg := &LazySegmentTree{}
+	seg.n = 1
+	for seg.n < n {
+		seg.n *= 2
+	}
+	seg.data = make([]int, seg.n*2-1)
+	seg.lazy = make([]int, seg.n*2-1)
+	seg.noop = noop
+	seg.op = op
+	seg.lazyOp = lazyOp
+	seg.isNoop = isNoop
+	return seg
+}
+
+func (seg *LazySegmentTree) eval(idx, l, r int) {
+	if !seg.isNoop(seg.lazy[idx]) {
+		seg.data[idx] = seg.lazyOp(seg.data[idx], seg.lazy[idx]*(r-l))
+		if r-l > 1 {
+			seg.lazy[idx*2+1] = seg.lazyOp(seg.lazy[idx*2+1], seg.lazy[idx])
+			seg.lazy[idx*2+2] = seg.lazyOp(seg.lazy[idx*2+2], seg.lazy[idx])
+		}
+		seg.lazy[idx] = seg.noop
+	}
+}
+
+func (seg *LazySegmentTree) UpdateRange(begin, end, x int) {
+	seg.updateRange(begin, end, 0, 0, seg.n, x)
+}
+
+func (seg *LazySegmentTree) updateRange(begin, end, idx, l, r, x int) {
+	seg.eval(idx, l, r)
+	if end <= l || r <= begin {
+		return
+	}
+	if begin <= l && r <= end {
+		seg.lazy[idx] = seg.lazyOp(seg.lazy[idx], x)
+		seg.eval(idx, l, r)
+	} else {
+		seg.updateRange(begin, end, idx*2+1, l, (l+r)/2, x)
+		seg.updateRange(begin, end, idx*2+2, (l+r)/2, r, x)
+		seg.data[idx] = seg.op(seg.data[idx*2+1], seg.data[idx*2+2])
+	}
+}
+
+func (seg *LazySegmentTree) Query(begin, end int) int {
+	return seg.query(begin, end, 0, 0, seg.n)
+}
+
+func (seg *LazySegmentTree) query(begin, end, idx, l, r int) int {
+	seg.eval(idx, l, r)
+	if end <= l || r <= begin {
+		return 0
+	}
+	if begin <= l && r <= end {
+		return seg.data[idx]
+	}
+	v1 := seg.query(begin, end, idx*2+1, l, (l+r)/2)
+	v2 := seg.query(begin, end, idx*2+2, (l+r)/2, r)
+	return seg.op(v1, v2)
+}
+
 
 // 単純なgraphのDFS
 func graphBfs(graph [][]int, start int) []int {
@@ -1013,7 +1061,7 @@ func warshallFloyd(graph [][]int) [][]int {
 			if i == j {
 				dist[i][j] = 0
 			} else if graph[i][j] == 0 {
-				dist[i][j] = BIGGEST
+				dist[i][j] = 1 << 60
 			} else {
 				dist[i][j] = graph[i][j]
 			}
@@ -1085,6 +1133,117 @@ func (pq *dijkstraPriorityQueue) Pop() interface{} {
 	item := old[n-1]
 	*pq = old[0 : n-1]
 	return item
+}
+
+// 有向グラフの強連結成分分解
+func findSCCs(graph [][]int) [][]int {
+	n := len(graph)
+	visited := make([]bool, n)
+	finishOrder := []int{}
+
+	// 1. 一度目のDFSでノードを探索し、終了時間順にノードを記録
+	var dfs1 func(v int)
+	dfs1 = func(v int) {
+		visited[v] = true
+		for _, to := range graph[v] {
+			if !visited[to] {
+				dfs1(to)
+			}
+		}
+		finishOrder = append(finishOrder, v)
+	}
+
+	for i := 0; i < n; i++ {
+		if !visited[i] {
+			dfs1(i)
+		}
+	}
+
+	// 2. グラフを転置
+	reversedGraph := make([][]int, n)
+	for v, edges := range graph {
+		for _, to := range edges {
+			reversedGraph[to] = append(reversedGraph[to], v)
+		}
+	}
+
+	// 3. 転置グラフで二度目のDFSを行い、強連結成分を収集
+	var sccs [][]int
+	visited = make([]bool, n)
+
+	var dfs2 func(v int, component *[]int)
+	dfs2 = func(v int, component *[]int) {
+		visited[v] = true
+		*component = append(*component, v)
+		for _, to := range reversedGraph[v] {
+			if !visited[to] {
+				dfs2(to, component)
+			}
+		}
+	}
+
+	// finishOrderを逆順で処理
+	for i := len(finishOrder) - 1; i >= 0; i-- {
+		v := finishOrder[i]
+		if !visited[v] {
+			var component []int
+			dfs2(v, &component)
+			sccs = append(sccs, component)
+		}
+	}
+
+	return sccs
+}
+
+
+// functional graphのサイクルを検出
+func findCycle(n int, graph []int) (*[]int, error) {
+	visited := make([]int, n) // 0: 未訪問, 1: 訪問中, 2: 訪問完了
+	start, end := -1, -1
+
+	// DFSでサイクルを検出
+	var dfs func(v int) bool
+	dfs = func(v int) bool {
+		if visited[v] == 1 { // サイクル検出
+			start = v
+			end = v
+			return true
+		}
+		if visited[v] == 2 { // 訪問済み
+			return false
+		}
+		visited[v] = 1
+		next := graph[v]
+		if dfs(next) {
+			if start != -1 {
+				if v == end { // サイクル終了点
+					start = -1 // 全サイクルを検出終了
+				}
+				return true
+			}
+		}
+		visited[v] = 2
+		return false
+	}
+
+	// 全頂点についてDFSを試みる
+	for i := 0; i < n; i++ {
+		if visited[i] == 0 {
+			if dfs(i) {
+				break
+			}
+		}
+	}
+
+	// サイクルの頂点を抽出
+	if end == -1 {
+		return nil, fmt.Errorf("No cycle") // サイクルが存在しない場合
+	}
+	cycle := []int{end}
+	for v := graph[end]; v != end; v = graph[v] {
+		cycle = append(cycle, v)
+	}
+	return &cycle, nil
 }
 
 // ローリングハッシュ
