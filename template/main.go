@@ -1110,6 +1110,67 @@ func (pq *dijkstraPriorityQueue) Pop() interface{} {
 	return item
 }
 
+// 有向グラフの強連結成分分解
+func findSCCs(graph [][]int) [][]int {
+	n := len(graph)
+	visited := make([]bool, n)
+	finishOrder := []int{}
+
+	// 1. 一度目のDFSでノードを探索し、終了時間順にノードを記録
+	var dfs1 func(v int)
+	dfs1 = func(v int) {
+		visited[v] = true
+		for _, to := range graph[v] {
+			if !visited[to] {
+				dfs1(to)
+			}
+		}
+		finishOrder = append(finishOrder, v)
+	}
+
+	for i := 0; i < n; i++ {
+		if !visited[i] {
+			dfs1(i)
+		}
+	}
+
+	// 2. グラフを転置
+	reversedGraph := make([][]int, n)
+	for v, edges := range graph {
+		for _, to := range edges {
+			reversedGraph[to] = append(reversedGraph[to], v)
+		}
+	}
+
+	// 3. 転置グラフで二度目のDFSを行い、強連結成分を収集
+	var sccs [][]int
+	visited = make([]bool, n)
+
+	var dfs2 func(v int, component *[]int)
+	dfs2 = func(v int, component *[]int) {
+		visited[v] = true
+		*component = append(*component, v)
+		for _, to := range reversedGraph[v] {
+			if !visited[to] {
+				dfs2(to, component)
+			}
+		}
+	}
+
+	// finishOrderを逆順で処理
+	for i := len(finishOrder) - 1; i >= 0; i-- {
+		v := finishOrder[i]
+		if !visited[v] {
+			var component []int
+			dfs2(v, &component)
+			sccs = append(sccs, component)
+		}
+	}
+
+	return sccs
+}
+
+
 // functional graphのサイクルを検出
 func findCycle(n int, graph []int) (*[]int, error) {
 	visited := make([]int, n) // 0: 未訪問, 1: 訪問中, 2: 訪問完了
