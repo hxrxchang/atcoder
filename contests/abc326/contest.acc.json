@@ -31,7 +31,11 @@
       "id": "abc326_d",
       "label": "D",
       "title": "ABC Puzzle",
-      "url": "https://atcoder.jp/contests/abc326/tasks/abc326_d"
+      "url": "https://atcoder.jp/contests/abc326/tasks/abc326_d",
+      "directory": {
+        "path": "d",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc326_e",
