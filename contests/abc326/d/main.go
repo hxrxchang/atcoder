@@ -29,50 +29,86 @@ func main() {
 	solve()
 }
 
-var r []string
-var c []string
-
 func solve() {
 	n := getInt()
-	r = strToSlice(getStr(), "")
-	c = strToSlice(getStr(), "")
+	r := getStr()
+	c := getStr()
 
-	ps := []string{"A", "B", "C"}
-	if n == 4 {
-		ps = append(ps, ".")
-	} else if n == 5 {
-		ps = append(ps, ".")
-		ps = append(ps, ".")
-	}
-	pi := rangeSlice(n)
-
-	candidates := make([][][]string, n)
+	idxes := rangeSlice(n)
+	perms := [][]int{}
 	for {
-		ps2 := pi2ps(pi, ps)
-		for i := 0; i < n; i++ {
-			if ps2[i] == "." {
-				continue
-			}
-			for j := 0; j < n; j++ {
-				if ps2[i] == r[j] {
-					candidates[j] = append(candidates[j], ps2)
+		perms = append(perms, append([]int(nil), idxes...))
+		if !nextPermutation(sort.IntSlice(idxes)) {
+			break
+		}
+	}
+
+	for _, x := range perms {
+		for _, y := range perms {
+			for _, z := range perms {
+				// 重複チェック
+				conflict := false
+				for i := 0; i < n; i++ {
+					if x[i] == y[i] || y[i] == z[i] || z[i] == x[i] {
+						conflict = true
+						break
+					}
+				}
+				if conflict {
+					continue
+				}
+
+				S := make([][]string, n)
+				for i := 0; i < n; i++ {
+					S[i] = make([]string, n)
+					for j := 0; j < n; j++ {
+						S[i][j] = "."
+					}
+				}
+				for i, j := range x {
+					S[i][j] = "A"
+				}
+				for i, j := range y {
+					S[i][j] = "B"
+				}
+				for i, j := range z {
+					S[i][j] = "C"
+				}
+
+				rowHeader := ""
+				colHeader := ""
+				for i := 0; i < n; i++ {
+					rowHeader += head(S[i])
+				}
+				for i := 0; i < n; i++ {
+					col := make([]string, n)
+					for j := 0; j < n; j++ {
+						col[j] = S[j][i]
+					}
+					colHeader += head(col)
+				}
+
+				if rowHeader == r && colHeader == c {
+					fmt.Println("Yes")
+					for _, row := range S {
+						fmt.Println(strings.Join(row, ""))
+					}
+					return
 				}
 			}
-			break
-		}
-		if !nextPermutation(sort.IntSlice(pi)) {
-			break
 		}
 	}
+	fmt.Println("No")
 }
 
 
-func pi2ps(pi []int, ps[]string) []string {
-	ret := make([]string, len(pi))
-	for i, v := range pi {
-		ret[i] = ps[v]
+func head(s []string) string {
+	for _, c := range s {
+		if c != "." {
+			return c
+		}
 	}
-	return ret
+	return "."
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
