@@ -31,7 +31,11 @@
       "id": "abc334_d",
       "label": "D",
       "title": "Reindeer and Sleigh",
-      "url": "https://atcoder.jp/contests/abc334/tasks/abc334_d"
+      "url": "https://atcoder.jp/contests/abc334/tasks/abc334_d",
+      "directory": {
+        "path": "d",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc334_e",
