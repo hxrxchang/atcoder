@@ -241,6 +241,28 @@ func ceilDiv(a, b int) int {
 	return (a + b - 1) / b
 }
 
+// n以上の整数の中で、mの倍数で最小の値
+func smallestMultiple(n, m int) int {
+	if n % m == 0 {
+		return n
+	}
+	if n > 0 {
+		return n + m - n % m
+	}
+	return n - n % m
+}
+
+// n以下の整数の中で、mの倍数で最大の値
+func largestMultiple(n, m int) int {
+	if n % m == 0 {
+		return n
+	}
+	if n > 0 {
+		return n - n % m
+	}
+	return n - m - n % m
+}
+
 // nCr
 func getComb(n, k int) int {
 	numerator := 1
