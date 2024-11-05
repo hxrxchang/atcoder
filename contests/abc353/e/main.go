@@ -33,12 +33,10 @@ func solve() {
 	n := getInt()
 	s := getStrs()
 
-	mp := make(map[RollingHashPair]int)
+	mp := make(map[string]int)
 	for i := 0; i < n; i++ {
-		rh := NewRollingHash(s[i])
 		for j := 1; j <= len(s[i]); j++ {
-			hash := rh.Get(0, j)
-			mp[hash]++
+			mp[s[i][:j]]++
 		}
 	}
 
