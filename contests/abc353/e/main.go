@@ -47,6 +47,26 @@ func solve() {
 	fmt.Println(cnt)
 }
 
+// RollingHashで解くパターン
+func solve2() {
+	n := getInt()
+	s := getStrs()
+
+	mp := make(map[RollingHashPair]int)
+	for i := 0; i < n; i++ {
+		rh := NewRollingHash(s[i])
+		for j := 1; j <= len(s[i]); j++ {
+			mp[rh.Get(0, j)]++
+		}
+	}
+
+	cnt := 0
+	for _, v := range mp {
+		cnt += v * (v - 1) / 2
+	}
+	fmt.Println(cnt)
+}
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 func getInt() int {
