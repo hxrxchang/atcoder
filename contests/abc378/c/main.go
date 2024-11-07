@@ -33,15 +33,19 @@ func solve() {
 	n := getInt()
 	a := getInts()
 
-	am := make(map[int]int)
-	b := make([]int, n)
+	am := make(map[int][]int)
 	for i, v := range a {
-		if am[v] == 0 {
+		am[v] = append(am[v], i)
+	}
+
+	b := make([]int, n)
+	for i, target := range a {
+		v := lessThan(am[target], i)
+		if v == nil {
 			b[i] = -1
 		} else {
-			b[i] = am[v]
+			b[i] = *v + 1
 		}
-		am[v] = i + 1
 	}
 
 	printSlice(b)
