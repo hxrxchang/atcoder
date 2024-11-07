@@ -30,6 +30,30 @@ func main() {
 }
 
 func solve() {
+	n := getInt()
+	type Gabage struct {
+		q, r int
+	}
+	gabage := make([]Gabage, n)
+	for i := 0; i < n; i++ {
+		in := getInts()
+		gabage[i] = Gabage{in[0], in[1]}
+	}
+
+	q := getInt()
+	for i := 0; i < q; i++ {
+		in := getInts()
+		target, d := in[0]-1, in[1]
+		q, r := gabage[target].q, gabage[target].r
+		if d % q == r {
+			fmt.Println(d)
+		} else {
+			diff := r - d % q
+			diff2 := (diff + q) % q
+			nextDay := d + diff2
+			fmt.Println(nextDay)
+		}
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
