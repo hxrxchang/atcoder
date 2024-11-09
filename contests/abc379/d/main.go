@@ -30,8 +30,31 @@ func main() {
 }
 
 func solve() {
-	n := getInt()
+	q := getInt()
+	plants := make([]int, 0)
+	offset := 0
+
+	for i := 0; i < q; i++ {
+		query := getInts()
+		if query[0] == 1 {
+			plants = append(plants, -offset)
+		} else if query[0] == 2 {
+			t := query[1]
+			offset += t
+		} else {
+			h := query[1] - offset
+			cnt := 0
+
+			sort.Slice(plants, func(i, j int) bool { return plants[i] < plants[j] })
+			idx := bisectLeft(plants, h)
+			cnt = len(plants) - idx
+			plants = plants[:idx]
+
+			fmt.Println(cnt)
+		}
+	}
 }
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 func getInt() int {
