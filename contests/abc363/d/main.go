@@ -31,7 +31,35 @@ func main() {
 
 func solve() {
 	n := getInt()
+	if n <= 10 {
+		fmt.Println(n-1)
+		return
+	} else if n <= 19 {
+		fmt.Println(n - 10 * 11)
+		return
+	}
+
+	n -= 19
+	p := 90
+	for {
+		if n <= p {
+			first := i2s(n - 1 + p / 9)
+			second := sliceToStr(reverse(strToSlice(first, ""))[1:], "")
+			fmt.Println(first + second)
+			return
+		}
+		n -= p
+		if n <= p {
+			first := i2s(n - 1 + p / 9)
+			second := sliceToStr(reverse(strToSlice(first, "")), "")
+			fmt.Println(first + second)
+			return
+		}
+		n -= p
+		p *= 10
+	}
 }
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 func getInt() int {
