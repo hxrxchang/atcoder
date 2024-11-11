@@ -31,33 +31,47 @@ func main() {
 
 func solve() {
 	n := getInt()
-	if n <= 10 {
-		fmt.Println(n-1)
-		return
-	} else if n <= 19 {
-		fmt.Println(n - 10 * 11)
+	if n == 1 {
+		fmt.Println(0)
 		return
 	}
 
-	n -= 19
-	p := 90
+	// 回文数0は除外したため、n -= 1
+	n -= 1
+	keta := 1
 	for {
-		if n <= p {
-			first := i2s(n - 1 + p / 9)
-			second := sliceToStr(reverse(strToSlice(first, ""))[1:], "")
-			fmt.Println(first + second)
-			return
+		// その桁数になる回文数の個数
+		size := sizeByKeta(keta)
+		if n <= size {
+			break
 		}
-		n -= p
-		if n <= p {
-			first := i2s(n - 1 + p / 9)
-			second := sliceToStr(reverse(strToSlice(first, "")), "")
-			fmt.Println(first + second)
-			return
-		}
-		n -= p
-		p *= 10
+		n -= size
+		keta++
 	}
+
+	var base int
+	if keta % 2 == 0 {
+		base = pow(10, keta / 2 - 1)
+	} else {
+		base = pow(10, keta / 2)
+	}
+	leftHalf := i2s(base + n - 1)
+	var rightHalf string
+	if keta % 2 == 0 {
+		rightHalf = sliceToStr(reverse(strToSlice(leftHalf, "")), "")
+	} else {
+		rightHalf = sliceToStr(reverse(strToSlice(leftHalf, ""))[1:], "")
+	}
+
+	fmt.Println(leftHalf + rightHalf)
+}
+
+func sizeByKeta(i int) int {
+	if i % 2 == 1 {
+        power := (i - 1) / 2
+        return 9 * pow(10, power)
+    }
+    return sizeByKeta(i - 1)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
