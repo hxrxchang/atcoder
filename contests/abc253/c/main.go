@@ -47,8 +47,8 @@ func solve() {
 				s.remove(x)
 			}
 		} else {
-			start := s.values.Begin().Value()
-			last := s.values.Last().Value()
+			start := s.Begin().Value()
+			last := s.Last().Value()
 			fmt.Println(last - start)
 		}
 	}
@@ -239,29 +239,29 @@ func (s *Set[V]) Values() []V {
 
 // sorted set
 type SortedSet[T comparator.Ordered] struct {
-	values *set.Set[T]
+	*set.Set[T]
 }
 func newSortedSet[T comparator.Ordered]() *SortedSet[T] {
 	var comparatorFn comparator.Comparator[T] = comparator.OrderedTypeCmp[T]
-	return &SortedSet[T]{values: set.New[T](comparatorFn)}
+	return &SortedSet[T]{set.New[T](comparatorFn)}
 }
 func (s *SortedSet[T]) add(v T) {
-	s.values.Insert(v)
+	s.Insert(v)
 }
 func (s *SortedSet[T]) remove(v T) {
-	s.values.Erase(v)
+	s.Erase(v)
 }
 func (s *SortedSet[T]) has(v T) bool {
-	return s.values.Contains(v)
+	return s.Contains(v)
 }
 func (s *SortedSet[T]) size() int {
-	return s.values.Size()
+	return s.Size()
 }
 func (s *SortedSet[T]) lowerBound(v T) *set.SetIterator[T] {
-	return s.values.LowerBound(v)
+	return s.LowerBound(v)
 }
 func (s *SortedSet[T]) upperBound(v T) *set.SetIterator[T] {
-	return s.values.UpperBound(v)
+	return s.UpperBound(v)
 }
 
 // multiset
