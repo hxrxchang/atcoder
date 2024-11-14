@@ -383,29 +383,29 @@ func(s *Set[V]) Pop() V {
 
 // sorted set
 type SortedSet[T comparator.Ordered] struct {
-	values *set.Set[T]
+	*set.Set[T]
 }
 func newSortedSet[T comparator.Ordered]() *SortedSet[T] {
 	var comparatorFn comparator.Comparator[T] = comparator.OrderedTypeCmp[T]
-	return &SortedSet[T]{values: set.New[T](comparatorFn)}
+	return &SortedSet[T]{set.New[T](comparatorFn)}
 }
 func (s *SortedSet[T]) add(v T) {
-	s.values.Insert(v)
+	s.Insert(v)
 }
 func (s *SortedSet[T]) remove(v T) {
-	s.values.Erase(v)
+	s.Erase(v)
 }
 func (s *SortedSet[T]) has(v T) bool {
-	return s.values.Contains(v)
+	return s.Contains(v)
 }
 func (s *SortedSet[T]) size() int {
-	return s.values.Size()
+	return s.Size()
 }
 func (s *SortedSet[T]) lowerBound(v T) *set.SetIterator[T] {
-	return s.values.LowerBound(v)
+	return s.LowerBound(v)
 }
 func (s *SortedSet[T]) upperBound(v T) *set.SetIterator[T] {
-	return s.values.UpperBound(v)
+	return s.UpperBound(v)
 }
 // 指定した値未満の最大の値を取得
 func (s *SortedSet[T]) lessThan(v T) (*T, error) {
@@ -413,8 +413,8 @@ func (s *SortedSet[T]) lessThan(v T) (*T, error) {
 		res := s.lowerBound(v).Prev().Value()
 		return &res, nil
 	}
-	if s.values.Last().IsValid() {
-		res := s.values.Last().Value()
+	if s.Last().IsValid() {
+		res := s.Last().Value()
 		if res < v {
 			return &res, nil
 		}
@@ -423,10 +423,28 @@ func (s *SortedSet[T]) lessThan(v T) (*T, error) {
 	return nil, fmt.Errorf("not found")
 }
 
+type MultiSet[T comparable] struct {
+	*set.MultiSet[T]
+	mapping map[T]int
+}
 // multiset
-func newMultiset[T comparator.Ordered]() *set.MultiSet[T] {
+func newMultiset[T comparator.Ordered]() *MultiSet[T] {
 	var comparatorFn comparator.Comparator[T] = comparator.OrderedTypeCmp[T]
-	return set.NewMultiSet[T](comparatorFn, set.WithGoroutineSafe())
+	ms := set.NewMultiSet[T](comparatorFn, set.WithGoroutineSafe())
+	return &MultiSet[T]{MultiSet: ms, mapping: make(map[T]int)}
+}
+func (ms *MultiSet[T]) Add(v T) {
+	ms.Insert(v)
+	ms.mapping[v]++
+}
+func (ms *MultiSet[T]) Remove(v T) {
+	ms.mapping[v]--
+	if ms.mapping[v] <= 0 {
+		ms.Erase(v)
+	}
+}
+func (ms *MultiSet[T]) Has(v T) bool {
+	return ms.Contains(v)
 }
 
 // heap (priority queue)
