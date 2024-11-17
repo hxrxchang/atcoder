@@ -348,6 +348,11 @@ func isPrime(n int) bool {
 	return true
 }
 
+// 整数nが桁数を満たさなかったら0埋めする
+func formatNumber(n, digits int) string {
+	return fmt.Sprintf("%0*d", digits, n)
+}
+
 // set
 type Set[V comparable] struct {
 	values map[V]struct{}
@@ -643,11 +648,24 @@ func sliceToStr[T any](data []T, separator string) string {
     return strings.Join(strSlice, separator)
 }
 
+// n以上m以下の平方数を列挙
+func findSquaresInRange(n, m int) []int {
+	start := int(math.Ceil(math.Sqrt(float64(n))))
+	end := int(math.Floor(math.Sqrt(float64(m))))
+	result := []int{}
+	if n == 0 {
+		result = append(result, 0)
+	}
+	for i := start; i <= end; i++ {
+		result = append(result, i*i)
+	}
+	return result
+}
+
 // queue
 func newQueue[T any]() *deque.Deque[T] {
 	return deque.New[T]()
 }
-
 
 // UnionFind
 type UnionFind struct {
@@ -1330,6 +1348,28 @@ func isSubstring(s, t string) bool {
 		}
 	}
 	return ok
+}
+
+// 文字列を昇順でソート
+func sortString(s string) string {
+	runes := []rune(s)
+
+	sort.Slice(runes, func(i, j int) bool {
+		return runes[i] < runes[j]
+	})
+
+	return string(runes)
+}
+
+// 文字列を降順でソート
+func descendingSortString(s string) string {
+	runes := []rune(s)
+
+	sort.Slice(runes, func(i, j int) bool {
+		return runes[i] > runes[j]
+	})
+
+	return string(runes)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
