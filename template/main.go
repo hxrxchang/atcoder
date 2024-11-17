@@ -349,7 +349,7 @@ func isPrime(n int) bool {
 }
 
 // 整数nが桁数を満たさなかったら0埋めする
-func formatNumber(n, digits int) string {
+func zeroPad(n, digits int) string {
 	return fmt.Sprintf("%0*d", digits, n)
 }
 
@@ -653,9 +653,6 @@ func findSquaresInRange(n, m int) []int {
 	start := int(math.Ceil(math.Sqrt(float64(n))))
 	end := int(math.Floor(math.Sqrt(float64(m))))
 	result := []int{}
-	if n == 0 {
-		result = append(result, 0)
-	}
 	for i := start; i <= end; i++ {
 		result = append(result, i*i)
 	}
