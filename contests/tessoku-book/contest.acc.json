@@ -57,7 +57,11 @@
       "id": "tessoku_book_g",
       "label": "A07",
       "title": "Event Attendance",
-      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_g"
+      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_g",
+      "directory": {
+        "path": "a07",
+        "testdir": "tests"
+      }
     },
     {
       "id": "tessoku_book_h",
