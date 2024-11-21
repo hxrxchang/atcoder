@@ -443,8 +443,8 @@ func (ms *MultiSet[T]) Add(v T) {
 	ms.mapping[v]++
 }
 func (ms *MultiSet[T]) Remove(v T) {
-	ms.mapping[v]--
-	if ms.mapping[v] <= 0 {
+	ms.mapping[v] = max(0, ms.mapping[v] - 1)
+	if ms.mapping[v] == 0 {
 		ms.Erase(v)
 	}
 }
