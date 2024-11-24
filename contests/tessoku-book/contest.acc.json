@@ -29,13 +29,21 @@
       "id": "tessoku_book_c",
       "label": "A03",
       "title": "Two Cards",
-      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_c"
+      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_c",
+      "directory": {
+        "path": "a03",
+        "testdir": "tests"
+      }
     },
     {
       "id": "tessoku_book_d",
       "label": "A04",
       "title": "Binary Representation 1",
-      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_d"
+      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_d",
+      "directory": {
+        "path": "a04",
+        "testdir": "tests"
+      }
     },
     {
       "id": "tessoku_book_e",
@@ -67,7 +75,11 @@
       "id": "tessoku_book_h",
       "label": "A08",
       "title": "Two Dimensional Sum",
-      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_h"
+      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_h",
+      "directory": {
+        "path": "a08",
+        "testdir": "tests"
+      }
     },
     {
       "id": "tessoku_book_i",
