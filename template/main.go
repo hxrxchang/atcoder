@@ -1369,6 +1369,13 @@ func descendingSortString(s string) string {
 	return string(runes)
 }
 
+// 文字列の更新
+func updateString(s string, idx int, c byte) string {
+	runes := []rune(s)
+	runes[idx] = rune(c)
+	return string(runes)
+}
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //　幾何ゾーン
 
