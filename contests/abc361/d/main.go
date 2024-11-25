@@ -31,18 +31,54 @@ func main() {
 
 func solve() {
 	n := getInt()
-	plainS := getStr()
-	plainT := getStr()
+	s := getStr()
+	t := getStr()
 
-	if sortString(plainS) != sortString(plainT) {
-		fmt.Println(-1)
-		return
+	s += ".."
+	t += ".."
+
+	steps := make(map[string]int)
+
+	que := newQueue[string]()
+	que.PushBack(s)
+
+	for que.Size() > 0 {
+		current := que.PopFront()
+		if current == t {
+			fmt.Println(steps[current])
+			return
+		}
+
+		for i := 0; i <= n; i++ {
+			pairs := current[i:i+2]
+			if isValid(pairs) {
+				for j := 0; j <= n; j++ {
+					if current[j:j+2] == ".." {
+						next := current
+						next = updateString(next, i, '.')
+						next = updateString(next, i+1, '.')
+						next = updateString(next, j, pairs[0])
+						next = updateString(next, j+1, pairs[1])
+						if _, ok := steps[next]; !ok {
+							steps[next] = steps[current] + 1
+							que.PushBack(next)
+						}
+					}
+				}
+			}
+		}
 	}
 
-	s := strToSlice(plainS, "")
-	s = append(s, "..")
-	t := strToSlice(plainT, "")
-	t = append(t, "..")
+	fmt.Println(-1)
+}
+
+func isValid(s string) bool {
+	for _, v := range s {
+		if v == '.' {
+			return false
+		}
+	}
+	return true
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1379,6 +1415,13 @@ func descendingSortString(s string) string {
 		return runes[i] > runes[j]
 	})
 
+	return string(runes)
+}
+
+//
+func updateString(s string, idx int, c byte) string {
+	runes := []rune(s)
+	runes[idx] = rune(c)
 	return string(runes)
 }
 
