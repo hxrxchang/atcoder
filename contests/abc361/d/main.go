@@ -50,15 +50,15 @@ func solve() {
 		}
 
 		for i := 0; i <= n; i++ {
-			pairs := current[i:i+2]
-			if isValid(pairs) {
+			pair := current[i:i+2]
+			if isValid(pair) {
 				for j := 0; j <= n; j++ {
 					if current[j:j+2] == ".." {
 						next := current
 						next = updateString(next, i, '.')
 						next = updateString(next, i+1, '.')
-						next = updateString(next, j, pairs[0])
-						next = updateString(next, j+1, pairs[1])
+						next = updateString(next, j, pair[0])
+						next = updateString(next, j+1, pair[1])
 						if _, ok := steps[next]; !ok {
 							steps[next] = steps[current] + 1
 							que.PushBack(next)
