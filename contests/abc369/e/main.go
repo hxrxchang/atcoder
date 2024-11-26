@@ -40,15 +40,56 @@ func solve() {
 		}
 	}
 
+	type Bridge struct {
+		a, b, t int
+	}
+	bridges := make([]Bridge, m)
 	for i := 0; i < m; i++ {
 		in := getInts()
 		u, v, t := in[0]-1, in[1]-1, in[2]
-		graph[u][v] = t
-		graph[v][u] = t
+		graph[u][v] = min(graph[u][v], t)
+		graph[v][u] = min(graph[v][u], t)
+		bridges[i] = Bridge{a: u, b: v, t: t}
 	}
 
 	dist := warshallFloyd(graph)
 	fmt.Println(dist)
+	q := getInt()
+	for i := 0; i < q; i++ {
+		n2 := getInt()
+		b_ := getInts()
+		b := make([]int, n2)
+		for i, v := range b_ {
+			b[i] = v-1
+		}
+		b = sortSlice(b)
+		ans := BIGGEST
+		for {
+			subsets := generateSubsets(b)
+			for _, subset := range subsets {
+				islands := make([]int, 0)
+				tmp := 0
+				for _, bidx := range b {
+					tmp += bridges[bidx].t
+					if sliceContains(subset, bidx) {
+						islands = append(islands, bridges[bidx].a)
+						islands = append(islands, bridges[bidx].b)
+					} else {
+						islands = append(islands, bridges[bidx].b)
+						islands = append(islands, bridges[bidx].a)
+					}
+				}
+				tmp += dist[0][islands[0]]
+				tmp += dist[islands[len(islands)-1]][n-1]
+				fmt.Println(islands, tmp)
+				ans = min(ans, tmp)
+			}
+			if !nextPermutation(sort.IntSlice(b)) {
+				break
+			}
+		}
+		fmt.Println(ans)
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1101,27 +1142,30 @@ func gridBfs(height, width int, nextNodes map[GridBfsNode][]GridBfsNode, start G
 
 
 // ワーシャルフロイド法
+// graphは、到達不能な場合はmath.MaxInt64を入れる
 func warshallFloyd(graph [][]int) [][]int {
+	// ノード数
 	n := len(graph)
+
+	// 結果を格納するために元のグラフをコピー
 	dist := make([][]int, n)
-	for i := range dist {
+	for i := 0; i < n; i++ {
 		dist[i] = make([]int, n)
-		for j := range dist[i] {
-			if i == j {
-				dist[i][j] = 0
-			} else if graph[i][j] == 0 {
-				dist[i][j] = 1 << 60
-			} else {
-				dist[i][j] = graph[i][j]
-			}
-		}
+		copy(dist[i], graph[i])
 	}
 
+	// 自己ループを明示的に 0 に設定
 	for i := 0; i < n; i++ {
-		for j := 0; j < n; j++ {
-			for k := 0; k < n; k++ {
-				if dist[j][k] > dist[j][i]+dist[i][k] {
-					dist[j][k] = dist[j][i] + dist[i][k]
+		dist[i][i] = 0
+	}
+
+	// ワーシャル–フロイド法の計算
+	for k := 0; k < n; k++ {
+		for i := 0; i < n; i++ {
+			for j := 0; j < n; j++ {
+				// 中継ノードを経由する距離が無限大でない場合に更新
+				if dist[i][k] != BIGGEST && dist[k][j] != BIGGEST {
+					dist[i][j] = min(dist[i][j], dist[i][k]+dist[k][j])
 				}
 			}
 		}
