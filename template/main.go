@@ -1080,29 +1080,31 @@ func gridBfs(height, width int, nextNodes map[GridBfsNode][]GridBfsNode, start G
 	return distances
 }
 
-
 // ワーシャルフロイド法
+// graphは、到達不能な場合はmath.MaxInt64を入れる
 func warshallFloyd(graph [][]int) [][]int {
+	// ノード数
 	n := len(graph)
+
+	// 結果を格納するために元のグラフをコピー
 	dist := make([][]int, n)
-	for i := range dist {
+	for i := 0; i < n; i++ {
 		dist[i] = make([]int, n)
-		for j := range dist[i] {
-			if i == j {
-				dist[i][j] = 0
-			} else if graph[i][j] == 0 {
-				dist[i][j] = 1 << 60
-			} else {
-				dist[i][j] = graph[i][j]
-			}
-		}
+		copy(dist[i], graph[i])
 	}
 
+	// 自己ループを明示的に 0 に設定
 	for i := 0; i < n; i++ {
-		for j := 0; j < n; j++ {
-			for k := 0; k < n; k++ {
-				if dist[j][k] > dist[j][i]+dist[i][k] {
-					dist[j][k] = dist[j][i] + dist[i][k]
+		dist[i][i] = 0
+	}
+
+	// ワーシャル–フロイド法の計算
+	for k := 0; k < n; k++ {
+		for i := 0; i < n; i++ {
+			for j := 0; j < n; j++ {
+				// 中継ノードを経由する距離が無限大でない場合に更新
+				if dist[i][k] != BIGGEST && dist[k][j] != BIGGEST {
+					dist[i][j] = min(dist[i][j], dist[i][k]+dist[k][j])
 				}
 			}
 		}
