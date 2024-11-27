@@ -1082,6 +1082,7 @@ func gridBfs(height, width int, nextNodes map[GridBfsNode][]GridBfsNode, start G
 
 // ワーシャルフロイド法
 // graphは、到達不能な場合はmath.MaxInt64を入れる
+// 自分自身への経路は0を入れる
 func warshallFloyd(graph [][]int) [][]int {
 	// ノード数
 	n := len(graph)
@@ -1091,11 +1092,6 @@ func warshallFloyd(graph [][]int) [][]int {
 	for i := 0; i < n; i++ {
 		dist[i] = make([]int, n)
 		copy(dist[i], graph[i])
-	}
-
-	// 自己ループを明示的に 0 に設定
-	for i := 0; i < n; i++ {
-		dist[i][i] = 0
 	}
 
 	// ワーシャル–フロイド法の計算

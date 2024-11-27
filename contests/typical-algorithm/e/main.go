@@ -35,20 +35,30 @@ func solve() {
 	graph := make([][]int, n)
 	for i := 0; i < n; i++ {
 		graph[i] = make([]int, n)
-	}
-	for i := 0; i < m; i++ {
-		in := getInts()
-		u, v, c := in[0], in[1], in[2]
-		graph[u][v] = c
+		for j := 0; j < n; j++ {
+			if i == j {
+				graph[i][j] = 0
+			} else {
+				graph[i][j] = BIGGEST
+			}
+		}
 	}
 
-	dist := warshallFloyd(graph, pow(10, 9))
+	for i := 0; i < m; i++ {
+		in := getInts()
+		a, b, c := in[0], in[1], in[2]
+		graph[a][b] = c
+	}
+
+	dist := warshallFloyd(graph)
+
 	ans := 0
 	for i := 0; i < n; i++ {
 		for j := 0; j < n; j++ {
 			ans += dist[i][j]
 		}
 	}
+
 	fmt.Println(ans)
 }
 
@@ -232,6 +242,11 @@ func sqrt(x int) int {
 	return int(math.Sqrt(float64(x)))
 }
 
+// xのn乗根
+func rootN(x, n int) float64 {
+	return math.Pow(float64(x), 1.0/float64(n))
+}
+
 // 最大公約数
 func gcd(v1, v2 int) int {
 	if v1 > v2 {
@@ -254,6 +269,28 @@ func ceilDiv(a, b int) int {
 		return (a + b - 1) / b - 1
 	}
 	return (a + b - 1) / b
+}
+
+// n以上の整数の中で、mの倍数で最小の値
+func smallestMultiple(n, m int) int {
+	if n % m == 0 {
+		return n
+	}
+	if n > 0 {
+		return n + m - n % m
+	}
+	return n - n % m
+}
+
+// n以下の整数の中で、mの倍数で最大の値
+func largestMultiple(n, m int) int {
+	if n % m == 0 {
+		return n
+	}
+	if n > 0 {
+		return n - n % m
+	}
+	return n - m - n % m
 }
 
 // nCr
@@ -341,6 +378,11 @@ func isPrime(n int) bool {
 	return true
 }
 
+// 整数nが桁数を満たさなかったら0埋めする
+func zeroPad(n, digits int) string {
+	return fmt.Sprintf("%0*d", digits, n)
+}
+
 // set
 type Set[V comparable] struct {
 	values map[V]struct{}
@@ -376,29 +418,29 @@ func(s *Set[V]) Pop() V {
 
 // sorted set
 type SortedSet[T comparator.Ordered] struct {
-	values *set.Set[T]
+	*set.Set[T]
 }
 func newSortedSet[T comparator.Ordered]() *SortedSet[T] {
 	var comparatorFn comparator.Comparator[T] = comparator.OrderedTypeCmp[T]
-	return &SortedSet[T]{values: set.New[T](comparatorFn)}
+	return &SortedSet[T]{set.New[T](comparatorFn)}
 }
 func (s *SortedSet[T]) add(v T) {
-	s.values.Insert(v)
+	s.Insert(v)
 }
 func (s *SortedSet[T]) remove(v T) {
-	s.values.Erase(v)
+	s.Erase(v)
 }
 func (s *SortedSet[T]) has(v T) bool {
-	return s.values.Contains(v)
+	return s.Contains(v)
 }
 func (s *SortedSet[T]) size() int {
-	return s.values.Size()
+	return s.Size()
 }
 func (s *SortedSet[T]) lowerBound(v T) *set.SetIterator[T] {
-	return s.values.LowerBound(v)
+	return s.LowerBound(v)
 }
 func (s *SortedSet[T]) upperBound(v T) *set.SetIterator[T] {
-	return s.values.UpperBound(v)
+	return s.UpperBound(v)
 }
 // 指定した値未満の最大の値を取得
 func (s *SortedSet[T]) lessThan(v T) (*T, error) {
@@ -406,8 +448,8 @@ func (s *SortedSet[T]) lessThan(v T) (*T, error) {
 		res := s.lowerBound(v).Prev().Value()
 		return &res, nil
 	}
-	if s.values.Last().IsValid() {
-		res := s.values.Last().Value()
+	if s.Last().IsValid() {
+		res := s.Last().Value()
 		if res < v {
 			return &res, nil
 		}
@@ -416,10 +458,28 @@ func (s *SortedSet[T]) lessThan(v T) (*T, error) {
 	return nil, fmt.Errorf("not found")
 }
 
+type MultiSet[T comparable] struct {
+	*set.MultiSet[T]
+	mapping map[T]int
+}
 // multiset
-func newMultiset[T comparator.Ordered]() *set.MultiSet[T] {
+func newMultiset[T comparator.Ordered]() *MultiSet[T] {
 	var comparatorFn comparator.Comparator[T] = comparator.OrderedTypeCmp[T]
-	return set.NewMultiSet[T](comparatorFn, set.WithGoroutineSafe())
+	ms := set.NewMultiSet[T](comparatorFn, set.WithGoroutineSafe())
+	return &MultiSet[T]{MultiSet: ms, mapping: make(map[T]int)}
+}
+func (ms *MultiSet[T]) Add(v T) {
+	ms.Insert(v)
+	ms.mapping[v]++
+}
+func (ms *MultiSet[T]) Remove(v T) {
+	ms.mapping[v] = max(0, ms.mapping[v] - 1)
+	if ms.mapping[v] == 0 {
+		ms.Erase(v)
+	}
+}
+func (ms *MultiSet[T]) Has(v T) bool {
+	return ms.Contains(v)
 }
 
 // heap (priority queue)
@@ -535,6 +595,17 @@ func sortSlice[T constraints.Ordered](slice []T) []T {
     return copiedSlice
 }
 
+func descendingSortSlice[T constraints.Ordered](slice []T) []T {
+	copiedSlice := make([]T, len(slice))
+	copy(copiedSlice, slice)
+
+	sort.Slice(copiedSlice, func(i, j int) bool {
+		return copiedSlice[i] > copiedSlice[j]
+	})
+
+	return copiedSlice
+}
+
 func reverse[T any](slice []T) []T {
 	copiedSlice := make([]T, len(slice))
 	copy(copiedSlice, slice)
@@ -607,11 +678,21 @@ func sliceToStr[T any](data []T, separator string) string {
     return strings.Join(strSlice, separator)
 }
 
+// n以上m以下の平方数を列挙
+func findSquaresInRange(n, m int) []int {
+	start := int(math.Ceil(math.Sqrt(float64(n))))
+	end := int(math.Floor(math.Sqrt(float64(m))))
+	result := []int{}
+	for i := start; i <= end; i++ {
+		result = append(result, i*i)
+	}
+	return result
+}
+
 // queue
 func newQueue[T any]() *deque.Deque[T] {
 	return deque.New[T]()
 }
-
 
 // UnionFind
 type UnionFind struct {
@@ -844,7 +925,7 @@ func (z *Zaatsu) BisectRight(v int) int {
 	return bisectRight(z.values, v)
 }
 
-// Segment Tree
+// セグメント木
 type SegmentTree[T any] struct {
 	data []T
 	n    int // 葉の数(全区間の要素数)
@@ -891,6 +972,80 @@ func (segtree *SegmentTree[T]) query(begin, end, idx, a, b int) T {
 func (segtree *SegmentTree[T]) Query(begin, end int) T {
 	return segtree.query(begin, end, 0, 0, segtree.n)
 }
+
+// 遅延評価セグメント木
+type LazySegmentTree struct {
+	data   []int
+	lazy   []int
+	n      int
+	op     func(int, int) int
+	noop   int
+	lazyOp func(int, int) int
+	isNoop func(int) bool
+}
+
+func NewLazySegmentTree(n int, noop int, op, lazyOp func(int, int) int, isNoop func(int) bool) *LazySegmentTree {
+	seg := &LazySegmentTree{}
+	seg.n = 1
+	for seg.n < n {
+		seg.n *= 2
+	}
+	seg.data = make([]int, seg.n*2-1)
+	seg.lazy = make([]int, seg.n*2-1)
+	seg.noop = noop
+	seg.op = op
+	seg.lazyOp = lazyOp
+	seg.isNoop = isNoop
+	return seg
+}
+
+func (seg *LazySegmentTree) eval(idx, l, r int) {
+	if !seg.isNoop(seg.lazy[idx]) {
+		seg.data[idx] = seg.lazyOp(seg.data[idx], seg.lazy[idx]*(r-l))
+		if r-l > 1 {
+			seg.lazy[idx*2+1] = seg.lazyOp(seg.lazy[idx*2+1], seg.lazy[idx])
+			seg.lazy[idx*2+2] = seg.lazyOp(seg.lazy[idx*2+2], seg.lazy[idx])
+		}
+		seg.lazy[idx] = seg.noop
+	}
+}
+
+func (seg *LazySegmentTree) UpdateRange(begin, end, x int) {
+	seg.updateRange(begin, end, 0, 0, seg.n, x)
+}
+
+func (seg *LazySegmentTree) updateRange(begin, end, idx, l, r, x int) {
+	seg.eval(idx, l, r)
+	if end <= l || r <= begin {
+		return
+	}
+	if begin <= l && r <= end {
+		seg.lazy[idx] = seg.lazyOp(seg.lazy[idx], x)
+		seg.eval(idx, l, r)
+	} else {
+		seg.updateRange(begin, end, idx*2+1, l, (l+r)/2, x)
+		seg.updateRange(begin, end, idx*2+2, (l+r)/2, r, x)
+		seg.data[idx] = seg.op(seg.data[idx*2+1], seg.data[idx*2+2])
+	}
+}
+
+func (seg *LazySegmentTree) Query(begin, end int) int {
+	return seg.query(begin, end, 0, 0, seg.n)
+}
+
+func (seg *LazySegmentTree) query(begin, end, idx, l, r int) int {
+	seg.eval(idx, l, r)
+	if end <= l || r <= begin {
+		return 0
+	}
+	if begin <= l && r <= end {
+		return seg.data[idx]
+	}
+	v1 := seg.query(begin, end, idx*2+1, l, (l+r)/2)
+	v2 := seg.query(begin, end, idx*2+2, (l+r)/2, r)
+	return seg.op(v1, v2)
+}
+
 
 // 単純なgraphのDFS
 func graphBfs(graph [][]int, start int) []int {
@@ -955,29 +1110,26 @@ func gridBfs(height, width int, nextNodes map[GridBfsNode][]GridBfsNode, start G
 	return distances
 }
 
-
 // ワーシャルフロイド法
-func warshallFloyd(graph [][]int, maxCost int) [][]int {
+// graphは、到達不能な場合はmath.MaxInt64を入れる
+func warshallFloyd(graph [][]int) [][]int {
+	// ノード数
 	n := len(graph)
+
+	// 結果を格納するために元のグラフをコピー
 	dist := make([][]int, n)
-	for i := range dist {
+	for i := 0; i < n; i++ {
 		dist[i] = make([]int, n)
-		for j := range dist[i] {
-			if i == j {
-				dist[i][j] = 0
-			} else if graph[i][j] == 0 {
-				dist[i][j] = maxCost + 1
-			} else {
-				dist[i][j] = graph[i][j]
-			}
-		}
+		copy(dist[i], graph[i])
 	}
 
-	for i := 0; i < n; i++ {
-		for j := 0; j < n; j++ {
-			for k := 0; k < n; k++ {
-				if dist[j][k] > dist[j][i]+dist[i][k] {
-					dist[j][k] = dist[j][i] + dist[i][k]
+	// ワーシャル–フロイド法の計算
+	for k := 0; k < n; k++ {
+		for i := 0; i < n; i++ {
+			for j := 0; j < n; j++ {
+				// 中継ノードを経由する距離が無限大でない場合に更新
+				if dist[i][k] != BIGGEST && dist[k][j] != BIGGEST {
+					dist[i][j] = min(dist[i][j], dist[i][k]+dist[k][j])
 				}
 			}
 		}
@@ -1039,6 +1191,67 @@ func (pq *dijkstraPriorityQueue) Pop() interface{} {
 	*pq = old[0 : n-1]
 	return item
 }
+
+// 有向グラフの強連結成分分解
+func findSCCs(graph [][]int) [][]int {
+	n := len(graph)
+	visited := make([]bool, n)
+	finishOrder := []int{}
+
+	// 1. 一度目のDFSでノードを探索し、終了時間順にノードを記録
+	var dfs1 func(v int)
+	dfs1 = func(v int) {
+		visited[v] = true
+		for _, to := range graph[v] {
+			if !visited[to] {
+				dfs1(to)
+			}
+		}
+		finishOrder = append(finishOrder, v)
+	}
+
+	for i := 0; i < n; i++ {
+		if !visited[i] {
+			dfs1(i)
+		}
+	}
+
+	// 2. グラフを転置
+	reversedGraph := make([][]int, n)
+	for v, edges := range graph {
+		for _, to := range edges {
+			reversedGraph[to] = append(reversedGraph[to], v)
+		}
+	}
+
+	// 3. 転置グラフで二度目のDFSを行い、強連結成分を収集
+	var sccs [][]int
+	visited = make([]bool, n)
+
+	var dfs2 func(v int, component *[]int)
+	dfs2 = func(v int, component *[]int) {
+		visited[v] = true
+		*component = append(*component, v)
+		for _, to := range reversedGraph[v] {
+			if !visited[to] {
+				dfs2(to, component)
+			}
+		}
+	}
+
+	// finishOrderを逆順で処理
+	for i := len(finishOrder) - 1; i >= 0; i-- {
+		v := finishOrder[i]
+		if !visited[v] {
+			var component []int
+			dfs2(v, &component)
+			sccs = append(sccs, component)
+		}
+	}
+
+	return sccs
+}
+
 
 // functional graphのサイクルを検出
 func findCycle(n int, graph []int) (*[]int, error) {
@@ -1161,8 +1374,46 @@ func isSubstring(s, t string) bool {
 	return ok
 }
 
+// 文字列を昇順でソート
+func sortString(s string) string {
+	runes := []rune(s)
+
+	sort.Slice(runes, func(i, j int) bool {
+		return runes[i] < runes[j]
+	})
+
+	return string(runes)
+}
+
+// 文字列を降順でソート
+func descendingSortString(s string) string {
+	runes := []rune(s)
+
+	sort.Slice(runes, func(i, j int) bool {
+		return runes[i] > runes[j]
+	})
+
+	return string(runes)
+}
+
+// 文字列の更新
+func updateString(s string, idx int, c byte) string {
+	runes := []rune(s)
+	runes[idx] = rune(c)
+	return string(runes)
+}
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //　幾何ゾーン
+
+// 2点間の距離
+func distance(x1, y1, x2, y2 int) float64 {
+	x1f := float64(x1)
+	y1f := float64(y1)
+	x2f := float64(x2)
+	y2f := float64(y2)
+	return math.Sqrt((x2f-x1f)*(x2f-x1f) + (y2f-y1f)*(y2f-y1f))
+}
 
 // 2点間の距離の2乗
 // 平方根を取ると距離になるが、誤差が出るので距離の比較は距離の2乗で行う
