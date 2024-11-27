@@ -36,7 +36,11 @@ func solve() {
 	for i := 0; i < n; i++ {
 		graph[i] = make([]int, n)
 		for j := 0; j < n; j++ {
-			graph[i][j] = BIGGEST
+			if i == j {
+				graph[i][j] = 0
+			} else {
+				graph[i][j] = BIGGEST
+			}
 		}
 	}
 
@@ -53,7 +57,7 @@ func solve() {
 	}
 
 	dist := warshallFloyd(graph)
-	fmt.Println(dist)
+
 	q := getInt()
 	for i := 0; i < q; i++ {
 		n2 := getInt()
@@ -67,21 +71,31 @@ func solve() {
 		for {
 			subsets := generateSubsets(b)
 			for _, subset := range subsets {
-				islands := make([]int, 0)
+				subsetSets := newSet[int]()
+				for _, v := range subset {
+					subsetSets.Add(v)
+				}
+
 				tmp := 0
-				for _, bidx := range b {
-					tmp += bridges[bidx].t
-					if sliceContains(subset, bidx) {
-						islands = append(islands, bridges[bidx].a)
-						islands = append(islands, bridges[bidx].b)
+				route := []int{0}
+				for _, bridgeIdx := range b {
+					bridge := bridges[bridgeIdx]
+					tmp += bridge.t
+					if subsetSets.Has(bridgeIdx) {
+						route = append(route, bridge.a)
+						route = append(route, bridge.b)
 					} else {
-						islands = append(islands, bridges[bidx].b)
-						islands = append(islands, bridges[bidx].a)
+						route = append(route, bridge.b)
+						route = append(route, bridge.a)
 					}
 				}
-				tmp += dist[0][islands[0]]
-				tmp += dist[islands[len(islands)-1]][n-1]
-				fmt.Println(islands, tmp)
+				route = append(route, n-1)
+				for i := 0; i < len(route)-1; i++ {
+					// 奇数 -> 偶数は橋の通過で、すでに計算済み
+					if i % 2 == 0 {
+						tmp += dist[route[i]][route[i+1]]
+					}
+				}
 				ans = min(ans, tmp)
 			}
 			if !nextPermutation(sort.IntSlice(b)) {
@@ -1152,11 +1166,6 @@ func warshallFloyd(graph [][]int) [][]int {
 	for i := 0; i < n; i++ {
 		dist[i] = make([]int, n)
 		copy(dist[i], graph[i])
-	}
-
-	// 自己ループを明示的に 0 に設定
-	for i := 0; i < n; i++ {
-		dist[i][i] = 0
 	}
 
 	// ワーシャル–フロイド法の計算
