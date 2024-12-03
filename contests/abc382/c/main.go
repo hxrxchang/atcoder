@@ -30,8 +30,39 @@ func main() {
 }
 
 func solve() {
-}
+	in := getInts()
+	_, m := in[0], in[1]
+	a := getInts()
+	b := getInts()
+	bIndexes := make(map[int][]int)
+	for i, v := range b {
+		bIndexes[v] = append(bIndexes[v], i)
+	}
 
+	b = sortSlice(b)
+	res := make(map[int]int)
+	for i, va := range a {
+		boundary := bisectLeft(b, va)
+		if boundary == m {
+			continue
+		}
+		targetNetaList := b[boundary:]
+		for _, netaV := range targetNetaList {
+			res[bIndexes[netaV][0]] = i+1
+			bIndexes[netaV] = bIndexes[netaV][1:]
+		}
+		b = b[:boundary]
+	}
+
+	for i := 0; i < m; i++ {
+		v, ok := res[i]
+		if !ok {
+			fmt.Println(-1)
+		} else {
+			fmt.Println(v)
+		}
+	}
+}
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 func getInt() int {
@@ -827,13 +858,10 @@ func bisectRight[T constraints.Ordered](slice []T, value T) int {
 // sliceの中で指定した値以上の要素を返す
 func lowerBound[T constraints.Ordered](slice []T, value T) *T {
 	idx := bisectLeft(slice, value)
-	if slice[idx] == value {
-		return &value
+	if idx < len(slice) {
+		return &slice[idx]
 	}
-	if idx == 0 {
-		return nil
-	}
-	return &slice[idx-1]
+	return nil
 }
 // sliceの中で指定した値より大きい要素を返す
 func upperBound[T constraints.Ordered](slice []T, value T) *T {
