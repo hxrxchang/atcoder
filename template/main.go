@@ -813,20 +813,20 @@ func generateSubsets[T any](elements []T) [][]T {
 }
 
 // binary search
-func bisect[T constraints.Ordered](slice []T, fn func(int) bool) int {
+func binarySearch[T constraints.Ordered](slice []T, fn func(int) bool) int {
 	return sort.Search(len(slice), fn)
 }
 // sliceの中でvalue以上の値が最初に現れるindexを返す
-func bisectLeft[T constraints.Ordered](slice []T, value T) int {
-	return bisect(slice, func(i int) bool { return slice[i] >= value })
+func lowerBound[T constraints.Ordered](slice []T, value T) int {
+	return binarySearch(slice, func(i int) bool { return slice[i] >= value })
 }
 // sliceの中でvalueより大きい値が最初に現れるindexを返す
-func bisectRight[T constraints.Ordered](slice []T, value T) int {
-	return bisect(slice, func(i int) bool { return slice[i] > value })
+func upperBound[T constraints.Ordered](slice []T, value T) int {
+	return binarySearch(slice, func(i int) bool { return slice[i] > value })
 }
 // sliceの中で指定した値以上の要素を返す
-func lowerBound[T constraints.Ordered](slice []T, value T) *T {
-	idx := bisectLeft(slice, value)
+func equalOrMoreThan[T constraints.Ordered](slice []T, value T) *T {
+	idx := lowerBound(slice, value)
 	if slice[idx] == value {
 		return &value
 	}
@@ -836,16 +836,16 @@ func lowerBound[T constraints.Ordered](slice []T, value T) *T {
 	return &slice[idx-1]
 }
 // sliceの中で指定した値より大きい要素を返す
-func upperBound[T constraints.Ordered](slice []T, value T) *T {
-	idx := bisectRight(slice, value)
-	if idx == len(slice) {
-		return nil
+func moreThan[T constraints.Ordered](slice []T, value T) *T {
+	idx := upperBound(slice, value)
+	if idx < len(slice) {
+		return &slice[idx]
 	}
-	return &slice[idx]
+	return nil
 }
 // sliceの中で指定した値未満の中で最大の要素を返す
 func lessThan[T constraints.Ordered](slice []T, value T) *T {
-	idx := bisectLeft(slice, value)
+	idx := lowerBound(slice, value)
 	if idx == 0 {
 		return nil
 	}
@@ -889,10 +889,10 @@ func (z *Zaatsu) Count() int {
 	return len(z.values)
 }
 func (z *Zaatsu) BisectLeft(v int) int {
-	return bisectLeft(z.values, v)
+	return lowerBound(z.values, v)
 }
 func (z *Zaatsu) BisectRight(v int) int {
-	return bisectRight(z.values, v)
+	return upperBound(z.values, v)
 }
 
 // セグメント木
