@@ -824,12 +824,20 @@ func lowerBound[T constraints.Ordered](slice []T, value T) int {
 func upperBound[T constraints.Ordered](slice []T, value T) int {
 	return binarySearch(slice, func(i int) bool { return slice[i] > value })
 }
-// sliceの中で指定した値以上の要素を返す
+// sliceの中で指定した値以上の最小の要素を返す
 func equalOrMoreThan[T constraints.Ordered](slice []T, value T) *T {
 	idx := lowerBound(slice, value)
 	if slice[idx] == value {
 		return &value
 	}
+	if idx == 0 {
+		return nil
+	}
+	return &slice[idx-1]
+}
+// sliceの中で指定した値以下の最大の要素を返す
+func equalOrLessThan[T constraints.Ordered](slice []T, value T) *T {
+	idx := upperBound(slice, value)
 	if idx == 0 {
 		return nil
 	}

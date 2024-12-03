@@ -45,12 +45,12 @@ func solve() {
 	t := getInt()
 	for i := 0; i < t; i++ {
 		n := getInt()
-		boundary := upperBound(nums, n)
-		if boundary == 0 {
+		v := equalOrLessThan(nums, n)
+		if v == nil {
 			fmt.Println(-1)
-			continue
+		} else {
+			fmt.Println(*v)
 		}
-		fmt.Println(nums[boundary-1])
 	}
 }
 
@@ -855,6 +855,14 @@ func equalOrMoreThan[T constraints.Ordered](slice []T, value T) *T {
 	if slice[idx] == value {
 		return &value
 	}
+	if idx == 0 {
+		return nil
+	}
+	return &slice[idx-1]
+}
+// sliceの中で指定した値以下の最大の要素を返す
+func equalOrLessThan[T constraints.Ordered](slice []T, value T) *T {
+	idx := upperBound(slice, value)
 	if idx == 0 {
 		return nil
 	}
