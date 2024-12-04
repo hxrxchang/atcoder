@@ -1,0 +1,99 @@
+{
+  "contest": {
+    "id": "adt_all_20241204_2",
+    "title": "AtCoder Daily Training ALL 2024/12/04 18:00start",
+    "url": "https://atcoder.jp/contests/adt_all_20241204_2"
+  },
+  "tasks": [
+    {
+      "id": "abc278_a",
+      "label": "A",
+      "title": "Shift",
+      "url": "https://atcoder.jp/contests/adt_all_20241204_2/tasks/abc278_a",
+      "directory": {
+        "path": "a",
+        "testdir": "tests"
+      }
+    },
+    {
+      "id": "abc238_a",
+      "label": "B",
+      "title": "Exponential or Quadratic",
+      "url": "https://atcoder.jp/contests/adt_all_20241204_2/tasks/abc238_a",
+      "directory": {
+        "path": "b",
+        "testdir": "tests"
+      }
+    },
+    {
+      "id": "abc374_b",
+      "label": "C",
+      "title": "Unvarnished Report",
+      "url": "https://atcoder.jp/contests/adt_all_20241204_2/tasks/abc374_b",
+      "directory": {
+        "path": "c",
+        "testdir": "tests"
+      }
+    },
+    {
+      "id": "abc313_b",
+      "label": "D",
+      "title": "Who is Saikyo?",
+      "url": "https://atcoder.jp/contests/adt_all_20241204_2/tasks/abc313_b",
+      "directory": {
+        "path": "d",
+        "testdir": "tests"
+      }
+    },
+    {
+      "id": "abc226_c",
+      "label": "E",
+      "title": "Martial artist",
+      "url": "https://atcoder.jp/contests/adt_all_20241204_2/tasks/abc226_c",
+      "directory": {
+        "path": "e",
+        "testdir": "tests"
+      }
+    },
+    {
+      "id": "abc264_c",
+      "label": "F",
+      "title": "Matrix Reducing",
+      "url": "https://atcoder.jp/contests/adt_all_20241204_2/tasks/abc264_c",
+      "directory": {
+        "path": "f",
+        "testdir": "tests"
+      }
+    },
+    {
+      "id": "abc327_d",
+      "label": "G",
+      "title": "Good Tuple Problem",
+      "url": "https://atcoder.jp/contests/adt_all_20241204_2/tasks/abc327_d",
+      "directory": {
+        "path": "g",
+        "testdir": "tests"
+      }
+    },
+    {
+      "id": "abc242_e",
+      "label": "H",
+      "title": "(∀x∀)",
+      "url": "https://atcoder.jp/contests/adt_all_20241204_2/tasks/abc242_e",
+      "directory": {
+        "path": "h",
+        "testdir": "tests"
+      }
+    },
+    {
+      "id": "abc271_f",
+      "label": "I",
+      "title": "XOR on Grid Path",
+      "url": "https://atcoder.jp/contests/adt_all_20241204_2/tasks/abc271_f",
+      "directory": {
+        "path": "i",
+        "testdir": "tests"
+      }
+    }
+  ]
+}
