@@ -37,7 +37,11 @@
       "id": "abc261_e",
       "label": "E",
       "title": "Many Operations",
-      "url": "https://atcoder.jp/contests/abc261/tasks/abc261_e"
+      "url": "https://atcoder.jp/contests/abc261/tasks/abc261_e",
+      "directory": {
+        "path": "e",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc261_f",
