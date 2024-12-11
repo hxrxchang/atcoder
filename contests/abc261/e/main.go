@@ -35,6 +35,7 @@ func solve() {
 
 	u := (1 << 30) - 1
 	d := 0
+	x := c
 	for i := 0; i < n; i++ {
 		in := getInts()
 		t, a := in[0], in[1]
@@ -52,14 +53,14 @@ func solve() {
 
 		nx := 0
 		for j := 0; j < 30; j++ {
-			if (c & (1 << j)) != 0 {
+			if (x & (1 << j)) != 0 {
 				nx += (u & (1 << j))
 			} else {
 				nx += (d & (1 << j))
 			}
 		}
-		c = nx
-		fmt.Println(c)
+		x = nx
+		fmt.Println(x)
 	}
 }
 
