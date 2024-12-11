@@ -33,33 +33,32 @@ func solve() {
 	in := getInts()
 	n, c := in[0], in[1]
 
-	u := (1 << 30) - 1
-	d := 0
+	allOn := 1 << 30 - 1
+	allOff := 0
 	x := c
 	for i := 0; i < n; i++ {
 		in := getInts()
 		t, a := in[0], in[1]
-
 		if t == 1 {
-			u &= a
-			d &= a
+			allOn &= a
+			allOff &= a
 		} else if t == 2 {
-			u |= a
-			d |= a
-		} else if t == 3 {
-			u ^= a
-			d ^= a
+			allOn |= a
+			allOff |= a
+		} else {
+			allOn ^= a
+			allOff ^= a
 		}
 
-		nx := 0
-		for j := 0; j < 30; j++ {
-			if (x & (1 << j)) != 0 {
-				nx += (u & (1 << j))
+		x2 := 0
+		for i := 0; i < 30; i++ {
+			if x & (1 << i) != 0 {
+				x2 += allOn & (1 << i)
 			} else {
-				nx += (d & (1 << j))
+				x2 += allOff & (1 << i)
 			}
 		}
-		x = nx
+		x = x2
 		fmt.Println(x)
 	}
 }
