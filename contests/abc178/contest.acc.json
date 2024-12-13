@@ -21,7 +21,11 @@
       "id": "abc178_c",
       "label": "C",
       "title": "Ubiquity",
-      "url": "https://atcoder.jp/contests/abc178/tasks/abc178_c"
+      "url": "https://atcoder.jp/contests/abc178/tasks/abc178_c",
+      "directory": {
+        "path": "c",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc178_d",
