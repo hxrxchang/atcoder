@@ -237,7 +237,11 @@
       "id": "tessoku_book_ae",
       "label": "A31",
       "title": "Divisors",
-      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ae"
+      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ae",
+      "directory": {
+        "path": "a31",
+        "testdir": "tests"
+      }
     },
     {
       "id": "tessoku_book_af",
@@ -689,7 +693,11 @@
       "id": "tessoku_book_dd",
       "label": "B31",
       "title": "Divisors Hard",
-      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_dd"
+      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_dd",
+      "directory": {
+        "path": "b31",
+        "testdir": "tests"
+      }
     },
     {
       "id": "tessoku_book_de",
