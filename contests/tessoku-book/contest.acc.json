@@ -219,7 +219,11 @@
       "id": "tessoku_book_ad",
       "label": "A30",
       "title": "Combination",
-      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ad"
+      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ad",
+      "directory": {
+        "path": "a30",
+        "testdir": "tests"
+      }
     },
     {
       "id": "tessoku_book_ae",
