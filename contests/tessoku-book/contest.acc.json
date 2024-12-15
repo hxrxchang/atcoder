@@ -655,7 +655,11 @@
       "id": "math_and_algorithm_ap",
       "label": "B28",
       "title": "Fibonacci Easy (mod 1000000007)",
-      "url": "https://atcoder.jp/contests/tessoku-book/tasks/math_and_algorithm_ap"
+      "url": "https://atcoder.jp/contests/tessoku-book/tasks/math_and_algorithm_ap",
+      "directory": {
+        "path": "b28",
+        "testdir": "tests"
+      }
     },
     {
       "id": "tessoku_book_db",
