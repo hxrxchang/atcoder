@@ -85,7 +85,11 @@
       "id": "tessoku_book_i",
       "label": "A09",
       "title": "Winter in ALGO Kingdom",
-      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_i"
+      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_i",
+      "directory": {
+        "path": "a09",
+        "testdir": "tests"
+      }
     },
     {
       "id": "tessoku_book_j",
@@ -669,7 +673,11 @@
       "id": "tessoku_book_db",
       "label": "B29",
       "title": "Power Hard",
-      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_db"
+      "url": "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_db",
+      "directory": {
+        "path": "b29",
+        "testdir": "tests"
+      }
     },
     {
       "id": "tessoku_book_dc",
