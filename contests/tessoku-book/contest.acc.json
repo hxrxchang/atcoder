@@ -213,7 +213,11 @@
       "id": "math_and_algorithm_aq",
       "label": "A29",
       "title": "Power",
-      "url": "https://atcoder.jp/contests/tessoku-book/tasks/math_and_algorithm_aq"
+      "url": "https://atcoder.jp/contests/tessoku-book/tasks/math_and_algorithm_aq",
+      "directory": {
+        "path": "a29",
+        "testdir": "tests"
+      }
     },
     {
       "id": "tessoku_book_ad",
