@@ -31,7 +31,11 @@
       "id": "abc117_d",
       "label": "D",
       "title": "XXOR",
-      "url": "https://atcoder.jp/contests/abc117/tasks/abc117_d"
+      "url": "https://atcoder.jp/contests/abc117/tasks/abc117_d",
+      "directory": {
+        "path": "d",
+        "testdir": "tests"
+      }
     }
   ]
 }
