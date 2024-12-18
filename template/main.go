@@ -379,6 +379,8 @@ func (m *modint) nCr(n, r int) int {
 	return (ret)
 }
 
+// -----------------------------------------------
+
 // logXのYを求める
 func logXY(x, y int) int {
 	return int(math.Log(float64(y)) / math.Log(float64(x)))
@@ -523,6 +525,36 @@ func isPrime(n int) bool {
 		}
 	}
 	return true
+}
+
+// 2次元累積和
+type PrefixSum2D struct {
+	grid       [][]int
+	prefixSum  [][]int
+}
+func NewPrefixSum2D(grid [][]int) *PrefixSum2D {
+	n := len(grid)
+	m := len(grid[0])
+
+	prefixSum := make([][]int, n+1)
+	for i := range prefixSum {
+		prefixSum[i] = make([]int, m+1)
+	}
+
+	for i := 1; i <= n; i++ {
+		for j := 1; j <= m; j++ {
+			prefixSum[i][j] = grid[i-1][j-1] + prefixSum[i-1][j] + prefixSum[i][j-1] - prefixSum[i-1][j-1]
+		}
+	}
+
+	return &PrefixSum2D{
+		grid:      grid,
+		prefixSum: prefixSum,
+	}
+}
+
+func (ps *PrefixSum2D) Query(x1, y1, x2, y2 int) int {
+	return ps.prefixSum[x2+1][y2+1] - ps.prefixSum[x1][y2+1] - ps.prefixSum[x2+1][y1] + ps.prefixSum[x1][y1]
 }
 
 // 整数nが桁数を満たさなかったら0埋めする
