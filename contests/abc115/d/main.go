@@ -52,12 +52,13 @@ func solve() {
 		if n == 0 {
 			return 1
 		}
-		if x <= totalCnt[n-1]+1 {
-			return dfs(n-1, x-1)
-		} else if x <= 2 * totalCnt[n-1] + 2 {
-			return pattiesCnt[n-1] + 1 + dfs(n-1, x-2-totalCnt[n-1])
-		} else {
+
+		if x == totalCnt[n] { // レベルNのバーガーを全部
 			return pattiesCnt[n]
+		} else if x <= totalCnt[n-1]+1 { // 前半部分
+			return dfs(n-1, x-1) // x-1は最初のBを除いたもの
+		} else { // 後半部分
+			return pattiesCnt[n-1] + 1 + dfs(n-1, x-2-totalCnt[n-1]) //x-2-totalCnt[n-1]は最初と最後のBと、前半部分のレベルN-1のバーガーを除いたもの
 		}
 	}
 
