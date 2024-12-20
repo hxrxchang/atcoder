@@ -30,6 +30,68 @@ func main() {
 }
 
 func solve() {
+	m := getInt()
+	ss := [][]string{strToSlice(getStr(), ""), strToSlice(getStr(), ""), strToSlice(getStr(), "")}
+
+	perm := rangeSlice(3)
+	ans := BIGGEST
+	for {
+		for i := 0; i < m; i++ {
+			cnt := i
+			target := ss[perm[0]][i]
+
+			second := moveToEnd(ss[perm[1]], i)
+			foundSecond := false
+			var j int
+			for j = 0; j < m; j++ {
+				if second[j] == target {
+					cnt += j
+					foundSecond = true
+				}
+			}
+			if !foundSecond {
+				continue
+			}
+
+			third := moveToEnd(ss[perm[2]], i)
+			foundThird := false
+			var k int
+			for k = 0; k < m; k++ {
+				if third[k] == target {
+					cnt += k
+					foundThird = true
+				}
+			}
+			if !foundThird {
+				continue
+			}
+
+			if cnt < ans {
+				fmt.Println(perm, target, i, j, k, cnt)
+			}
+
+			ans = min(ans, cnt)
+		}
+		if !nextPermutation(sort.IntSlice(perm)) {
+			break
+		}
+	}
+
+	if ans == BIGGEST {
+		fmt.Println(-1)
+	} else {
+		fmt.Println(ans)
+	}
+}
+
+func moveToEnd[T any](slice []T, index int) []T {
+    if index < 0 || index >= len(slice) {
+		panic("index out of range")
+    }
+    element := slice[index]
+    slice = append(slice[:index], slice[index+1:]...)
+    slice = append(slice, element)
+    return slice
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -936,7 +998,7 @@ func getDividors(n int) []int {
 // x := []int{1, 2, 3, 4}
 // for {
 // 	fmt.Println(x)
-// 	if !nextPermutation(sort.IntSlice(x)) {
+// 	if !NextPermutation(sort.IntSlice(x)) {
 // 		break
 // 	}
 // }
