@@ -848,6 +848,18 @@ func copy2DSlice(original [][]int) [][]int {
     return newSlice
 }
 
+// スライスを指定した位置で分割して逆順に結合
+func splitAndReverse[T any](slice []T, index int) []T {
+    if index < 0 || index >= len(slice) {
+        panic("index out of range")
+    }
+    front := slice[:index]
+    back := slice[index:]
+
+    return append(back, front...)
+}
+
+
 // スライスを文字列に変換
 func sliceToStr[T any](data []T, separator string) string {
 	var strSlice []string
