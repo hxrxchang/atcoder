@@ -38,36 +38,35 @@ func solve() {
 	for {
 		for i := 0; i < m; i++ {
 			cnt := i
-			target := ss[perm[0]][i]
+			first := splitAndReverse(ss[perm[0]], i)
+			target := first[0]
 
-			second := moveToEnd(ss[perm[1]], i)
+			second := splitAndReverse(ss[perm[1]], (cnt + 1) % m)
 			foundSecond := false
 			var j int
 			for j = 0; j < m; j++ {
 				if second[j] == target {
-					cnt += j
+					cnt += j + 1
 					foundSecond = true
+					break
 				}
 			}
 			if !foundSecond {
 				continue
 			}
 
-			third := moveToEnd(ss[perm[2]], i)
+			third := splitAndReverse(ss[perm[2]], (cnt + 1) % m)
 			foundThird := false
 			var k int
 			for k = 0; k < m; k++ {
 				if third[k] == target {
-					cnt += k
+					cnt += k + 1
 					foundThird = true
+					break
 				}
 			}
 			if !foundThird {
 				continue
-			}
-
-			if cnt < ans {
-				fmt.Println(perm, target, i, j, k, cnt)
 			}
 
 			ans = min(ans, cnt)
@@ -84,14 +83,14 @@ func solve() {
 	}
 }
 
-func moveToEnd[T any](slice []T, index int) []T {
+func splitAndReverse[T any](slice []T, index int) []T {
     if index < 0 || index >= len(slice) {
-		panic("index out of range")
+        panic("index out of range")
     }
-    element := slice[index]
-    slice = append(slice[:index], slice[index+1:]...)
-    slice = append(slice, element)
-    return slice
+    front := slice[:index]
+    back := slice[index:]
+
+    return append(back, front...)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
