@@ -1345,7 +1345,18 @@ func dijkstra(graph [][]dijkstraItem, start int) []int {
 	for i := range dist {
 		dist[i] = BIGGEST
 	}
-	dist[start] = 0
+
+	// スタート地点からスタート地点自身への辺があった場合、それを優先する
+	for _, edge := range graph[start] {
+		if edge.node == start {
+			dist[start] = min(dist[start], edge.dist)
+		}
+	}
+
+	// なければ0
+	if dist[start] == BIGGEST {
+		dist[start] = 0
+	}
 
 	pq := &dijkstraPriorityQueue{}
 	heap.Init(pq)
