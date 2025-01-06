@@ -1105,7 +1105,11 @@ func newZaatsu(params []int) *Zaatsu {
 }
 // 圧縮後の値を取得
 func (z *Zaatsu) GetCompressedValue(v int) int {
-	return z.mapping[v]
+	if val, ok := z.mapping[v]; !ok {
+		panic("value not found")
+	} else {
+		return val
+	}
 }
 // 圧縮後の値から元の値を取得
 func (z *Zaatsu) GetOriginalValue(compressedIndex int) int {
