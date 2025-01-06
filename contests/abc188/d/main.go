@@ -65,7 +65,6 @@ func solve() {
 	fmt.Println(ans)
 }
 
-
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 func getInt() int {
@@ -1139,6 +1138,9 @@ func newZaatsu(params []int) *Zaatsu {
 }
 // 圧縮後の値を取得
 func (z *Zaatsu) GetCompressedValue(v int) int {
+	if _, ok := z.mapping[v]; !ok {
+		panic("Value not found")
+	}
 	return z.mapping[v]
 }
 // 圧縮後の値から元の値を取得
@@ -1151,10 +1153,10 @@ func (z *Zaatsu) GetOriginalValue(compressedIndex int) int {
 func (z *Zaatsu) Count() int {
 	return len(z.values)
 }
-func (z *Zaatsu) BisectLeft(v int) int {
+func (z *Zaatsu) LowerBound(v int) int {
 	return lowerBound(z.values, v)
 }
-func (z *Zaatsu) BisectRight(v int) int {
+func (z *Zaatsu) UpperBound(v int) int {
 	return upperBound(z.values, v)
 }
 
