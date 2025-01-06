@@ -1117,10 +1117,10 @@ func (z *Zaatsu) GetOriginalValue(compressedIndex int) int {
 func (z *Zaatsu) Count() int {
 	return len(z.values)
 }
-func (z *Zaatsu) BisectLeft(v int) int {
+func (z *Zaatsu) LowerBound(v int) int {
 	return lowerBound(z.values, v)
 }
-func (z *Zaatsu) BisectRight(v int) int {
+func (z *Zaatsu) UpperBound(v int) int {
 	return upperBound(z.values, v)
 }
 
