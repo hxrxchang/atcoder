@@ -33,15 +33,18 @@ func solve() {
 	in := getInts()
 	n, m := in[0], in[1]
 
-	// minLeftPerRight[i]: iを右端とするときの最小の左端
+	// minLeftPerRight[i]: iを右端とするとき、区間に選べる左端の最小値
 	minLeftPerRight := make([]int, m+1)
 	for i := 0; i <= m; i++ {
+		// 区間は1以上m以下なので、初期状態は最小の1にする
 		minLeftPerRight[i] = 1
 	}
 
+	// n個の区間を見て、有効な区間を判定していく
 	for i := 0; i < n; i++ {
 		in := getInts()
 		l, r := in[0], in[1]
+		// l+1すると完全には含まなくなる
 		minLeftPerRight[r] = max(minLeftPerRight[r], l+1)
 	}
 
