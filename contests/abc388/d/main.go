@@ -33,12 +33,6 @@ func solve() {
 	n := getInt()
 	a := getInts()
 
-	for i := 0; i < n; i++ {
-		a[i] = max(0, a[i] - (n - i - 1))
-	}
-
-	fmt.Println(a)
-
 	op := func(a, b int) int {
 		return a + b
 	}
@@ -50,9 +44,11 @@ func solve() {
 		segtree.UpdateRange(i, i+1, a[i])
 	}
 
-	for i := 1; i < n; i++ {
-		v := segtree.Query(0, i)
-		fmt.Println(v)
+	for i := 0; i < n-1; i++ {
+		ai := segtree.Query(i, i+1)
+		cnt := min(ai, n-i-1)
+		segtree.UpdateRange(i, i+1, -cnt)
+		segtree.UpdateRange(i+1, i+1+cnt, 1)
 	}
 
 	ans := make([]int, n)
@@ -60,7 +56,7 @@ func solve() {
 		ans[i] = segtree.Query(i, i+1)
 	}
 
-	fmt.Println(ans)
+	printSlice(ans)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
