@@ -36,10 +36,13 @@ func solve() {
 	op := func(a, b int) int {
 		return a + b
 	}
+	lazyOp := func(a, b int) int {
+		return a + b
+	}
 	isNoop := func(a int) bool {
 		return a == 0
 	}
-	segtree := NewLazySegmentTree(n, 0, op, op, isNoop)
+	segtree := NewLazySegmentTree(n, 0, op, lazyOp, isNoop)
 	for i := 0; i < n; i++ {
 		segtree.UpdateRange(i, i+1, a[i])
 	}
