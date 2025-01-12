@@ -1187,7 +1187,7 @@ type LazySegmentTree struct {
 	isNoop func(int) bool
 }
 
-func NewLazySegmentTree(n int, noop int, op, lazyOp func(int, int) int, isNoop func(int) bool) *LazySegmentTree {
+func NewLazySegmentTree(n int, op, lazyOp func(int, int) int, noop int) *LazySegmentTree {
 	seg := &LazySegmentTree{}
 	seg.n = 1
 	for seg.n < n {
@@ -1198,6 +1198,10 @@ func NewLazySegmentTree(n int, noop int, op, lazyOp func(int, int) int, isNoop f
 	seg.noop = noop
 	seg.op = op
 	seg.lazyOp = lazyOp
+
+	isNoop := func(x int) bool {
+		return x == noop
+	}
 	seg.isNoop = isNoop
 	return seg
 }

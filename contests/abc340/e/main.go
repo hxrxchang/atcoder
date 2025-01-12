@@ -38,10 +38,8 @@ func solve() {
 	op := func(x, y int) int {
 		return x + y
 	}
-	noop := func(x int) bool {
-		return x == 0
-	}
-	segtree := NewLazySegmentTree(n, 0, op, op, noop)
+	noop := 0
+	segtree := NewLazySegmentTree(n, op, op, noop)
 	for i := 0; i < n; i++ {
 		segtree.UpdateRange(i, i+1, a[i])
 	}
@@ -80,7 +78,7 @@ type LazySegmentTree struct {
 	isNoop func(int) bool
 }
 
-func NewLazySegmentTree(n int, noop int, op, lazyOp func(int, int) int, isNoop func(int) bool) *LazySegmentTree {
+func NewLazySegmentTree(n int, op, lazyOp func(int, int) int, noop int) *LazySegmentTree {
 	seg := &LazySegmentTree{}
 	seg.n = 1
 	for seg.n < n {
@@ -91,6 +89,10 @@ func NewLazySegmentTree(n int, noop int, op, lazyOp func(int, int) int, isNoop f
 	seg.noop = noop
 	seg.op = op
 	seg.lazyOp = lazyOp
+
+	isNoop := func(x int) bool {
+		return x == noop
+	}
 	seg.isNoop = isNoop
 	return seg
 }
