@@ -32,20 +32,20 @@ func main() {
 func solve() {
 	n := getInt()
 	type Distinct struct {
-		takahashiCnt, aokiCnt, cnt int
+		cost, cnt int
 	}
+	totalCnt := 0
 	distincts := make([]Distinct, n)
-	total := 0
 	for i := 0; i < n; i++ {
 		in := getInts()
-		x, y, z := in[0], in[1], in[2]
-		distincts[i] = Distinct{takahashiCnt: x, aokiCnt: y, cnt: z}
-		total += z
+		x, y, cnt := in[0], in[1], in[2]
+		cost := max(0, (y-x+1)/2)
+		distincts[i] = Distinct{cost, cnt}
+		totalCnt += cnt
 	}
 
-	// dp[i]: ある選挙区まで見たときに、i議席を獲得するために必要な最小の鞍替え人数
-	dp := make([]int, total+1)
-	for i := 0; i <= total; i++ {
+	dp := make([]int, totalCnt+1)
+	for i := 0; i <= totalCnt; i++ {
 		dp[i] = BIGGEST
 	}
 	dp[0] = 0
@@ -53,22 +53,16 @@ func solve() {
 	for i := 0; i < n; i++ {
 		tmp := copySlice(dp)
 		distinct := distincts[i]
-		for j := 1; j <= total; j++ {
-			if j - distinct.cnt < 0 || dp[j - distinct.cnt] == BIGGEST {
-				// j議席丁度にすることができないためスキップ
-				continue
-			}
-			if distinct.takahashiCnt > distinct.aokiCnt {
-				// 高橋君が多い場合は鞍替えが必要ない
-				tmp[j] = min(tmp[j], dp[j - distinct.cnt])
-			} else {
-				tmp[j] = min(tmp[j], dp[j - distinct.cnt] + (distinct.aokiCnt - distinct.takahashiCnt + 1) / 2)
+		for j := 0; j <= totalCnt; j++ {
+			if j-distinct.cnt >= 0 && dp[j-distinct.cnt] != BIGGEST {
+				tmp[j] = min(dp[j], dp[j-distinct.cnt]+distinct.cost)
 			}
 		}
 		dp = tmp
 	}
 
-	ans := min(dp[total/2 + 1:]...)
+	half := (totalCnt + 1) / 2
+	ans := min(dp[half:]...)
 	fmt.Println(ans)
 }
 
