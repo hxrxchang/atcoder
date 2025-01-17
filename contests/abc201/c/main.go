@@ -31,13 +31,13 @@ func main() {
 
 func solve() {
 	s := strToSlice(getStr(), "")
-	mustIncluded := make(map[string]bool)
-	notIncluded := make(map[string]bool)
+	mustIncluded := make([]string, 0)
+	notIncluded := make([]string, 0)
 	for i, v := range s {
 		if v == "x" {
-			notIncluded[i2s(i)] = true
+			notIncluded = append(notIncluded, i2s(i))
 		} else if v == "o" {
-			mustIncluded[i2s(i)] = true
+			mustIncluded = append(mustIncluded, i2s(i))
 		}
 	}
 
@@ -46,13 +46,13 @@ func solve() {
 		tmp := zeroPad(i, 4)
 		tmpSlice := strToSlice(tmp, "")
 		ok := true
-		for k := range mustIncluded {
+		for _, k := range mustIncluded {
 			if !sliceContains(tmpSlice, k) {
 				ok = false
 				break
 			}
 		}
-		for k := range notIncluded {
+		for _, k := range notIncluded {
 			if sliceContains(tmpSlice, k) {
 				ok = false
 				break
