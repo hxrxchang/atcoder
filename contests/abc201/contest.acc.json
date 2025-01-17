@@ -21,7 +21,11 @@
       "id": "abc201_c",
       "label": "C",
       "title": "Secret Number",
-      "url": "https://atcoder.jp/contests/abc201/tasks/abc201_c"
+      "url": "https://atcoder.jp/contests/abc201/tasks/abc201_c",
+      "directory": {
+        "path": "c",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc201_d",
