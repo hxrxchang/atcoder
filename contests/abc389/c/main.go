@@ -31,27 +31,38 @@ func main() {
 
 func solve() {
 	q := getInt()
-	minus := 0
-	plus := 0
-	current := 1
-	mp := make(map[int]int)
+
+	type Snake struct {
+		head, tail int
+	}
+	snakes := make([]Snake, 0)
+	// 列内のヘビをidxで管理
 	que := newQueue[int]()
+	// 何センチ進んだか
+	accm := 0
+	// 抜けたヘビの数
+	cnt := 0
 
 	for i := 0; i < q; i++ {
 		in := getInts()
 		if in[0] == 1 {
 			l := in[1]
-			mp[current] = plus
-			plus += l
-			que.PushBack(current)
-			current += 1
+			if que.Size() == 0 {
+				snakes = append(snakes, Snake{head: 0, tail: l})
+				que.PushBack(0)
+			} else {
+				last := que.Back()
+				snakes = append(snakes, Snake{head: snakes[last].tail, tail: snakes[last].tail + l})
+				que.PushBack(last + 1)
+			}
 		} else if in[0] == 2 {
-			idx := que.PopFront()
-			minus = -mp[idx+1]
+			head := que.PopFront()
+			accm = snakes[head].tail
+			cnt += 1
 		} else {
-			target := que.Front() + in[1] - 1
-			l := mp[target]
-			fmt.Println(l + minus)
+			k := in[1]
+			snake := snakes[k+cnt-1]
+			fmt.Println(snake.head - accm)
 		}
 	}
 }
