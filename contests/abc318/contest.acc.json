@@ -35,7 +35,11 @@
       "id": "abc318_d",
       "label": "D",
       "title": "General Weighted Max Matching",
-      "url": "https://atcoder.jp/contests/abc318/tasks/abc318_d"
+      "url": "https://atcoder.jp/contests/abc318/tasks/abc318_d",
+      "directory": {
+        "path": "d",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc318_e",
