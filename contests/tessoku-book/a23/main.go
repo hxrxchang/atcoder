@@ -35,6 +35,8 @@ func solve() {
 	// m: クーポン数
 	n, m := in[0], in[1]
 
+	// 各クーポンで無料にできる商品をbitで表す
+	// 例: 1, 2番目の商品が無料になるのはbitで11なので、3になる
 	coupons := make([]int, m)
 	for i := 0; i < m; i++ {
 		in := strToSlice(getStr(), " ")
@@ -47,12 +49,13 @@ func solve() {
 	}
 	dp[0] = 0
 
-	for i := 0; i < 1 << n; i++ {
-		for j := 0; j < m; j++ {
-			next := i | coupons[j]
-			dp[next] = min(dp[next], dp[i]+1)
+	for i := 0; i < m; i++ {
+		for j := 0; j < 1 << n; j++ {
+			next := j | coupons[i]
+			dp[next] = min(dp[next], dp[j]+1)
 		}
 	}
+
 
 	if dp[1<<n-1] == BIGGEST {
 		fmt.Println(-1)
