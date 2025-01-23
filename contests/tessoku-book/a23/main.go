@@ -20,8 +20,8 @@ import (
 
 const BUFSIZE = 10000000
 const MOD = 1000000007
-const BIGGEST = math.MaxInt64
-const MINIMUM = math.MinInt64
+const BIGGEST = math.MaxInt32
+const MINIMUM = math.MinInt32
 var rdr *bufio.Reader
 
 func main() {
@@ -35,22 +35,30 @@ func solve() {
 	// m: クーポン数
 	n, m := in[0], in[1]
 
-	coupons := make([][]int, m)
+	coupons := make([]int, m)
 	for i := 0; i < m; i++ {
-		coupons[i] = getInts()
+		in := strToSlice(getStr(), " ")
+		coupons[i] = bit2i(in)
 	}
 
-	// dp[j]: 使えるクーポン1枚ずつ増やしていき、その中で自由に使えるとして、無料の商品の集合jを作るのに必要最小のクーポン数
-	dp := make([]int, m+1)
-	patterns := 1 << n
-	for i := 1; i <= m; i++ {
-		for j := 0; j < patterns; j++ {
-			coupon := coupons[i-1]
+	dp := make([]int, 1<<n)
+	for i := 0; i < 1<<n; i++ {
+		dp[i] = BIGGEST
+	}
+	dp[0] = 0
 
+	for i := 0; i < 1 << n; i++ {
+		for j := 0; j < m; j++ {
+			next := i | coupons[j]
+			dp[next] = min(dp[next], dp[i]+1)
 		}
 	}
 
-	fmt.Println(dp)
+	if dp[1<<n-1] == BIGGEST {
+		fmt.Println(-1)
+	} else {
+		fmt.Println(dp[1<<n-1])
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -154,6 +162,16 @@ func i2b(i int) bool {
 
 func i2bit(i int) []string {
 	return strToSlice(strconv.FormatInt(int64(i), 2), "")
+}
+
+func bit2i(bits []string) int {
+	bitStr := strings.Join(bits, "")
+
+	result, err := strconv.ParseInt(bitStr, 2, 64)
+	if err != nil {
+		panic(err)
+	}
+	return int(result)
 }
 
 func abs(v int) int {
