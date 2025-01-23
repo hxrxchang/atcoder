@@ -135,6 +135,16 @@ func i2bit(i int) []string {
 	return strToSlice(strconv.FormatInt(int64(i), 2), "")
 }
 
+func bit2i(bits []string) int {
+	bitStr := strings.Join(bits, "")
+
+	result, err := strconv.ParseInt(bitStr, 2, 64)
+	if err != nil {
+		panic(err)
+	}
+	return int(result)
+}
+
 func abs(v int) int {
 	if v < 0 {
 		return -v
