@@ -31,31 +31,29 @@ func main() {
 
 func solve() {
 	in := getInts()
-	// n: 商品数
-	// m: クーポン数
+	// n: 商品数, m: クーポン数
 	n, m := in[0], in[1]
 
-	// 各クーポンで無料にできる商品をbitで表す
-	// 例: 1, 2番目の商品が無料になるのはbitで11なので、3になる
+	// クーポンは、どの商品を無料にできるかをbitで表現する
+	// 例: 1, 2, 3番目の商品を無料にできる場合は、bitで0111なので7となる
 	coupons := make([]int, m)
 	for i := 0; i < m; i++ {
-		in := strToSlice(getStr(), " ")
+		in := getStrs()
 		coupons[i] = bit2i(in)
 	}
 
+	// bitDP
 	dp := make([]int, 1<<n)
-	for i := 0; i < 1<<n; i++ {
+	for i := 1; i < 1<<n; i++ {
 		dp[i] = BIGGEST
 	}
-	dp[0] = 0
 
-	for i := 0; i < m; i++ {
-		for j := 0; j < 1 << n; j++ {
-			next := j | coupons[i]
-			dp[next] = min(dp[next], dp[j]+1)
+	for _, coupon := range coupons {
+		for state := 0; state < 1<<n; state++ {
+			next := state | coupon
+			dp[next] = min(dp[next], dp[state]+1)
 		}
 	}
-
 
 	if dp[1<<n-1] == BIGGEST {
 		fmt.Println(-1)
