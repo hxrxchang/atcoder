@@ -39,6 +39,7 @@ func solve() {
 	coupons := make([]int, m)
 	for i := 0; i < m; i++ {
 		in := getStrs()
+		in = reverse(in)
 		coupons[i] = bit2i(in)
 	}
 
