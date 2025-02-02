@@ -37,7 +37,11 @@
       "id": "abc308_e",
       "label": "E",
       "title": "MEX",
-      "url": "https://atcoder.jp/contests/abc308/tasks/abc308_e"
+      "url": "https://atcoder.jp/contests/abc308/tasks/abc308_e",
+      "directory": {
+        "path": "e",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc308_f",
