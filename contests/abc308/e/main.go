@@ -28,7 +28,6 @@ func main() {
 	rdr = bufio.NewReaderSize(os.Stdin, BUFSIZE)
 	solve()
 }
-
 func solve() {
 	n := getInt()
 	a := getInts()
@@ -61,73 +60,40 @@ func solve() {
 		}
 	}
 
-	cnt := 0
+	res := 0
 	for i := 0; i < n; i++ {
-		if s[i] == "E" {
-			m0Cnt := lowerBound(m0Idxes, i)
-			x0Cnt := len(x0Idxes) - lowerBound(x0Idxes, i+1)
-			m1Cnt := lowerBound(m1Idxes, i)
-			x1Cnt := len(x1Idxes) - lowerBound(x1Idxes, i+1)
-			m2Cnt := lowerBound(m2Idxes, i)
-			x2Cnt := len(x2Idxes) - lowerBound(x2Idxes, i+1)
-			if a[i] == 0 {
-				// 000だったらMEXは1
-				cnt += m0Cnt * x0Cnt
-				// 001だったらMEXは2
-				cnt += 2 * m0Cnt * x1Cnt
-				// 100だったらMEXは2
-				cnt += 2 * m1Cnt * x0Cnt
-				// 101だったらMEXは2
-				cnt += 2 * m1Cnt * x1Cnt
-				// 102だったらMEXは3
-				cnt += 3 * m1Cnt * x2Cnt
-				// 200だったらMEXは1
-				cnt += m2Cnt * x0Cnt
-				// 201だったらMEXは3
-				cnt += 3 * m2Cnt * x1Cnt
-				// 202だったらMEXは1
-				cnt += m2Cnt * x2Cnt
-			} else if a[i] == 1 {
-				// 010だったらMEXは2
-				cnt += 2 * m0Cnt * x0Cnt
-				// 012だったらMEXは3
-				cnt += 3 * m0Cnt * x2Cnt
-				// 110だったらMEXは2
-				cnt += 2 * m1Cnt * x0Cnt
-				// 111だったらMEXは0
-				cnt += 0 * m1Cnt * x1Cnt
-				// 112だったらMEXは0
-				cnt += 0 * m1Cnt * x2Cnt
-				// 210だったらMEXは3
-				cnt += 3 * m2Cnt * x0Cnt
-				// 211だったらMEXは0
-				cnt += 0 * m2Cnt * x1Cnt
-				// 212だったらMEXは0
-				cnt += 0 * m2Cnt * x2Cnt
-			} else if a[i] == 2 {
-				// 020だったらMEXは1
-				cnt += m0Cnt * x0Cnt
-				// 021だったらMEXは3
-				cnt += 3 * m0Cnt * x1Cnt
-				// 022だったらMEXは1
-				cnt += m0Cnt * x2Cnt
-				// 120だったらMEXは3
-				cnt += 3 * m1Cnt * x0Cnt
-				// 121だったらMEXは0
-				cnt += 0 * m1Cnt * x1Cnt
-				// 122だったらMEXは0
-				cnt += 0 * m1Cnt * x2Cnt
-				// 220だったらMEXは1
-				cnt += m2Cnt * x0Cnt
-				// 221だったらMEXは0
-				cnt += 0 * m2Cnt * x1Cnt
-				// 222だったらMEXは0
-				cnt += 0 * m2Cnt * x2Cnt
+		if s[i] != "E" {
+			continue
+		}
+		m0 := lowerBound(m0Idxes, i)
+		x0 := len(x0Idxes) - upperBound(x0Idxes, i)
+		m1 := lowerBound(m1Idxes, i)
+		x1 := len(x1Idxes) - upperBound(x1Idxes, i)
+		m2 := lowerBound(m2Idxes, i)
+		x2 := len(x2Idxes) - upperBound(x2Idxes, i)
+		m := []int{m0, m1, m2}
+		x := []int{x0, x1, x2}
+
+		for j := 0; j < 3; j++ {
+			for k := 0; k < 3; k++ {
+				res += m[j] * x[k] * mex([]int{j, a[i], k}, 3)
 			}
 		}
 	}
 
-	fmt.Println(cnt)
+	fmt.Println(res)
+}
+
+
+func mex(vs []int, dft int) int {
+	res := dft
+	for i := 0; i < len(vs); i++ {
+		if !sliceContains(vs, i) {
+			res = i
+			break
+		}
+	}
+	return res
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
