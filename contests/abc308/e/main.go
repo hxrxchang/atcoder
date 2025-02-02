@@ -76,7 +76,7 @@ func solve() {
 
 		for j := 0; j < 3; j++ {
 			for k := 0; k < 3; k++ {
-				res += m[j] * x[k] * mex([]int{j, a[i], k}, 3)
+				res += m[j] * x[k] * mex([]int{j, a[i], k})
 			}
 		}
 	}
@@ -85,8 +85,8 @@ func solve() {
 }
 
 
-func mex(vs []int, dft int) int {
-	res := dft
+func mex(vs []int) int {
+	res := len(vs)
 	for i := 0; i < len(vs); i++ {
 		if !sliceContains(vs, i) {
 			res = i
