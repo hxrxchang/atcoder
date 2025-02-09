@@ -37,7 +37,11 @@
       "id": "abc322_e",
       "label": "E",
       "title": "Product Development",
-      "url": "https://atcoder.jp/contests/abc322/tasks/abc322_e"
+      "url": "https://atcoder.jp/contests/abc322/tasks/abc322_e",
+      "directory": {
+        "path": "e",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc322_f",
