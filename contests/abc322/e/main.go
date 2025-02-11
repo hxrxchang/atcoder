@@ -20,8 +20,8 @@ import (
 
 const BUFSIZE = 10000000
 const MOD = 1000000007
-const BIGGEST = math.MaxInt32
-const MINIMUM = math.MinInt32
+const BIGGEST = 1 << 40
+const MINIMUM = -BIGGEST
 var rdr *bufio.Reader
 
 func main() {
@@ -56,44 +56,45 @@ func solve() {
 		cost := idea.cost
 		adds := idea.adds
 		tmp := copySlice(dp)
-
 		for i := 0; i < patterns; i++ {
 			if dp[i] == BIGGEST {
 				continue
 			}
-
-			// 現在の状態 i をデコード
-			state := i
-			params := make([]int, k)
+			params := idx2Params(i, k, p)
 			for j := 0; j < k; j++ {
-				params[j] = state % (p + 1)
-				state /= (p + 1)
+				params[j] = min(params[j]+adds[j], p)
 			}
-
-			// 開発案を適用
-			for j := 0; j < k; j++ {
-				params[j] = min(params[j]+adds[j], p) // 上限 P に抑える
-			}
-
-			// 新しい状態をエンコード
-			newState := 0
-			for j := k - 1; j >= 0; j-- {
-				newState = newState*(p+1) + params[j]
-			}
-
-			// DP 更新
+			newState := params2Idx(params, p)
 			tmp[newState] = min(tmp[newState], dp[i]+cost)
 		}
-		dp = tmp
+		dp = copySlice(tmp)
 	}
 
-
-	goalState := patterns - 1
-	if dp[goalState] == BIGGEST {
+	if dp[patterns-1] == BIGGEST {
 		fmt.Println(-1)
 	} else {
-		fmt.Println(dp[goalState])
+		fmt.Println(dp[patterns-1])
 	}
+}
+
+// pow(p+1, k)のidxからk個のパラメータの状態を取得
+func idx2Params(idx, k, p int) []int {
+	params := make([]int, k)
+	for i := 0; i < k; i++ {
+		params[i] = idx % (p+1)
+		idx /= p+1
+	}
+	return params
+}
+
+// k個のパラメータの状態からpow(p+1, k)のidxを取得
+func params2Idx(params []int, p int) int {
+	idx := 0
+	for i := len(params)-1; i >= 0; i-- {
+		idx *= p+1
+		idx += params[i]
+	}
+	return idx
 }
 
 
