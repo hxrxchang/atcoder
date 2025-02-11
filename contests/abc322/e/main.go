@@ -32,46 +32,70 @@ func main() {
 func solve() {
 	in := getInts()
 	n, k, p := in[0], in[1], in[2]
-
 	type Idea struct {
-		cost int
-		values []int
+		cost   int
+		adds []int
 	}
+
 	ideas := make([]Idea, n)
 	for i := 0; i < n; i++ {
 		in := getInts()
 		cost := in[0]
-		values := in[1:]
-		ideas[i] = Idea{cost, values}
+		adds := in[1:]
+		ideas[i] = Idea{cost, adds}
 	}
 
-	// ある開発案まで使えるときの、dp[i][j]: i番目のパラメータをj以上にするための最小コスト
-	dp := make([][]int, k)
-	for i := 0; i < k; i++ {
-		dp[i] = make([]int, p+1)
-		for j := 1; j <= p; j++ {
-			dp[i][j] = BIGGEST
-		}
+	patterns := pow(p+1, k)
+	dp := make([]int, patterns)
+	for i := 0; i < patterns; i++ {
+		dp[i] = BIGGEST
 	}
+	dp[0] = 0
 
 	for _, idea := range ideas {
-		tmp := copy2DSlice(dp)
 		cost := idea.cost
-		values := idea.values
-		for vi, value := range values {
+		adds := idea.adds
+		tmp := copySlice(dp)
+
+		for i := 0; i < patterns; i++ {
+			if dp[i] == BIGGEST {
+				continue
+			}
+
+			// 現在の状態 i をデコード
+			state := i
+			params := make([]int, k)
+			for j := 0; j < k; j++ {
+				params[j] = state % (p + 1)
+				state /= (p + 1)
+			}
+
+			// 開発案を適用
+			for j := 0; j < k; j++ {
+				params[j] = min(params[j]+adds[j], p) // 上限 P に抑える
+			}
+
+			// 新しい状態をエンコード
+			newState := 0
+			for j := k - 1; j >= 0; j-- {
+				newState = newState*(p+1) + params[j]
+			}
+
+			// DP 更新
+			tmp[newState] = min(tmp[newState], dp[i]+cost)
 		}
+		dp = tmp
 	}
 
-	ans := BIGGEST
-	for i := 0; i < k; i++ {
-		ans = min(ans, dp[i][p])
-	}
-	if ans == BIGGEST {
+
+	goalState := patterns - 1
+	if dp[goalState] == BIGGEST {
 		fmt.Println(-1)
 	} else {
-		fmt.Println(ans)
+		fmt.Println(dp[goalState])
 	}
 }
+
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
