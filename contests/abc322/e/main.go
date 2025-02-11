@@ -44,6 +44,33 @@ func solve() {
 		values := in[1:]
 		ideas[i] = Idea{cost, values}
 	}
+
+	// ある開発案まで使えるときの、dp[i][j]: i番目のパラメータをj以上にするための最小コスト
+	dp := make([][]int, k)
+	for i := 0; i < k; i++ {
+		dp[i] = make([]int, p+1)
+		for j := 1; j <= p; j++ {
+			dp[i][j] = BIGGEST
+		}
+	}
+
+	for _, idea := range ideas {
+		tmp := copy2DSlice(dp)
+		cost := idea.cost
+		values := idea.values
+		for vi, value := range values {
+		}
+	}
+
+	ans := BIGGEST
+	for i := 0; i < k; i++ {
+		ans = min(ans, dp[i][p])
+	}
+	if ans == BIGGEST {
+		fmt.Println(-1)
+	} else {
+		fmt.Println(ans)
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -863,10 +890,10 @@ func copySlice[T any](original []T) []T {
 }
 
 // 2次元スライスのコピー
-func copy2DSlice(original [][]int) [][]int {
-    newSlice := make([][]int, len(original))
+func copy2DSlice[T any](original [][]T) [][]T {
+    newSlice := make([][]T, len(original))
     for i := range original {
-        newSlice[i] = make([]int, len(original[i]))
+        newSlice[i] = make([]T, len(original[i]))
         copy(newSlice[i], original[i])
     }
     return newSlice
