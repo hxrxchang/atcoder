@@ -37,7 +37,11 @@
       "id": "abc361_e",
       "label": "E",
       "title": "Tree and Hamilton Path 2",
-      "url": "https://atcoder.jp/contests/abc361/tasks/abc361_e"
+      "url": "https://atcoder.jp/contests/abc361/tasks/abc361_e",
+      "directory": {
+        "path": "e",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc361_f",
