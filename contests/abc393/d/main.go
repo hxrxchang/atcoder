@@ -56,20 +56,20 @@ func solve() {
 		item := heap.pop()
 		dist := item[0]
 		idx := item[1]
-		var alreadyCnt int
+		var cntBetween int
 		if idx < oneIdxes[center] {
-			alreadyCnt = countInRange(oneIdxes, idx, oneIdxes[center])
+			cntBetween = countInRange(oneIdxes, idx+1, oneIdxes[center])
 		} else {
-			alreadyCnt = countInRange(oneIdxes, oneIdxes[center], idx)
+			cntBetween = countInRange(oneIdxes, oneIdxes[center]+1, idx)
 		}
-		cnt += dist - alreadyCnt
+		cnt += dist - cntBetween
 	}
 
 	fmt.Println(cnt)
 }
 
 func countInRange(nums []int, x, y int) int {
-	left := sort.Search(len(nums), func(i int) bool { return nums[i] > x })
+	left := sort.Search(len(nums), func(i int) bool { return nums[i] >= x })
 	right := sort.Search(len(nums), func(i int) bool { return nums[i] >= y })
 	return right - left
 }
