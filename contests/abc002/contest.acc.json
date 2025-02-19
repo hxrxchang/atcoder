@@ -31,7 +31,11 @@
       "id": "abc002_4",
       "label": "D",
       "title": "派閥",
-      "url": "https://atcoder.jp/contests/abc002/tasks/abc002_4"
+      "url": "https://atcoder.jp/contests/abc002/tasks/abc002_4",
+      "directory": {
+        "path": "d",
+        "testdir": "tests"
+      }
     }
   ]
 }
