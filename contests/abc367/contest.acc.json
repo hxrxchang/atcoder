@@ -39,7 +39,11 @@
       "id": "abc367_d",
       "label": "D",
       "title": "Pedometer",
-      "url": "https://atcoder.jp/contests/abc367/tasks/abc367_d"
+      "url": "https://atcoder.jp/contests/abc367/tasks/abc367_d",
+      "directory": {
+        "path": "d",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc367_e",
