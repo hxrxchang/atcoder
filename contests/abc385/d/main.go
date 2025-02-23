@@ -20,8 +20,8 @@ import (
 
 const BUFSIZE = 10000000
 const MOD = 1000000007
-const BIGGEST = math.MaxInt64
-const MINIMUM = math.MinInt64
+const BIGGEST = 1 << 60
+const MINIMUM = -BIGGEST
 var rdr *bufio.Reader
 
 func main() {
@@ -33,42 +33,23 @@ func solve() {
 	in := getInts()
 	n, m, sx, sy := in[0], in[1], in[2], in[3]
 
-	type Position struct {
-		x, y int
-	}
-	housesX := newSortedSet[string]()
-	housesY := newSortedSet[string]()
+	sortedSetBasedX := map[int]*SortedSet[int]{}
+	sortedSetBasedY := map[int]*SortedSet[int]{}
+
 	for i := 0; i < n; i++ {
 		in := getInts()
-		houses.Add(Position{in[0], in[1]})
-	}
+		x, y := in[0], in[1]
 
-	visited := newSet[Position]()
-	current := Position{sx, sy}
-	for i := 0; i < m; i++ {
-		in := getStrs()
-		dir := in[0]
-		dist := s2i(in[1])
-
-		if dir == "U" {
-			current.y += dist
-		} else if dir == "D" {
-			current.y -= dist
-		} else if dir == "L" {
-			current.x -= dist
-		} else {
-			current.x += dist
+		if _, ok := sortedSetBasedX[x]; !ok {
+			sortedSetBasedX[x] = newSortedSet[int]()
 		}
+		sortedSetBasedX[x].add(y)
 
-		fmt.Println("current", current)
-
-		if houses.Has(current) {
-			fmt.Println("visited", current)
-			visited.Add(current)
+		if _, ok := sortedSetBasedY[y]; !ok {
+			sortedSetBasedY[y] = newSortedSet[int]()
 		}
+		sortedSetBasedY[y].add(x)
 	}
-
-	fmt.Println(visited.Size())
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -172,6 +153,16 @@ func i2b(i int) bool {
 
 func i2bit(i int) []string {
 	return strToSlice(strconv.FormatInt(int64(i), 2), "")
+}
+
+func bit2i(bits []string) int {
+	bitStr := strings.Join(bits, "")
+
+	result, err := strconv.ParseInt(bitStr, 2, 64)
+	if err != nil {
+		panic(err)
+	}
+	return int(result)
 }
 
 func abs(v int) int {
@@ -878,10 +869,10 @@ func copySlice[T any](original []T) []T {
 }
 
 // 2次元スライスのコピー
-func copy2DSlice(original [][]int) [][]int {
-    newSlice := make([][]int, len(original))
+func copy2DSlice[T any](original [][]T) [][]T {
+    newSlice := make([][]T, len(original))
     for i := range original {
-        newSlice[i] = make([]int, len(original[i]))
+        newSlice[i] = make([]T, len(original[i]))
         copy(newSlice[i], original[i])
     }
     return newSlice
@@ -1119,6 +1110,13 @@ func lessThan[T constraints.Ordered](slice []T, value T) *T {
 	}
 	return &slice[idx-1]
 }
+// ソート済みのsliceの中でx以上、y未満の要素数を返す(半開区間)
+// 例: countInRange([]int{1, 2, 3, 4, 5}, 1, 4) => 3
+func countInRange(nums []int, x, y int) int {
+	left := sort.Search(len(nums), func(i int) bool { return nums[i] >= x })
+	right := sort.Search(len(nums), func(i int) bool { return nums[i] >= y })
+	return right - left
+}
 
 // 座標圧縮
 type Zaatsu struct {
@@ -1144,7 +1142,11 @@ func newZaatsu(params []int) *Zaatsu {
 }
 // 圧縮後の値を取得
 func (z *Zaatsu) GetCompressedValue(v int) int {
-	return z.mapping[v]
+	if val, ok := z.mapping[v]; !ok {
+		panic("value not found")
+	} else {
+		return val
+	}
 }
 // 圧縮後の値から元の値を取得
 func (z *Zaatsu) GetOriginalValue(compressedIndex int) int {
@@ -1156,10 +1158,10 @@ func (z *Zaatsu) GetOriginalValue(compressedIndex int) int {
 func (z *Zaatsu) Count() int {
 	return len(z.values)
 }
-func (z *Zaatsu) BisectLeft(v int) int {
+func (z *Zaatsu) LowerBound(v int) int {
 	return lowerBound(z.values, v)
 }
-func (z *Zaatsu) BisectRight(v int) int {
+func (z *Zaatsu) UpperBound(v int) int {
 	return upperBound(z.values, v)
 }
 
@@ -1222,7 +1224,7 @@ type LazySegmentTree struct {
 	isNoop func(int) bool
 }
 
-func NewLazySegmentTree(n int, noop int, op, lazyOp func(int, int) int, isNoop func(int) bool) *LazySegmentTree {
+func NewLazySegmentTree(n int, op, lazyOp func(int, int) int, noop int) *LazySegmentTree {
 	seg := &LazySegmentTree{}
 	seg.n = 1
 	for seg.n < n {
@@ -1233,6 +1235,10 @@ func NewLazySegmentTree(n int, noop int, op, lazyOp func(int, int) int, isNoop f
 	seg.noop = noop
 	seg.op = op
 	seg.lazyOp = lazyOp
+
+	isNoop := func(x int) bool {
+		return x == noop
+	}
 	seg.isNoop = isNoop
 	return seg
 }
@@ -1384,7 +1390,18 @@ func dijkstra(graph [][]dijkstraItem, start int) []int {
 	for i := range dist {
 		dist[i] = BIGGEST
 	}
-	dist[start] = 0
+
+	// スタート地点からスタート地点自身への辺があった場合、それを優先する
+	for _, edge := range graph[start] {
+		if edge.node == start {
+			dist[start] = min(dist[start], edge.dist)
+		}
+	}
+
+	// なければ0
+	if dist[start] == BIGGEST {
+		dist[start] = 0
+	}
 
 	pq := &dijkstraPriorityQueue{}
 	heap.Init(pq)
