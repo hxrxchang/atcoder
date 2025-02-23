@@ -37,21 +37,21 @@ func solve() {
 	a = append(a, a...)
 
 	accm := make([]int, n * 2)
-	accm[0] = a[0] % m
 
 	for i := 1; i < 2 * n; i++ {
-		accm[i] = (accm[i - 1] + a[i]) % m
+		accm[i] = (accm[i - 1] + a[i - 1]) % m
 	}
 
-	mp := make(map[int][]int)
-	for i, v := range accm {
-		mp[v] = append(mp[v], i)
+	mp := make(map[int]int)
+	for i := 0; i < n; i++ {
+		mp[accm[i]]++
 	}
 
-	fmt.Println(mp)
 	cnt := 0
-	for i, v := range accm {
-		cnt += countInRange(mp[v], i+1, i+n)
+	for i := n; i < 2 * n; i++ {
+		mp[accm[i-n]]--
+		cnt += mp[accm[i]]
+		mp[accm[i]]++
 	}
 
 	fmt.Println(cnt)
