@@ -36,22 +36,23 @@ func solve() {
 	a := getInts()
 	a = append(a, a...)
 
-	accm := make([]int, n * 2)
-
-	for i := 1; i < 2 * n; i++ {
-		accm[i] = (accm[i - 1] + a[i - 1]) % m
+	// 地点1から地点1まで2周するときの移動コストの累積和をmで割った余り
+	accm := make([]int, 2*n)
+	for i := 1; i < 2*n; i++ {
+		accm[i] = (accm[i-1] + a[i-1]) % m
 	}
 
+	// mで割った余りをキーとして、0~nまで(1周分)その値が何回出現したかを記録
 	mp := make(map[int]int)
 	for i := 0; i < n; i++ {
 		mp[accm[i]]++
 	}
 
 	cnt := 0
-	for i := n; i < 2 * n; i++ {
-		mp[accm[i-n]]--
+	for i := n; i < 2*n; i++ {
+		mp[accm[i-n]]-- // 範囲外の値を減らす
 		cnt += mp[accm[i]]
-		mp[accm[i]]++
+		mp[accm[i]]++ // 範囲内の値を増やす
 	}
 
 	fmt.Println(cnt)
