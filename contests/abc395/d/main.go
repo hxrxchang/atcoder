@@ -33,26 +33,35 @@ func solve() {
 	in := getInts()
 	n, q := in[0], in[1]
 
-	birds := make([]int, n)
-	nest := make([]int, n)
+	// i番目の巣に入っているラベル鳩の番号
+	boxToLabel := make([]int, n)
+
+	// ラベル鳩の番号に対応する巣の番号
+	labelToBox := make([]int, n)
+
+	// 鳩が入っている巣の番号
+	birdToBox := make([]int, n)
 
 	for i := 0; i < n; i++ {
-		birds[i] = i
-		nest[i] = i
+		boxToLabel[i] = i
+		labelToBox[i] = i
+		birdToBox[i] = i
 	}
 
 	for i := 0; i < q; i++ {
 		in := getInts()
 		op := in[0]
+
 		if op == 1 {
 			a, b := in[1]-1, in[2]-1
-			birds[a] = nest[birds[b]]
+			birdToBox[a] = labelToBox[b]
 		} else if op == 2 {
 			a, b := in[1]-1, in[2]-1
-			nest[a], nest[b] = nest[b], nest[a]
+			labelToBox[a], labelToBox[b] = labelToBox[b], labelToBox[a]
+			boxToLabel[labelToBox[a]], boxToLabel[labelToBox[b]] = boxToLabel[labelToBox[b]], boxToLabel[labelToBox[a]]
 		} else {
 			a := in[1] - 1
-			fmt.Println(birds[a]+1)
+			fmt.Println(boxToLabel[birdToBox[a]] + 1)
 		}
 	}
 }
