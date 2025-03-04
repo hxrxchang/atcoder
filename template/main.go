@@ -212,6 +212,11 @@ func modPow(base, exp, mod int) int {
 	return result
 }
 
+// modInverse は a の m における逆元 (a^{-1} mod m) を返す (m は素数を想定)
+func modInverse(a, m int) int {
+    return modPow(a, m-2, m)
+}
+
 //----------------------------------------
 // modint
 //----------------------------------------
