@@ -33,6 +33,8 @@ func main() {
 func solve() {
 	n := getInt()
 
+	// 5 の逆元 (mod MOD)
+	// すなわち、(5 * inv5) ≡ 1 (mod MOD) が成り立つような inv5 を求める。
 	inv5 := modInverse(5, MOD)
 
 	mp := make(map[int]int)
