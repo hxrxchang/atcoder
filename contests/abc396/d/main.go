@@ -43,40 +43,24 @@ func solve() {
 		graph[v] = append(graph[v], Node{u, w})
 	}
 
-	result := make([][]Node, 0)
-	visited := make([]bool, n)
-	visited[0] = true
-
-	var enumeratePaths func([][]Node, Node, []Node, []bool, *[][]Node)
-	enumeratePaths = func(graph [][]Node, cur Node, path []Node, visited []bool, result *[][]Node) {
-		if cur.to == n-1 {
-			*result = append(*result, path)
-			return
-		}
-
-		for _, next := range graph[cur.to] {
-			if visited[next.to] {
-				continue
-			}
-			visited[next.to] = true
-			path = append(path, next)
-			enumeratePaths(graph, next, path, visited, result)
-			path = path[:len(path)-1]
-			visited[next.to] = false
-		}
-	}
-
-	enumeratePaths(graph, Node{0, 0}, []Node{{0, 0}}, visited, &result)
-
 	ans := BIGGEST
-	for _, path := range result {
-		tmp := path[1].label
-		for _, node := range path[2:] {
-			tmp ^= node.label
+	visited := make([]bool, n)
+	var dfs func(v, xor int)
+	dfs = func(v, xor int) {
+		visited[v] = true
+		if v == n-1 {
+			ans = min(ans, xor)
 		}
-		ans = min(ans, tmp)
+		for _, next := range graph[v] {
+			if !visited[next.to] {
+				dfs(next.to, xor^next.label)
+			}
+		}
+		visited[v] = false
 	}
 
+	fmt.Println(visited)
+	dfs(0, 0)
 	fmt.Println(ans)
 }
 
