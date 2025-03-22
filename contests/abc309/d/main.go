@@ -41,43 +41,10 @@ func solve() {
 		graph[v] = append(graph[v], u)
 	}
 
-	dist1 := make([]int, n1+n2)
-	for i := 0; i < n1+n2; i++ {
-		dist1[i] = -1
-	}
-	que := newQueue[int]()
-	que.PushBack(0)
-	dist1[0] = 0
-	for que.Size() > 0 {
-		cur := que.PopFront()
-		for _, next := range graph[cur] {
-			if dist1[next] == -1 {
-				dist1[next] = dist1[cur] + 1
-				que.PushBack(next)
-			}
-		}
-	}
-	max1 := max(dist1...)
+	distFromStart := graphBfs(graph, 0)
+	distFromGoal := graphBfs(graph, n1+n2-1)
 
-	dist2 := make([]int, n1+n2)
-	for i := 0; i < n1+n2; i++ {
-		dist2[i] = -1
-	}
-	que = newQueue[int]()
-	que.PushBack(n1+n2-1)
-	dist2[n1+n2-1] = 0
-	for que.Size() > 0 {
-		cur := que.PopFront()
-		for _, next := range graph[cur] {
-			if dist2[next] == -1 {
-				dist2[next] = dist2[cur] + 1
-				que.PushBack(next)
-			}
-		}
-	}
-	max2 := max(dist2...)
-
-	fmt.Println(max1 + max2 + 1)
+	fmt.Println(max(distFromStart...) + max(distFromGoal...) + 1)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
