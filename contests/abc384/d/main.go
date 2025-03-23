@@ -38,16 +38,18 @@ func solve() {
 
 	a = append(a, a...)
 
+	accm := make([]int, 2*n)
+	accm[0] = a[0]
 	ss := newSet[int]()
-	for i := 0; i < 2 * n; i++ {
-		if i != 0 {
-			a[i] += a[i-1]
-		}
-		ss.Add(a[i])
+	ss.Add(accm[0])
+
+	for i := 1; i < 2 * n; i++ {
+		accm[i] = accm[i-1] + a[i]
+		ss.Add(accm[i])
 	}
 
 	for i := 0; i < 2 * n; i++ {
-		if ss.Has(a[i]+s) {
+		if ss.Has(accm[i]+s) {
 			fmt.Println("Yes")
 			return
 		}
