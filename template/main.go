@@ -152,7 +152,7 @@ func abs(v int) int {
 	return v
 }
 
-func min(values ...int) int {
+func min[T constraints.Ordered](values ...T) T {
 	ret := values[0]
 	for _, v := range values {
 		if ret > v {
@@ -162,7 +162,7 @@ func min(values ...int) int {
 	return ret
 }
 
-func max(values ...int) int {
+func max[T constraints.Ordered](values ...T) T {
 	ret := values[0]
 	for _, v := range values {
 		if ret < v {
@@ -172,8 +172,8 @@ func max(values ...int) int {
 	return ret
 }
 
-func sum(slice []int) int {
-	sum := 0
+func sum[T constraints.Ordered](slice []T) T {
+	var sum T
 	for _, v := range slice {
 		sum += v
 	}
