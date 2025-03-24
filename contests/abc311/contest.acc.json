@@ -15,7 +15,11 @@
       "id": "abc311_b",
       "label": "B",
       "title": "Vacation Together",
-      "url": "https://atcoder.jp/contests/abc311/tasks/abc311_b"
+      "url": "https://atcoder.jp/contests/abc311/tasks/abc311_b",
+      "directory": {
+        "path": "b",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc311_c",
