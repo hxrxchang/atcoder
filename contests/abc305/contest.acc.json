@@ -27,7 +27,11 @@
       "id": "abc305_d",
       "label": "D",
       "title": "Sleep Log",
-      "url": "https://atcoder.jp/contests/abc305/tasks/abc305_d"
+      "url": "https://atcoder.jp/contests/abc305/tasks/abc305_d",
+      "directory": {
+        "path": "d",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc305_e",
