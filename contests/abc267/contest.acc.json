@@ -9,7 +9,11 @@
       "id": "abc267_a",
       "label": "A",
       "title": "Saturday",
-      "url": "https://atcoder.jp/contests/abc267/tasks/abc267_a"
+      "url": "https://atcoder.jp/contests/abc267/tasks/abc267_a",
+      "directory": {
+        "path": "a",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc267_b",

@@ -30,27 +30,20 @@ func main() {
 }
 
 func solve() {
-	in := getInts()
-	n, m := in[0], in[1]
-
-	a := getInts()
-	accm := make([]int, n +1)
-	for i := 1; i <= n; i++ {
-		accm[i] = accm[i-1] + a[i-1]
+	s := getStr()
+	var ans int
+	switch s {
+	case "Monday":
+		ans = 5
+	case "Tuesday":
+		ans = 4
+	case "Wednesday":
+		ans = 3
+	case "Thursday":
+		ans = 2
+	case "Friday":
+		ans = 1
 	}
-
-	tmp := 0
-	for i := 0; i < m; i++ {
-		tmp += a[i] * (i + 1)
-	}
-
-	ans := tmp
-	for i := m; i < n; i++ {
-		tmp -= accm[i] - accm[i-m]
-		tmp += a[i] * m
-		ans = max(ans, tmp)
-	}
-
 	fmt.Println(ans)
 }
 
