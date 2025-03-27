@@ -35,7 +35,11 @@
       "id": "abc267_d",
       "label": "D",
       "title": "Index × A(Not Continuous ver.)",
-      "url": "https://atcoder.jp/contests/abc267/tasks/abc267_d"
+      "url": "https://atcoder.jp/contests/abc267/tasks/abc267_d",
+      "directory": {
+        "path": "d",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc267_e",
