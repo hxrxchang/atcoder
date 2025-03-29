@@ -31,20 +31,43 @@ func main() {
 
 func solve() {
 	n := getInt()
+	type Dice struct {
+		size int
+		mp map[int]int
+	}
 
-	dices := make([]map[int]int, n)
+	dices := make([]Dice, n)
 	for i := 0; i < n; i++ {
 		in := getInts()
-		k, values := in[0], in[1:]
-		dice := make(map[int]int)
-		for j := 0; j < k; j++ {
-			v := values[j]
-			dice[v]++
+		dice := Dice{size: in[0]}
+		values := in[1:]
+		dice.mp = make(map[int]int)
+		for _, v := range values {
+			dice.mp[v]++
 		}
 		dices[i] = dice
 	}
-}
 
+	combinations := getCombinations(rangeSlice(n), 2)
+	var ans float64
+	for _, comb := range combinations {
+		dice1 := dices[comb[0]]
+		dice2 := dices[comb[1]]
+
+		var tmp float64
+		dices1Keys := maps.Keys(dice1.mp)
+		for _, key := range dices1Keys {
+			if dice2.mp[key] == 0 {
+				continue
+			}
+			tmp += (float64(dice1.mp[key]) / float64(dice1.size)) * (float64(dice2.mp[key]) / float64(dice2.size))
+		}
+
+		ans = max(ans, tmp)
+	}
+
+	fmt.Println(ans)
+}
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -166,7 +189,7 @@ func abs(v int) int {
 	return v
 }
 
-func min(values ...int) int {
+func min[T constraints.Ordered](values ...T) T {
 	ret := values[0]
 	for _, v := range values {
 		if ret > v {
@@ -176,7 +199,7 @@ func min(values ...int) int {
 	return ret
 }
 
-func max(values ...int) int {
+func max[T constraints.Ordered](values ...T) T {
 	ret := values[0]
 	for _, v := range values {
 		if ret < v {
@@ -186,8 +209,8 @@ func max(values ...int) int {
 	return ret
 }
 
-func sum(slice []int) int {
-	sum := 0
+func sum[T constraints.Ordered](slice []T) T {
+	var sum T
 	for _, v := range slice {
 		sum += v
 	}
@@ -224,6 +247,11 @@ func modPow(base, exp, mod int) int {
 		exp /= 2
 	}
 	return result
+}
+
+// modInverse は a の m における逆元 (a^{-1} mod m) を返す (m は素数を想定)
+func modInverse(a, m int) int {
+    return modPow(a, m-2, m)
 }
 
 //----------------------------------------
@@ -1104,6 +1132,13 @@ func lessThan[T constraints.Ordered](slice []T, value T) *T {
 	}
 	return &slice[idx-1]
 }
+// ソート済みのsliceの中でx以上、y未満の要素数を返す(半開区間)
+// 例: countInRange([]int{1, 2, 3, 4, 5}, 1, 4) => 3
+func countInRange(nums []int, x, y int) int {
+	left := sort.Search(len(nums), func(i int) bool { return nums[i] >= x })
+	right := sort.Search(len(nums), func(i int) bool { return nums[i] >= y })
+	return right - left
+}
 
 // 座標圧縮
 type Zaatsu struct {
@@ -1649,7 +1684,7 @@ func updateString(s string, idx int, c byte) string {
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //　幾何ゾーン
 
-// 2点間の距離
+// 2点間のユークリッド距離
 func distance(x1, y1, x2, y2 int) float64 {
 	x1f := float64(x1)
 	y1f := float64(y1)
@@ -1658,7 +1693,7 @@ func distance(x1, y1, x2, y2 int) float64 {
 	return math.Sqrt((x2f-x1f)*(x2f-x1f) + (y2f-y1f)*(y2f-y1f))
 }
 
-// 2点間の距離の2乗
+// 2点間のユークリッド距離の2乗
 // 平方根を取ると距離になるが、誤差が出るので距離の比較は距離の2乗で行う
 func distanceSquared(x1, y1, x2, y2 int) int {
 	return pow(x1-x2, 2) + pow(y1-y2, 2)
