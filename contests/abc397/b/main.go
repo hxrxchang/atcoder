@@ -31,29 +31,42 @@ func main() {
 
 func solve() {
 	s := strToSlice(getStr(), "")
-	n := len(s)
-	tmp := 0
+
+	que := newQueue[string]()
+	for _, v := range s {
+		que.PushBack(v)
+	}
+
 	cnt := 0
-
-	for i := 0; i < n; i++ {
-		target := "i"
-		if tmp % 2 == 1 {
-			target = "o"
-		}
-
-		if s[i] == target {
-			tmp++
+	ideal := make([]string, 0)
+	for que.Size() > 0 {
+		v := que.PopFront()
+		if len(ideal) % 2 == 0 {
+			if v == "i" {
+				ideal = append(ideal, "i")
+				continue
+			}
+			que.PushFront(v)
+			que.PushFront("i")
+			cnt++
 		} else {
+			if v == "o" {
+				ideal = append(ideal, "o")
+				continue
+			}
+			que.PushFront(v)
+			que.PushFront("o")
 			cnt++
 		}
 	}
 
-	if tmp % 2 == 1 {
+	if len(ideal) % 2 == 1 {
 		cnt++
 	}
 
 	fmt.Println(cnt)
 }
+
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -175,7 +188,7 @@ func abs(v int) int {
 	return v
 }
 
-func min(values ...int) int {
+func min[T constraints.Ordered](values ...T) T {
 	ret := values[0]
 	for _, v := range values {
 		if ret > v {
@@ -185,7 +198,7 @@ func min(values ...int) int {
 	return ret
 }
 
-func max(values ...int) int {
+func max[T constraints.Ordered](values ...T) T {
 	ret := values[0]
 	for _, v := range values {
 		if ret < v {
@@ -195,8 +208,8 @@ func max(values ...int) int {
 	return ret
 }
 
-func sum(slice []int) int {
-	sum := 0
+func sum[T constraints.Ordered](slice []T) T {
+	var sum T
 	for _, v := range slice {
 		sum += v
 	}
@@ -1670,7 +1683,7 @@ func updateString(s string, idx int, c byte) string {
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //　幾何ゾーン
 
-// 2点間の距離
+// 2点間のユークリッド距離
 func distance(x1, y1, x2, y2 int) float64 {
 	x1f := float64(x1)
 	y1f := float64(y1)
@@ -1679,7 +1692,7 @@ func distance(x1, y1, x2, y2 int) float64 {
 	return math.Sqrt((x2f-x1f)*(x2f-x1f) + (y2f-y1f)*(y2f-y1f))
 }
 
-// 2点間の距離の2乗
+// 2点間のユークリッド距離の2乗
 // 平方根を取ると距離になるが、誤差が出るので距離の比較は距離の2乗で行う
 func distanceSquared(x1, y1, x2, y2 int) int {
 	return pow(x1-x2, 2) + pow(y1-y2, 2)
