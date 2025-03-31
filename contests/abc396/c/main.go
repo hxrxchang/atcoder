@@ -30,51 +30,30 @@ func main() {
 }
 
 func solve() {
-	getInts()
-	// n, m := in[0], in[1]
-	b := getInts()
-	b = descendingSortSlice(b)
-	w := getInts()
-	w = descendingSortSlice(w)
+	in := getInts()
+	n, m := in[0], in[1]
 
-	heapB := newMyHeap[int]()
-	heapW := newMyHeap[int]()
+	b := descendingSortSlice(getInts())
+	w := descendingSortSlice(getInts())
 
-	for _, v := range b {
-		heapB.push(-v)
-	}
-
-	for _, v := range w {
-		heapW.push(-v)
-	}
-
-	ans := 0
-	for heapB.len() > 0 {
-		tmpB := -heapB.pop()
-		if heapW.len() == 0 {
-			if tmpB > 0 {
-				ans += tmpB
-			} else {
-				break
-			}
+	cnt := 0
+	for i := 0; i < n; i++ {
+		bi := b[i]
+		var wi int
+		if i < m {
+			wi = w[i]
 		}
-		if heapW.len() > 0 {
-			tmpW := -heapW.pop()
-			if tmpB >= 0 {
-				if tmpW >= 0 {
-					ans += tmpB
-					ans += tmpW
-				} else {
-					ans += tmpB
-				}
-			} else if tmpB < 0 && tmpW > abs(tmpB) {
-				ans += tmpB
-				ans += tmpW
-			}
+
+		if bi > 0 && wi > 0 {
+			cnt += bi + wi
+		} else if bi <= 0 && bi + wi > 0 {
+			cnt += bi + wi
+		} else if bi > 0 && wi <= 0 {
+			cnt += bi
 		}
 	}
 
-	fmt.Println(ans)
+	fmt.Println(cnt)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -197,7 +176,7 @@ func abs(v int) int {
 	return v
 }
 
-func min(values ...int) int {
+func min[T constraints.Ordered](values ...T) T {
 	ret := values[0]
 	for _, v := range values {
 		if ret > v {
@@ -207,7 +186,7 @@ func min(values ...int) int {
 	return ret
 }
 
-func max(values ...int) int {
+func max[T constraints.Ordered](values ...T) T {
 	ret := values[0]
 	for _, v := range values {
 		if ret < v {
@@ -217,8 +196,8 @@ func max(values ...int) int {
 	return ret
 }
 
-func sum(slice []int) int {
-	sum := 0
+func sum[T constraints.Ordered](slice []T) T {
+	var sum T
 	for _, v := range slice {
 		sum += v
 	}
@@ -1692,7 +1671,7 @@ func updateString(s string, idx int, c byte) string {
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //　幾何ゾーン
 
-// 2点間の距離
+// 2点間のユークリッド距離
 func distance(x1, y1, x2, y2 int) float64 {
 	x1f := float64(x1)
 	y1f := float64(y1)
@@ -1701,7 +1680,7 @@ func distance(x1, y1, x2, y2 int) float64 {
 	return math.Sqrt((x2f-x1f)*(x2f-x1f) + (y2f-y1f)*(y2f-y1f))
 }
 
-// 2点間の距離の2乗
+// 2点間のユークリッド距離の2乗
 // 平方根を取ると距離になるが、誤差が出るので距離の比較は距離の2乗で行う
 func distanceSquared(x1, y1, x2, y2 int) int {
 	return pow(x1-x2, 2) + pow(y1-y2, 2)
