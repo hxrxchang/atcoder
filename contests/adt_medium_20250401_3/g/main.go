@@ -61,6 +61,7 @@ func solve() {
 			visited2[tmp2] = 0
 
 			que1 := deque.New[Grid]()
+		}
 	}
 
 	if ans == BIGGEST {
