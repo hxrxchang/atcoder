@@ -44,22 +44,24 @@ func solve() {
 	}
 
 	ans := BIGGEST
-	visited := make([]bool, n)
+
 	var dfs func(v, xor int)
+	visited := make([]bool, n)
 	dfs = func(v, xor int) {
 		visited[v] = true
 		if v == n-1 {
 			ans = min(ans, xor)
 		}
-		for _, next := range graph[v] {
-			if !visited[next.to] {
-				dfs(next.to, xor^next.label)
+		for _, node := range graph[v] {
+			if visited[node.to] {
+				continue
 			}
+			dfs(node.to, xor^node.label)
 		}
+		// バックトラック
 		visited[v] = false
 	}
 
-	fmt.Println(visited)
 	dfs(0, 0)
 	fmt.Println(ans)
 }
