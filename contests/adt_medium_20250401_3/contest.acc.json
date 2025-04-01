@@ -1,0 +1,59 @@
+{
+  "contest": {
+    "id": "adt_medium_20250401_3",
+    "title": "AtCoder Daily Training MEDIUM 2025/04/01 19:30start",
+    "url": "https://atcoder.jp/contests/adt_medium_20250401_3"
+  },
+  "tasks": [
+    {
+      "id": "abc284_b",
+      "label": "C",
+      "title": "Multi Test Cases",
+      "url": "https://atcoder.jp/contests/adt_medium_20250401_3/tasks/abc284_b",
+      "directory": {
+        "path": "c",
+        "testdir": "tests"
+      }
+    },
+    {
+      "id": "abc374_b",
+      "label": "D",
+      "title": "Unvarnished Report",
+      "url": "https://atcoder.jp/contests/adt_medium_20250401_3/tasks/abc374_b",
+      "directory": {
+        "path": "d",
+        "testdir": "tests"
+      }
+    },
+    {
+      "id": "abc288_c",
+      "label": "E",
+      "title": "Don’t be cycle",
+      "url": "https://atcoder.jp/contests/adt_medium_20250401_3/tasks/abc288_c",
+      "directory": {
+        "path": "e",
+        "testdir": "tests"
+      }
+    },
+    {
+      "id": "abc310_c",
+      "label": "F",
+      "title": "Reversible",
+      "url": "https://atcoder.jp/contests/adt_medium_20250401_3/tasks/abc310_c",
+      "directory": {
+        "path": "f",
+        "testdir": "tests"
+      }
+    },
+    {
+      "id": "abc339_d",
+      "label": "G",
+      "title": "Synchronized Players ",
+      "url": "https://atcoder.jp/contests/adt_medium_20250401_3/tasks/abc339_d",
+      "directory": {
+        "path": "g",
+        "testdir": "tests"
+      }
+    }
+  ]
+}
