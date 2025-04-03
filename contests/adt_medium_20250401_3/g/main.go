@@ -35,8 +35,7 @@ func solve() {
 	type Grid struct {
 		y, x int
 	}
-	var start1 Grid
-	var start2 Grid
+
 	start := make([]Grid, 0)
 	for i := 0; i < n; i++ {
 		grid[i] = strToSlice(getStr(), "")
@@ -46,21 +45,61 @@ func solve() {
 			}
 		}
 	}
-	start1 = start[0]
-	start2 = start[1]
+	visited := make([][][][]int, n)
+	for i := 0; i < n; i++ {
+		visited[i] = make([][][]int, n)
+		for j := 0; j < n; j++ {
+			visited[i][j] = make([][]int, n)
+			for k := 0; k < n; k++ {
+				visited[i][j][k] = make([]int, n)
+				for l := 0; l < n; l++ {
+					visited[i][j][k][l] = -1
+				}
+			}
+		}
+	}
+
+	type Pair struct {
+		one Grid
+		two Grid
+	}
+	que := newQueue[Pair]()
+	que.PushBack(Pair{one: start[0], two: start[1]})
+	visited[start[0].y][start[0].x][start[1].y][start[1].x] = 0
+
+	for que.Size() > 0 {
+		current := que.PopFront()
+		one := current.one
+		two := current.two
+
+		// 上下左右の順で移動
+		for _, next := range [][]int{{-1, 0}, {1, 0}, {0, -1}, {0, 1}} {
+			if one.y + next[0] >= 0 && one.y + next[0] < n && one.x + next[1] >= 0 && one.x + next[1] < n && grid[one.y + next[0]][one.x + next[1]] != "#" {
+				if visited[one.y + next[0]][one.x + next[1]][two.y][two.x] == -1 {
+					visited[one.y + next[0]][one.x + next[1]][two.y][two.x] = visited[one.y][one.x][two.y][two.x] + 1
+					que.PushBack(Pair{one: Grid{y: one.y + next[0], x: one.x + next[1]}, two: two})
+				}
+			}
+
+			if two.y + next[0] >= 0 && two.y + next[0] < n && two.x + next[1] >= 0 && two.x + next[1] < n && grid[two.y + next[0]][two.x + next[1]] != "#" {
+				if visited[one.y][one.x][two.y + next[0]][two.x + next[1]] == -1 {
+					visited[one.y][one.x][two.y + next[0]][two.x + next[1]] = visited[one.y][one.x][two.y][two.x] + 1
+					que.PushBack(Pair{one: one, two: Grid{y: two.y + next[0], x: two.x + next[1]}})
+				}
+			}
+		}
+	}
 
 	ans := BIGGEST
 	for i := 0; i < n; i++ {
 		for j := 0; j < n; j++ {
-			goal := Grid{y: i, x: j}
-			tmp1 := Grid{y: start1.y, x: start1.x}
-			tmp2 := Grid{y: start2.y, x: start2.x}
-			visited1 := make(map[Grid]int)
-			visited1[tmp1] = 0
-			visited2 := make(map[Grid]int)
-			visited2[tmp2] = 0
-
-			que1 := deque.New[Grid]()
+			for k := 0; k < n; k++ {
+				for l := 0; l < n; l++ {
+					if visited[i][j][k][l] != -1 && visited[i][j][k][l] != 0 {
+						ans = min(ans, visited[i][j][k][l])
+					}
+				}
+			}
 		}
 	}
 
