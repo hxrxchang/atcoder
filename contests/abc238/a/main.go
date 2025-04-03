@@ -19,7 +19,7 @@ import (
 )
 
 const BUFSIZE = 10000000
-const MOD = 998244353
+const MOD = 1000000007
 const BIGGEST = 1 << 60
 const MINIMUM = -BIGGEST
 var rdr *bufio.Reader
@@ -31,35 +31,11 @@ func main() {
 
 func solve() {
 	n := getInt()
-	i := 1
-
-	cnt := 0
-	for i < len(i2s(n)) {
-		to := countNDigitIntegers(i) % MOD
-		cnt += sumFromTo(1, to) % MOD
-		cnt %= MOD
-		i++
+	if n == 1 || n > 4 {
+		fmt.Println("Yes")
+	} else {
+		fmt.Println("No")
 	}
-
-	to := (n - pow(10, i-1) + 1) % MOD
-	cnt += sumFromTo(1, to) % MOD
-	cnt %= MOD
-
-	fmt.Println(cnt)
-}
-
-func sumFromTo(from, to int) int {
-	if from > to {
-		return 0
-	}
-	return (to - from + 1) * (from + to) / 2
-}
-
-func countNDigitIntegers(n int) int {
-    if n <= 0 {
-        return 0
-    }
-    return int(9 * int(math.Pow(10, float64(n-1))))
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
