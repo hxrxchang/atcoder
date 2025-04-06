@@ -30,6 +30,12 @@ func main() {
 }
 
 func solve() {
+	n := getInt()
+	if n == 1 || n > 4 {
+		fmt.Println("Yes")
+	} else {
+		fmt.Println("No")
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -218,23 +224,6 @@ func modPow(base, exp, mod int) int {
 		exp /= 2
 	}
 	return result
-}
-
-// fromからtoまでincrementした値の合計を求める
-func sumFromTo(from, to int) int {
-	if from > to {
-		return 0
-	}
-	return (to - from + 1) * (from + to) / 2
-}
-
-// n桁の整数の個数を求める
-// 例: n=3 の場合、100~999 までの整数の個数は 900
-func countNDigitIntegers(n int) int {
-    if n <= 0 {
-        return 0
-    }
-    return int(9 * int(math.Pow(10, float64(n-1))))
 }
 
 // modInverse は a の m における逆元 (a^{-1} mod m) を返す (m は素数を想定)

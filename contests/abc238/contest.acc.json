@@ -9,7 +9,11 @@
       "id": "abc238_a",
       "label": "A",
       "title": "Exponential or Quadratic",
-      "url": "https://atcoder.jp/contests/abc238/tasks/abc238_a"
+      "url": "https://atcoder.jp/contests/abc238/tasks/abc238_a",
+      "directory": {
+        "path": "a",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc238_b",
