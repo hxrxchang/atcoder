@@ -426,9 +426,25 @@ func logXY(x, y int) int {
 	return int(math.Log(float64(y)) / math.Log(float64(x)))
 }
 
-// intのまま計算できるように
-func sqrt(x int) int {
-	return int(math.Sqrt(float64(x)))
+// 整数平方根: x*x <= n を満たす最大の x を返す
+// 二分探索を使うことで誤差を生まない。ref: https://atcoder.jp/contests/abc400/editorial/12642
+// pythonのmath.isqrtと同じ
+func isqrt(n int) int {
+	if n == 0 || n == 1 {
+		return n
+	}
+	low, high := 1, n
+	var ans int
+	for low <= high {
+		mid := (low + high) / 2
+		if mid <= n/mid {
+			ans = mid
+			low = mid + 1
+		} else {
+			high = mid - 1
+		}
+	}
+	return ans
 }
 
 // xのn乗根
