@@ -30,6 +30,18 @@ func main() {
 }
 
 func solve() {
+	n := getInt()
+
+	ans := 0
+	for a := 1; a <= 60; a++ {
+		if pow(2, a) > n {
+			break
+		}
+		b := isqrt(n / pow(2, a))
+		ans += ceilDiv(b, 2)
+	}
+
+	fmt.Println(ans)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -409,9 +421,27 @@ func logXY(x, y int) int {
 	return int(math.Log(float64(y)) / math.Log(float64(x)))
 }
 
-// intのまま計算できるように
-func sqrt(x int) int {
-	return int(math.Sqrt(float64(x)))
+// pythonのmath.isqrtのように整数の平方根を求める
+func isqrt(n int) int {
+	if n < 2 {
+		return n
+	}
+
+	// 二分探索で平方根を求める
+	left, right := 0, n
+	for left <= right {
+		mid := (left + right) / 2
+		square := mid * mid
+
+		if square == n {
+			return mid
+		} else if square < n {
+			left = mid + 1
+		} else {
+			right = mid - 1
+		}
+	}
+	return right
 }
 
 // xのn乗根
