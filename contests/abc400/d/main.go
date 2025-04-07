@@ -55,6 +55,7 @@ func solve() {
 	in = getInts()
 	sy, sx, gy, gx := in[0]-1, in[1]-1, in[2]-1, in[3]-1
 	que.PushBack(BfsItem{sy, sx, 0})
+	dist[sy][sx] = 0
 
 	for que.Size() > 0 {
 		item := que.PopFront()
