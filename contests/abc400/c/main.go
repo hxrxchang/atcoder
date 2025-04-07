@@ -421,27 +421,25 @@ func logXY(x, y int) int {
 	return int(math.Log(float64(y)) / math.Log(float64(x)))
 }
 
-// pythonのmath.isqrtのように整数の平方根を求める
+// 整数平方根: x*x <= n を満たす最大の x を返す
+// 二分探索を使うことで誤差を生まない。ref: https://atcoder.jp/contests/abc400/editorial/12642
+// pythonのmath.isqrtと同じ
 func isqrt(n int) int {
-	if n < 2 {
+	if n == 0 || n == 1 {
 		return n
 	}
-
-	// 二分探索で平方根を求める
-	left, right := 0, n
-	for left <= right {
-		mid := (left + right) / 2
-		square := mid * mid
-
-		if square == n {
-			return mid
-		} else if square < n {
-			left = mid + 1
+	low, high := 1, n
+	var ans int
+	for low <= high {
+		mid := (low + high) / 2
+		if mid <= n/mid {
+			ans = mid
+			low = mid + 1
 		} else {
-			right = mid - 1
+			high = mid - 1
 		}
 	}
-	return right
+	return ans
 }
 
 // xのn乗根
