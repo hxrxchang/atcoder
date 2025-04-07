@@ -30,6 +30,81 @@ func main() {
 }
 
 func solve() {
+	in := getInts()
+	h, w := in[0], in[1]
+
+	grid := make([][]string, h)
+	for i := 0; i < h; i++ {
+		grid[i] = strToSlice(input(), "")
+	}
+	dist := make([][]int, h)
+	for i := 0; i < h; i++ {
+		dist[i] = make([]int, w)
+		for j := 0; j < w; j++ {
+			dist[i][j] = -1
+		}
+	}
+
+	type BfsItem struct {
+		y int
+		x int
+		steps int
+	}
+	que := newQueue[BfsItem]()
+
+	in = getInts()
+	sy, sx, gy, gx := in[0]-1, in[1]-1, in[2]-1, in[3]-1
+	que.PushBack(BfsItem{sy, sx, 0})
+
+	for que.Size() > 0 {
+		item := que.PopFront()
+		currentSteps := item.steps
+		for i, next := range [][2]int{{item.y-1, item.x}, {item.y+1, item.x}, {item.y, item.x-1}, {item.y, item.x+1}} {
+			ny, nx := next[0], next[1]
+			if ny < 0 || ny >= h || nx < 0 || nx >= w {
+				continue
+			}
+			if dist[ny][nx] != -1 {
+				continue
+			}
+
+			dist[ny][nx] = currentSteps
+
+			switch i {
+			// 上
+			case 0:
+				if ny - 1 >= 0 {
+					que.PushBack(BfsItem{ny-1, nx, currentSteps + 1})
+				}
+			// 下
+			case 1:
+				if ny + 1 < h {
+					que.PushBack(BfsItem{ny+1, nx, currentSteps + 1})
+				}
+			// 左
+			case 2:
+				if nx - 1 >= 0 {
+					que.PushBack(BfsItem{ny, nx-1, currentSteps + 1})
+				}
+			// 右
+			case 3:
+				if nx + 1 < w {
+					que.PushBack(BfsItem{ny, nx+1, currentSteps + 1})
+				}
+			default:
+				panic("Invalid direction")
+			}
+
+			if grid[ny][nx] == "#" {
+				que.PushBack(BfsItem{ny, nx, currentSteps + 1})
+
+			} else {
+				que.PushFront(BfsItem{ny, nx, currentSteps})
+			}
+		}
+	}
+
+	fmt.Println(dist[gy][gx])
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
