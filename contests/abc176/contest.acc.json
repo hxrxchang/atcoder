@@ -31,7 +31,11 @@
       "id": "abc176_d",
       "label": "D",
       "title": "Wizard in Maze",
-      "url": "https://atcoder.jp/contests/abc176/tasks/abc176_d"
+      "url": "https://atcoder.jp/contests/abc176/tasks/abc176_d",
+      "directory": {
+        "path": "d",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc176_e",
