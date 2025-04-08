@@ -55,7 +55,6 @@ func solve() {
 	in = getInts()
 	sy, sx, gy, gx := in[0]-1, in[1]-1, in[2]-1, in[3]-1
 	que.PushBack(BfsItem{sy, sx, 0})
-	dist[sy][sx] = 0
 
 	for que.Size() > 0 {
 		item := que.PopFront()
@@ -71,6 +70,7 @@ func solve() {
 
 			dist[ny][nx] = currentSteps
 
+			// 前蹴り
 			switch i {
 			// 上
 			case 0:
@@ -98,7 +98,6 @@ func solve() {
 
 			if grid[ny][nx] == "#" {
 				que.PushBack(BfsItem{ny, nx, currentSteps + 1})
-
 			} else {
 				que.PushFront(BfsItem{ny, nx, currentSteps})
 			}
