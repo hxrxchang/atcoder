@@ -15,7 +15,11 @@
       "id": "abc204_b",
       "label": "B",
       "title": "Nuts",
-      "url": "https://atcoder.jp/contests/abc204/tasks/abc204_b"
+      "url": "https://atcoder.jp/contests/abc204/tasks/abc204_b",
+      "directory": {
+        "path": "b",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc204_c",
