@@ -44,15 +44,25 @@ func solve() {
 	for i := 0; i < l; i++ {
 		in = getInts()
 		c, d := in[0]-1, in[1]-1
-		mp[c].Add(b[d])
+		mp[c].Add(d)
 	}
 
-	b = descendingSortSlice(b)
+	type B2 struct {
+		idx, value int
+	}
+	b2 := make([]B2, len(b))
+	for i := 0; i < len(b); i++ {
+		b2[i] = B2{idx: i, value: b[i]}
+	}
+	sort.Slice(b2, func(i, j int) bool {
+		return b2[i].value > b2[j].value
+	})
+
 	ans := 0
 	for i, v := range a {
-		for _, w := range b {
-			if !mp[i].Has(w) {
-				ans = max(ans, v+w)
+		for _, w := range b2 {
+			if !mp[i].Has(w.idx) {
+				ans = max(ans, v+w.value)
 				break
 			}
 		}
