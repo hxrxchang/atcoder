@@ -33,15 +33,38 @@ func solve() {
 	in := getInts()
 	n, q := in[0], in[1]
 	_x := getInts()
-	x := make([]int, q)
+
+	s := newSet[int]()
+	v := make([][]int, n)
+	for i := 0; i < n; i++ {
+		v[i] = make([]int, 0)
+	}
+	sum := make([]int, q+1)
+
 	for i := 0; i < q; i++ {
-		x[i] = _x[i]-1
+		x := _x[i]-1
+		v[x] = append(v[x], i)
+		if s.Has(x) {
+			s.Remove(x)
+		} else {
+			s.Add(x)
+		}
+		sum[i+1] = sum[i] + s.Size()
 	}
 
-	accms := make([][]int, n)
+	res := make([]int, 0)
 	for i := 0; i < n; i++ {
-		accms[i] = make([]int, q+1)
+		if len(v[i]) % 2 != 0 {
+			v[i] = append(v[i], q)
+		}
+		tSum := 0
+		for j := 0; j < len(v[i]) / 2; j++ {
+			tSum += sum[v[i][2*j+1]] - sum[v[i][2*j]]
+		}
+		res = append(res, tSum)
 	}
+
+	printSlice(res)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
