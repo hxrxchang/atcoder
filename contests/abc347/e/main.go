@@ -32,39 +32,37 @@ func main() {
 func solve() {
 	in := getInts()
 	n, q := in[0], in[1]
-	_x := getInts()
+	x := getInts()
+
+	// 答え
+	a := make([]int, n+1)
 
 	s := newSet[int]()
-	v := make([][]int, n)
-	for i := 0; i < n; i++ {
-		v[i] = make([]int, 0)
-	}
-	sum := make([]int, q+1)
+	accm := make([]int, q+1)
+	// 集合内にいる場合、最後に登場した位置
+	lastApperance := make([]int, n+1)
 
-	for i := 0; i < q; i++ {
-		x := _x[i]-1
-		v[x] = append(v[x], i)
-		if s.Has(x) {
-			s.Remove(x)
+	for _i, v := range x {
+		// 1-indexとして扱う
+		i := _i + 1
+		if !s.Has(v) {
+			s.Add(v)
+			accm[i] = accm[i-1] + s.Size()
+			lastApperance[v] = i
 		} else {
-			s.Add(x)
+			s.Remove(v)
+			accm[i] = accm[i-1] + s.Size()
+			a[v] += accm[i-1] - accm[lastApperance[v]-1]
 		}
-		sum[i+1] = sum[i] + s.Size()
 	}
 
-	res := make([]int, 0)
-	for i := 0; i < n; i++ {
-		if len(v[i]) % 2 != 0 {
-			v[i] = append(v[i], q)
+	for i := 1; i <= n; i++ {
+		if s.Has(i) {
+			a[i] += accm[q] - accm[lastApperance[i]-1]
 		}
-		tSum := 0
-		for j := 0; j < len(v[i]) / 2; j++ {
-			tSum += sum[v[i][2*j+1]] - sum[v[i][2*j]]
-		}
-		res = append(res, tSum)
 	}
 
-	printSlice(res)
+	printSlice(a[1:])
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
