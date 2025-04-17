@@ -33,18 +33,23 @@ func solve() {
 	in := getInts()
 	n, k := in[0], in[1]
 
-	// dp[i]: i回目の操作が終わったときに、黒いボールが左端にいる確率
-	dp := make([]float64, k+1)
-	dp[0] = 1
+	n2 := n * n % MOD
+	invN2 := modInverse(n2, MOD)
 
-	for i := 0; i < n; i++ {
-		// 左端から左端以外にいく
-		fromEdgeToOther := float64(n-1) / float64(n)
-		// 左端以外から左端にいく
-		fromOtherToEdge := float64(1) / float64(n-1)
+	p := 2 * (n - 1) % MOD * invN2 % MOD
+	q := 2 * invN2 % MOD
+
+	d := 1
+	for i := 0; i < k; i++ {
+		tmp := (MOD + 1 - p - q) % MOD
+		d = (tmp*d%MOD + q) % MOD
 	}
-}
 
+	u := (n + 2) * modInverse(2, MOD) % MOD
+
+	ans := (d + (MOD + 1 - d) * u % MOD) % MOD
+	fmt.Println(ans)
+}
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 func getInt() int {
