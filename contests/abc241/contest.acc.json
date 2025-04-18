@@ -21,7 +21,11 @@
       "id": "abc241_c",
       "label": "C",
       "title": "Connect 6",
-      "url": "https://atcoder.jp/contests/abc241/tasks/abc241_c"
+      "url": "https://atcoder.jp/contests/abc241/tasks/abc241_c",
+      "directory": {
+        "path": "c",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc241_d",
