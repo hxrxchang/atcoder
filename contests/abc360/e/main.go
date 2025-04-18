@@ -36,18 +36,22 @@ func solve() {
 	n2 := n * n % MOD
 	invN2 := modInverse(n2, MOD)
 
-	p := 2 * (n - 1) % MOD * invN2 % MOD
-	q := 2 * invN2 % MOD
+	fromLeftToOther := 2 * (n - 1) % MOD * invN2 % MOD
+	fromOtherToLeft := 2 * invN2 % MOD
+	stayLeft := (MOD + 1 - fromLeftToOther - fromOtherToLeft) % MOD
 
-	d := 1
+	// 操作が終わった段階で、黒い点が左側にある確率
+	dp := 1
+
 	for i := 0; i < k; i++ {
-		tmp := (MOD + 1 - p - q) % MOD
-		d = (tmp*d%MOD + q) % MOD
+		dp = (stayLeft*dp%MOD + fromOtherToLeft) % MOD
 	}
 
+	// 左端以外にいるときの期待値の平均
 	u := (n + 2) * modInverse(2, MOD) % MOD
+	ans := (dp + (1 + MOD - dp) * u % MOD) % MOD
 
-	ans := (d + (MOD + 1 - d) * u % MOD) % MOD
+
 	fmt.Println(ans)
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
