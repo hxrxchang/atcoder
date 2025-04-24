@@ -43,7 +43,11 @@
       "id": "abc351_f",
       "label": "F",
       "title": "Double Sum",
-      "url": "https://atcoder.jp/contests/abc351/tasks/abc351_f"
+      "url": "https://atcoder.jp/contests/abc351/tasks/abc351_f",
+      "directory": {
+        "path": "f",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc351_g",
