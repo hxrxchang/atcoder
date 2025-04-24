@@ -21,7 +21,11 @@
       "id": "abc268_c",
       "label": "C",
       "title": "Chinese Restaurant",
-      "url": "https://atcoder.jp/contests/abc268/tasks/abc268_c"
+      "url": "https://atcoder.jp/contests/abc268/tasks/abc268_c",
+      "directory": {
+        "path": "c",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc268_d",
