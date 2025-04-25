@@ -38,15 +38,23 @@ func solve() {
 
 	// 方針: 各料理はその値をvとすると、v-1, v, v+1の人しか喜ばせられない
 	// そのため、各料理がp-1, p, p+1の人の前に何回目の操作で行くかを数え上げていく
-	for i := 0; i < n; i++ {
-		for j := 0; j < 3; j++ {
-			cnt[(p[i]-1-i+j+n)%n]++
-		}
+	for i, v := range p {
+		left := (n + v - 1) % n
+		front := v
+		right := (n + v + 1) % n
+
+		// 料理がp-1, p, p+1の人の前に行く操作の回数を数える
+		cntToLeft := (left - i + n) % n
+		cntToFront := (front - i + n) % n
+		cntToRight := (right - i + n) % n
+
+		cnt[cntToLeft]++
+		cnt[cntToFront]++
+		cnt[cntToRight]++
 	}
 
 	ans := max(cnt...)
 	fmt.Println(ans)
-
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
