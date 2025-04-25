@@ -66,6 +66,7 @@ func solve() {
 			cnt++
 		}
 		// 右隣が同じ体重であったら移動させるだけで更新しない
+		// なぜ更新したらだめかは、sample3を見たら分かる
 		if i + 1 < n && v.weight == people[i+1].weight {
 			continue
 		}
