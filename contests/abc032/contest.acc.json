@@ -15,7 +15,11 @@
       "id": "abc032_b",
       "label": "B",
       "title": "高橋君とパスワード",
-      "url": "https://atcoder.jp/contests/abc032/tasks/abc032_b"
+      "url": "https://atcoder.jp/contests/abc032/tasks/abc032_b",
+      "directory": {
+        "path": "b",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc032_c",
