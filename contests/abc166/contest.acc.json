@@ -27,7 +27,11 @@
       "id": "abc166_d",
       "label": "D",
       "title": "I hate Factorization",
-      "url": "https://atcoder.jp/contests/abc166/tasks/abc166_d"
+      "url": "https://atcoder.jp/contests/abc166/tasks/abc166_d",
+      "directory": {
+        "path": "d",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc166_e",
