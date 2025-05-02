@@ -59,10 +59,24 @@ func solve() {
 		}
 	}
 
+	groupA := newSet[int]()
+	groupB := newSet[int]()
+	for i := 0; i < n; i++ {
+		if dist[i]%2 == 0 {
+			groupA.Add(i)
+		} else {
+			groupB.Add(i)
+		}
+	}
+
+	isSameGroup := func(a, b int) bool {
+		return groupA.Has(a) && groupA.Has(b) || groupB.Has(a) && groupB.Has(b)
+	}
+
 	for i := 0; i < q; i++ {
 		in := getInts()
 		c, d := in[0]-1, in[1]-1
-		if abs(dist[c]-dist[d])%2 == 0 {
+		if isSameGroup(c, d) {
 			fmt.Println("Town")
 		} else {
 			fmt.Println("Road")
