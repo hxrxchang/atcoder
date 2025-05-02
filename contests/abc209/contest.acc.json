@@ -31,7 +31,11 @@
       "id": "abc209_d",
       "label": "D",
       "title": "Collision",
-      "url": "https://atcoder.jp/contests/abc209/tasks/abc209_d"
+      "url": "https://atcoder.jp/contests/abc209/tasks/abc209_d",
+      "directory": {
+        "path": "d",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc209_e",
