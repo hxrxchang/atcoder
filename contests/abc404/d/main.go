@@ -36,61 +36,46 @@ func solve() {
 	c := getInts()
 
 	zooHasAnimals := make([][]int, n)
-	for i := 0; i < n; i++ {
-		zooHasAnimals[i] = make([]int, m+1)
-	}
 
-	for animalID := 1; animalID <= m; animalID++ {
-		in := getInts()
-		for _, zooIdx := range in[1:] {
-			zooHasAnimals[zooIdx-1][animalID] = 1
+	for i := 1; i <= m; i++ {
+		in := getInts()[1:]
+		for _, zooId := range in {
+			zooHasAnimals[zooId-1] = append(zooHasAnimals[zooId-1], i)
 		}
 	}
 
-	ans := BIGGEST
-	total := 1
-	for i := 0; i < n; i++ {
-		total *= 3
-	}
+	zoos := rangeSlice(n*2)
+	subsets := generateSubsets(zoos)
 
-	for mask := 0; mask < total; mask++ {
-		visit := make([]int, n)
-		tmp := mask
-		for i := 0; i < n; i++ {
-			visit[i] = tmp % 3
-			tmp /= 3
+	ans := BIGGEST
+	for _, subset := range subsets {
+		zooIds := make([]int, 0)
+		for _, v := range subset {
+			zooIds = append(zooIds, v % n)
 		}
 
 		animalCnt := make([]int, m+1)
-		for zooIdx := 0; zooIdx < n; zooIdx++ {
-			count := visit[zooIdx]
-			if count == 0 {
-				continue
-			}
-			for animalID := 1; animalID <= m; animalID++ {
-				if zooHasAnimals[zooIdx][animalID] == 1 {
-					animalCnt[animalID] += count
-				}
+		for _, zooId := range zooIds {
+			for _, animalId := range zooHasAnimals[zooId] {
+				animalCnt[animalId]++
 			}
 		}
 
-		ok := true
-		for animalID := 1; animalID <= m; animalID++ {
-			if animalCnt[animalID] < 2 {
-				ok = false
+		flag := true
+		for i := 1; i <= m; i++ {
+			if animalCnt[i] < 2 {
+				flag = false
 				break
 			}
 		}
-		if !ok {
-			continue
-		}
 
-		tmpCost := 0
-		for i := 0; i < n; i++ {
-			tmpCost += c[i] * visit[i]
-		}
-		if tmpCost < ans {
-			ans = tmpCost
+		if flag {
+			tmp := 0
+			for _, id := range zooIds {
+				tmp += c[id]
+			}
+
+			ans = min(ans, tmp)
 		}
 	}
 
