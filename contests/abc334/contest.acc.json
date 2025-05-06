@@ -25,7 +25,11 @@
       "id": "abc334_c",
       "label": "C",
       "title": "Socks 2",
-      "url": "https://atcoder.jp/contests/abc334/tasks/abc334_c"
+      "url": "https://atcoder.jp/contests/abc334/tasks/abc334_c",
+      "directory": {
+        "path": "c",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc334_d",
