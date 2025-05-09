@@ -33,28 +33,20 @@ func solve() {
 	in := getInts()
 	n, m := in[0], in[1]
 
-	results := make([][]int, 0)
-
-	var dfs func(current []int)
-	dfs = func(current []int) {
-		if len(current) == n {
-			// スライスの参照問題を避けるためにコピーしてから追加
-			tmp := make([]int, n)
-			copy(tmp, current)
-			results = append(results, tmp)
+	res := make([][]int, 0)
+	var dfs func(values []int)
+	dfs = func(values []int) {
+		if len(values) == n {
+			copied := copySlice(values)
+			res = append(res, copied)
 			return
 		}
-
-		var start int
-		if len(current) == 0 {
-			start = 1
-		} else {
-			start = current[len(current)-1] + 10
-		}
-		end := m - (n - len(current) - 1) * 10
+		start := values[len(values)-1] + 10
+		keta := len(values)
+		end := m - (n - (keta + 1)) * 10
 
 		for i := start; i <= end; i++ {
-			dfs(append(current, i))
+			dfs(append(values, i))
 		}
 	}
 
@@ -63,9 +55,9 @@ func solve() {
 		dfs([]int{i})
 	}
 
-	fmt.Println(len(results))
-	for _, res := range results {
-		printSlice(res)
+	fmt.Println(len(res))
+	for _, v := range res {
+		printSlice(v)
 	}
 }
 
