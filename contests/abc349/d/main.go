@@ -37,9 +37,11 @@ func solve() {
 
 	for l != r {
 		for i := 60; i >= 0; i-- {
-			if l%(1<<i) > 0 {
+			// 2 ** i の倍数の最大を探す
+			if l%(1<<i) != 0 {
 				continue
 			}
+			// 2 ** i の倍数でも、rを超えないものを探す
 			if l+1<<i > r {
 				continue
 			}
