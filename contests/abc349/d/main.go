@@ -37,17 +37,15 @@ func solve() {
 
 	for l != r {
 		for i := 60; i >= 0; i-- {
-			// 2 ** i の倍数の最大を探す
-			if l%(1<<i) != 0 {
-				continue
+			size := 1 << i
+
+			// 長さが2 ** 1で、終端が 2 ** i の倍数かどうか
+			// 終端がrを超えてはいけない
+			if (l + size) % size == 0 && l + size <= r {
+				results = append(results, []int{l, l + size})
+				l = l + size
+				break
 			}
-			// 2 ** i の倍数でも、rを超えないものを探す
-			if l+1<<i > r {
-				continue
-			}
-			results = append(results, []int{l, l + 1<<i})
-			l = l + 1<<i
-			break
 		}
 	}
 
