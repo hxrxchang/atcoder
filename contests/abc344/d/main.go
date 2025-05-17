@@ -50,6 +50,7 @@ func solve() {
 				if dp[i] == BIGGEST {
 					continue
 				}
+				// 配るDP
 				if i+len(item) <= len(t) && t[i:i+len(item)] == item {
 					tmp[i+len(item)] = min(dp[i+len(item)], dp[i]+1)
 				}
