@@ -31,63 +31,46 @@ func main() {
 
 func solve() {
 	in := getInts()
-	n := in[2]
-
-	// その行に何個ゴミがあるか
-	rowCnt := make(map[int]int)
-	// その列に何個ゴミがあるか
-	colCnt := make(map[int]int)
+	h, w, n := in[0], in[1], in[2]
 
 	// その行のどこの列にゴミがあるか
-	gabagesByRow := make(map[int][]int)
+	gabagesByRow := make(map[int]*Set[int])
+	for i := 1; i <= h; i++ {
+		gabagesByRow[i] = newSet[int]()
+	}
+
 	// その列のどこの列にゴミがあるか
-	gabagesByCol := make(map[int][]int)
+	gabagesByCol := make(map[int]*Set[int])
+	for i := 1; i <= w; i++ {
+		gabagesByCol[i] = newSet[int]()
+	}
 
 	for i := 0; i < n; i++ {
 		in := getInts()
-		x, y := in[0], in[1]
-		rowCnt[x]++
-		colCnt[y]++
-		gabagesByRow[x] = append(gabagesByRow[x], y)
-		gabagesByCol[y] = append(gabagesByCol[y], x)
+		row, col := in[0], in[1]
+		gabagesByRow[row].Add(col)
+		gabagesByCol[col].Add(row)
 	}
-
-	rowDeleted := make(map[int]bool)
-	colDeleted := make(map[int]bool)
 
 	q := getInt()
 	for i := 0; i < q; i++ {
 		in := getInts()
 		if in[0] == 1 {
 			row := in[1]
-			if rowDeleted[row] {
-				fmt.Println(0)
-				continue
-			}
+			fmt.Println(gabagesByRow[row].Size())
 
-			fmt.Println(rowCnt[row])
-
-			rowDeleted[row] = true
-			for _, col := range gabagesByRow[row] {
-				if !colDeleted[col] {
-					colCnt[col]--
-				}
+			for _, col := range gabagesByRow[row].Values() {
+				gabagesByCol[col].Remove(row)
 			}
+			gabagesByRow[row].Clear()
 		} else {
 			col := in[1]
-			if colDeleted[col] {
-				fmt.Println(0)
-				continue
-			}
+			fmt.Println(gabagesByCol[col].Size())
 
-			fmt.Println(colCnt[col])
-
-			colDeleted[col] = true
-			for _, row := range gabagesByCol[col] {
-				if !rowDeleted[row] {
-					rowCnt[row]--
-				}
+			for _, row := range gabagesByCol[col].Values() {
+				gabagesByRow[row].Remove(col)
 			}
+			gabagesByCol[col].Clear()
 		}
 	}
 }
@@ -708,6 +691,9 @@ func(s *Set[V]) Pop() V {
 	v := s.Values()[0]
 	s.Remove(v)
 	return v
+}
+func (s *Set[V]) Clear() {
+	s.values = make(map[V]struct{})
 }
 
 
