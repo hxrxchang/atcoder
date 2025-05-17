@@ -649,6 +649,9 @@ func(s *Set[V]) Pop() V {
 	s.Remove(v)
 	return v
 }
+func (s *Set[V]) Clear() {
+	s.values = make(map[V]struct{})
+}
 
 
 // sorted set
