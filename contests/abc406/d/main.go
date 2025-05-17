@@ -31,29 +31,29 @@ func main() {
 
 func solve() {
 	in := getInts()
-	_, _, n := in[0], in[1], in[2]
+	n := in[2]
 
+	// その行に何個ゴミがあるか
 	rowCnt := make(map[int]int)
+	// その列に何個ゴミがあるか
 	colCnt := make(map[int]int)
-	gabageByCol := make(map[int][]int)
-	gabageByRow := make(map[int][]int)
+
+	// その行のどこの列にゴミがあるか
+	gabagesByRow := make(map[int][]int)
+	// その列のどこの列にゴミがあるか
+	gabagesByCol := make(map[int][]int)
 
 	for i := 0; i < n; i++ {
 		in := getInts()
-		row, col := in[0], in[1]
-		rowCnt[row]++
-		colCnt[col]++
-		gabageByCol[col] = append(gabageByCol[col], row)
-		gabageByRow[row] = append(gabageByRow[row], col)
+		x, y := in[0], in[1]
+		rowCnt[x]++
+		colCnt[y]++
+		gabagesByRow[x] = append(gabagesByRow[x], y)
+		gabagesByCol[y] = append(gabagesByCol[y], x)
 	}
 
-	// fmt.Println("rowCnt", rowCnt)
-	// fmt.Println("colCnt", colCnt)
-	// fmt.Println("gabageByCol", gabageByCol)
-	// fmt.Println("gabageByRow", gabageByRow)
-
-	colDeleted := make(map[int]bool)
 	rowDeleted := make(map[int]bool)
+	colDeleted := make(map[int]bool)
 
 	q := getInt()
 	for i := 0; i < q; i++ {
@@ -64,11 +64,13 @@ func solve() {
 				fmt.Println(0)
 				continue
 			}
+
 			fmt.Println(rowCnt[row])
+
 			rowDeleted[row] = true
-			for _, gabage := range gabageByRow[row] {
-				if !colDeleted[gabage] {
-					colCnt[gabage]--
+			for _, col := range gabagesByRow[row] {
+				if !colDeleted[col] {
+					colCnt[col]--
 				}
 			}
 		} else {
@@ -77,11 +79,13 @@ func solve() {
 				fmt.Println(0)
 				continue
 			}
+
 			fmt.Println(colCnt[col])
+
 			colDeleted[col] = true
-			for _, gabage := range gabageByCol[col] {
-				if !rowDeleted[gabage] {
-					rowCnt[gabage]--
+			for _, row := range gabagesByCol[col] {
+				if !rowDeleted[row] {
+					rowCnt[row]--
 				}
 			}
 		}
