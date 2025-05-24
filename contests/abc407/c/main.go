@@ -38,12 +38,17 @@ func solve() {
 		s[i] = s2i(v)
 	}
 
-	cnt := len(s)
-	pre := 0
-	for _, v := range s {
-		cnt += (v + pre) % 10
+	cnt := 0
+	for i, v := range s {
+		u := 0
+		if i != 0 {
+			u = s[i-1]
+		}
+
+		cnt += (10 + v - u) % 10
 	}
 
+	cnt += len(s)
 	fmt.Println(cnt)
 }
 
