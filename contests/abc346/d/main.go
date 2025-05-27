@@ -32,6 +32,7 @@ func main() {
 func solve() {
 	n := getInt()
 	s := strToSlice(getStr(), "")
+	c := getInts()
 
 	a := make([]string, n)
 	b := make([]string, n)
@@ -45,19 +46,45 @@ func solve() {
 		}
 	}
 
-	// c := make([]string, n)
-	// d := make([]string, n)
-	// for i := n - 1; i >= 0; i-- {
-	// 	if i % 2 == 0 {
-	// 		c[i] = "1"
-	// 		d[i] = "0"
-	// 	} else {
-	// 		c[i] = "0"
-	// 		d[i] = "1"
-	// 	}
-	// }
+	fromHeadA := make([]int, n+1)
+	fromHeadB := make([]int, n+1)
+	for i := 1; i <= n; i++ {
+		fromHeadA[i] = fromHeadA[i-1]
+		if s[i-1] != a[i-1] {
+			fromHeadA[i] += c[i-1]
+		}
 
-	// fmt.Println(s, a, b, c, d)
+		fromHeadB[i] = fromHeadB[i-1]
+		if s[i-1] != b[i-1] {
+			fromHeadB[i] += c[i-1]
+		}
+	}
+	fromHeadA = fromHeadA[1:]
+	fromHeadB = fromHeadB[1:]
+
+	fromTaillA := make([]int, n+1)
+	fromTaillB := make([]int, n+1)
+	for i := n-1; i >= 0; i-- {
+		fromTaillA[i] = fromTaillA[i+1]
+		if s[i] != a[i] {
+			fromTaillA[i] += c[i]
+		}
+
+		fromTaillB[i] = fromTaillB[i+1]
+		if s[i] != b[i] {
+			fromTaillB[i] += c[i]
+		}
+	}
+	fromTaillA = fromTaillA[:n]
+	fromTaillB = fromTaillB[:n]
+
+	ans := BIGGEST
+	for i := 0; i < n - 1; i++ {
+		ans = min(ans, fromHeadA[i] + fromTaillB[i+1])
+		ans = min(ans, fromHeadB[i] + fromTaillA[i+1])
+	}
+
+	fmt.Println(ans)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
