@@ -32,12 +32,21 @@ func main() {
 func solve() {
 	n := getInt()
 
+	// x = 2 ** a, y = b ** 2 とする
 	ans := 0
 	for a := 1; a <= 60; a++ {
-		if pow(2, a) > n {
+		x := pow(2, a)
+		if x > n {
 			break
 		}
-		b := isqrt(n / pow(2, a))
+		y := n / x
+		b := isqrt(y)
+
+		// 素朴にbを足すと、以下のループを回すと分かるように、x*iが重複することが分かる。
+		// for i := 1; i <= b; i++ {
+		// 	fmt.Println(x, i, x*i)
+		// }
+		// よって、bの奇数のときは数えないようにceilDivをとって足す。
 		ans += ceilDiv(b, 2)
 	}
 
