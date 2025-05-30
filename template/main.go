@@ -1386,6 +1386,7 @@ func gridBfs(height, width int, nextNodes map[GridBfsNode][]GridBfsNode, start G
 // ワーシャルフロイド法
 // graphは、到達不能な場合はmath.MaxInt64を入れる
 // 自分自身への経路は0を入れる
+// 計算量はO(V^3) ただし、Vは頂点数
 func warshallFloyd(graph [][]int) [][]int {
 	// ノード数
 	n := len(graph)
@@ -1413,7 +1414,8 @@ func warshallFloyd(graph [][]int) [][]int {
 }
 
 // ダイクストラ法
-func dijkstra(graph [][]dijkstraItem, start int) []int {
+// 計算量は O((V + E) log V) ただし、Vは頂点数、Eは辺の数
+func dijkstra(graph [][]DijkstraItem, start int) []int {
 	n := len(graph)
 	dist := make([]int, n)
 	for i := range dist {
@@ -1432,12 +1434,12 @@ func dijkstra(graph [][]dijkstraItem, start int) []int {
 		dist[start] = 0
 	}
 
-	pq := &dijkstraPriorityQueue{}
+	pq := &DijkstraPriorityQueue{}
 	heap.Init(pq)
-	heap.Push(pq, &dijkstraItem{node: start, dist: 0})
+	heap.Push(pq, &DijkstraItem{node: start, dist: 0})
 
 	for pq.Len() > 0 {
-		u := heap.Pop(pq).(*dijkstraItem)
+		u := heap.Pop(pq).(*DijkstraItem)
 		if u.dist > dist[u.node] {
 			continue
 		}
@@ -1447,29 +1449,29 @@ func dijkstra(graph [][]dijkstraItem, start int) []int {
 			alt := u.dist + edge.dist
 			if alt < dist[v] {
 				dist[v] = alt
-				heap.Push(pq, &dijkstraItem{node: v, dist: alt})
+				heap.Push(pq, &DijkstraItem{node: v, dist: alt})
 			}
 		}
 	}
 
 	return dist
 }
-type dijkstraItem struct {
+type DijkstraItem struct {
 	node int
 	dist   int
 }
-type dijkstraPriorityQueue []*dijkstraItem
-func (pq dijkstraPriorityQueue) Len() int { return len(pq) }
-func (pq dijkstraPriorityQueue) Less(i, j int) bool {
+type DijkstraPriorityQueue []*DijkstraItem
+func (pq DijkstraPriorityQueue) Len() int { return len(pq) }
+func (pq DijkstraPriorityQueue) Less(i, j int) bool {
 	return pq[i].dist < pq[j].dist
 }
-func (pq dijkstraPriorityQueue) Swap(i, j int) {
+func (pq DijkstraPriorityQueue) Swap(i, j int) {
 	pq[i], pq[j] = pq[j], pq[i]
 }
-func (pq *dijkstraPriorityQueue) Push(x interface{}) {
-	*pq = append(*pq, x.(*dijkstraItem))
+func (pq *DijkstraPriorityQueue) Push(x interface{}) {
+	*pq = append(*pq, x.(*DijkstraItem))
 }
-func (pq *dijkstraPriorityQueue) Pop() interface{} {
+func (pq *DijkstraPriorityQueue) Pop() interface{} {
 	old := *pq
 	n := len(old)
 	item := old[n-1]
