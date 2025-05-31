@@ -243,23 +243,23 @@ func modInverse(a, m int) int {
 }
 
 //----------------------------------------
-// modint
+// ModInt
 //----------------------------------------
-type modint struct {
+type ModInt struct {
 	mod       int
 	factMemo  []int
 	ifactMemo []int
 }
 
-func newModint(m int) *modint {
-	var ret modint
+func newModint(m int) *ModInt {
+	var ret ModInt
 	ret.mod = m
 	ret.factMemo = []int{1, 1}
 	ret.ifactMemo = []int{1, 1}
 	return &ret
 }
 
-func (m *modint) add(a, b int) int {
+func (m *ModInt) add(a, b int) int {
 	ret := (a + b) % m.mod
 	if ret < 0 {
 		ret += m.mod
@@ -267,7 +267,7 @@ func (m *modint) add(a, b int) int {
 	return ret
 }
 
-func (m *modint) sub(a, b int) int {
+func (m *ModInt) sub(a, b int) int {
 	ret := (a - b) % m.mod
 	if ret < 0 {
 		ret += m.mod
@@ -275,7 +275,7 @@ func (m *modint) sub(a, b int) int {
 	return ret
 }
 
-func (m *modint) mul(a, b int) int {
+func (m *ModInt) mul(a, b int) int {
 	a %= m.mod
 	b %= m.mod
 	ret := a * b % m.mod
@@ -285,14 +285,14 @@ func (m *modint) mul(a, b int) int {
 	return ret
 }
 
-func (m *modint) div(a, b int) int {
+func (m *ModInt) div(a, b int) int {
 	a %= m.mod
-	ret := a * m.modinv(b)
+	ret := a * m.modInv(b)
 	ret %= m.mod
 	return ret
 }
 
-func (m *modint) pow(p, n int) int {
+func (m *ModInt) pow(p, n int) int {
 	ret := 1
 	x := p % m.mod
 	for n != 0 {
@@ -308,7 +308,7 @@ func (m *modint) pow(p, n int) int {
 
 
 // 拡張オイラーの互除法で逆元を求める
-func (mm *modint) modinv(a int) int {
+func (mm *ModInt) modInv(a int) int {
 	m := mm.mod
 	b, u, v := m, 1, 0
 	for b != 0 {
@@ -329,7 +329,7 @@ func (mm *modint) modinv(a int) int {
 // 行列累乗
 // 　A[][]のp乗を求める
 //-----------------------------------------------
-func (m *modint) powModMatrix(A [][]int, p int) [][]int {
+func (m *ModInt) powModMatrix(A [][]int, p int) [][]int {
 	N := len(A)
 	ret := make([][]int, N)
 	for i := 0; i < N; i++ {
@@ -348,7 +348,7 @@ func (m *modint) powModMatrix(A [][]int, p int) [][]int {
 	return ret
 }
 
-func (m *modint) mulMod(A, B [][]int) [][]int {
+func (m *ModInt) mulMod(A, B [][]int) [][]int {
 	H := len(A)
 	W := len(B[0])
 	K := len(A[0])
@@ -374,7 +374,7 @@ func (m *modint) mulMod(A, B [][]int) [][]int {
 //                ※pow(x, p-2)を何度も取るので
 // 厳しそうな場合は、ここを削除して高速なのを使う
 //---------------------------------------------------
-func (m *modint) mfact(n int) int {
+func (m *ModInt) mfact(n int) int {
 	if len(m.factMemo) > n {
 		return m.factMemo[n]
 	}
@@ -388,7 +388,7 @@ func (m *modint) mfact(n int) int {
 	return m.factMemo[n]
 }
 
-func (m *modint) mifact(n int) int {
+func (m *ModInt) mifact(n int) int {
 	if len(m.ifactMemo) > n {
 		return m.ifactMemo[n]
 	}
@@ -402,7 +402,7 @@ func (m *modint) mifact(n int) int {
 	return m.ifactMemo[n]
 }
 
-func (m *modint) nCr(n, r int) int {
+func (m *ModInt) nCr(n, r int) int {
 	if n == r {
 		return 1
 	}
