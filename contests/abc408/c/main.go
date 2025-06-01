@@ -33,20 +33,18 @@ func solve() {
 	in := getInts()
 	n, m := in[0], in[1]
 
-	imosu := make([]int, n+1)
+	imosu := make([]int, n+2)
 	for i := 0; i < m; i++ {
 		in := getInts()
 		l, r := in[0], in[1]
 		imosu[l]++
-		if r + 1 <= n {
-			imosu[r+1]--
-		}
+		imosu[r+1]--
 	}
 	for i := 1; i <= n; i++ {
 		imosu[i] += imosu[i-1]
 	}
 
-	ans := min(imosu[1:]...)
+	ans := min(imosu[1:n+1]...)
 	fmt.Println(ans)
 }
 
