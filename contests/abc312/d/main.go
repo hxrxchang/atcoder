@@ -56,7 +56,6 @@ func solve() {
 				}
 			}
 		}
-		fmt.Println(nextDp)
 		dp = nextDp
 	}
 
