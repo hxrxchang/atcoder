@@ -1,6 +1,6 @@
 module github.com/hxrxchang/atcoder
 
-go 1.21.0
+go 1.21
 
 require (
 	github.com/liyue201/gostl v1.2.0 // indirect
