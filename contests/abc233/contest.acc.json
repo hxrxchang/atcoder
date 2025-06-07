@@ -37,7 +37,11 @@
       "id": "abc233_e",
       "label": "E",
       "title": "Σ[k=0..10^100]floor(X／10^k)",
-      "url": "https://atcoder.jp/contests/abc233/tasks/abc233_e"
+      "url": "https://atcoder.jp/contests/abc233/tasks/abc233_e",
+      "directory": {
+        "path": "e",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc233_f",
