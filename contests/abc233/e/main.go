@@ -36,10 +36,29 @@ func solve() {
 		nums[i] = s2i(v)
 	}
 
+	accm := make([]int, len(nums))
+	accm[0] = nums[0]
 	for i := 1; i < len(nums); i++ {
-
+		accm[i] = accm[i-1] + nums[i]
 	}
-	fmt.Println(nums)
+
+	ans := make([]string, len(nums))
+	for i := len(nums)-1; i >=0; i-- {
+		s := i2s(accm[i])
+		if len(s) == 1 {
+			ans[i] = s
+			continue
+		}
+		ans[i] = string(s[len(s)-1])
+		plus := string(s[:len(s)-1])
+		if i > 0 {
+			accm[i-1] += s2i(plus)
+		} else {
+			ans = append([]string{plus}, ans...)
+		}
+	}
+
+	fmt.Println(strings.Join(ans, ""))
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
