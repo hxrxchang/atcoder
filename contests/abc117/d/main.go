@@ -30,43 +30,55 @@ func main() {
 }
 
 func solve() {
-	// in := getInts()
-	// n, k := in[0], in[1]
-	// a := getInts()
+	in := getInts()
+	n, k := in[0], in[1]
+	a := getInts()
 
-	// 試しに、8357以下の整数の数は当然8358だが、これを桁DPで求めてみる。
-	n := 8357
-	ns := i2s(n)
-	digits := make([]int, len(ns))
-	for i, c := range ns {
-		digits[i] = s2i(string(c))
+	const MAX_BIT = 60
+
+	cnt1 := make([]int, MAX_BIT)
+	for i := 0; i < n; i++ {
+		for b := 0; b < MAX_BIT; b++ {
+			if (a[i]>>b)&1 == 1 {
+				cnt1[b]++
+			}
+		}
 	}
 
 	type DpItem struct {
 		same, lessThan int
 	}
-	dp := make([]DpItem, len(digits)+1)
-	for i := range dp {
-		dp[i] = DpItem{same: 0, lessThan: 0}
+
+	dp := make([]DpItem, MAX_BIT+1)
+	for i := 0; i <= MAX_BIT; i++ {
+		dp[i] = DpItem{same: -1, lessThan: -1}
 	}
-	dp[0] = DpItem{same: 1, lessThan: 0} // 0桁目は1通り（空文字列）
+	dp[0].same = 0
 
-	for i := 0; i < len(digits); i++ {
-		cur := digits[i]
+	for i := 0; i < MAX_BIT; i++ {
+		b := MAX_BIT - 1 - i
+		kbit := (k >> b) & 1
 
-		for d := 0; d <= cur; d++ {
-			if d < cur {
-				dp[i+1].lessThan += dp[i].same
+		cost0 := cnt1[b] << b           // Xのbビットが0
+		cost1 := (n - cnt1[b]) << b     // Xのbビットが1
+
+		// from same state
+		if dp[i].same != -1 {
+			if kbit == 1 {
+				dp[i+1].lessThan = max(dp[i+1].lessThan, dp[i].same+cost0)
+				dp[i+1].same = max(dp[i+1].same, dp[i].same+cost1)
 			} else {
-				dp[i+1].same += dp[i].same
+				dp[i+1].same = max(dp[i+1].same, dp[i].same+cost0)
 			}
 		}
-		dp[i+1].lessThan += dp[i].lessThan * 10 // 前の桁が小さい場合、次の桁は0-9まで選べる
+
+		// from lessThan state (自由に選べる)
+		if dp[i].lessThan != -1 {
+			dp[i+1].lessThan = max(dp[i+1].lessThan, dp[i].lessThan+max(cost0, cost1))
+		}
 	}
 
-	fmt.Println(dp)
-
-	fmt.Println(dp[len(digits)].same + dp[len(digits)].lessThan)
+	fmt.Println(max(dp[MAX_BIT].same, dp[MAX_BIT].lessThan))
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
