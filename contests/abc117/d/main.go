@@ -34,7 +34,8 @@ func solve() {
 	n, k := in[0], in[1]
 	a := getInts()
 
-	const MAX_BIT = 60
+	// k <= 10 ** 12 なので約40bit
+	const MAX_BIT = 40
 
 	cnt1 := make([]int, MAX_BIT)
 	for i := 0; i < n; i++ {
@@ -59,8 +60,10 @@ func solve() {
 		b := MAX_BIT - 1 - i
 		kbit := (k >> b) & 1
 
-		cost0 := cnt1[b] << b           // Xのbビットが0
-		cost1 := (n - cnt1[b]) << b     // Xのbビットが1
+		// Xのbビットが0
+		cost0 := cnt1[b] << b
+		// Xのbビットが1
+		cost1 := (n - cnt1[b]) << b
 
 		// from same state
 		if dp[i].same != -1 {
@@ -80,6 +83,7 @@ func solve() {
 
 	fmt.Println(max(dp[MAX_BIT].same, dp[MAX_BIT].lessThan))
 }
+
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
