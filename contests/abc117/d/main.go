@@ -32,58 +32,42 @@ func main() {
 func solve() {
 	in := getInts()
 	n, k := in[0], in[1]
+
 	a := getInts()
-
-	// k <= 10 ** 12 なので約40bit
-	const MAX_BIT = 40
-
-	cnt1 := make([]int, MAX_BIT)
-	for i := 0; i < n; i++ {
-		for b := 0; b < MAX_BIT; b++ {
-			if (a[i]>>b)&1 == 1 {
-				cnt1[b]++
+	bitsA := make([]int, 40)
+	for _, v := range a {
+		for i := 0; i < 40; i++ {
+			if v&(1<<i) != 0 {
+				bitsA[i]++
 			}
 		}
 	}
 
-	type DpItem struct {
-		same, lessThan int
+	type Dp struct {
+		lessThan, equal int
+	}
+	dp := &Dp {
+		lessThan: 0,
+		equal: -1,
 	}
 
-	dp := make([]DpItem, MAX_BIT+1)
-	for i := 0; i <= MAX_BIT; i++ {
-		dp[i] = DpItem{same: -1, lessThan: -1}
-	}
-	dp[0].same = 0
+	for i := 0; i < 40; i++ {
+		currentBit := 40 - i - 1
+		currentBitCount := bitsA[currentBit]
+		currentBitValue := 1 << currentBit
 
-	for i := 0; i < MAX_BIT; i++ {
-		b := MAX_BIT - 1 - i
-		kbit := (k >> b) & 1
-
-		// Xのbビットが0
-		cost0 := cnt1[b] << b
-		// Xのbビットが1
-		cost1 := (n - cnt1[b]) << b
-
-		// from same state
-		if dp[i].same != -1 {
-			if kbit == 1 {
-				dp[i+1].lessThan = max(dp[i+1].lessThan, dp[i].same+cost0)
-				dp[i+1].same = max(dp[i+1].same, dp[i].same+cost1)
-			} else {
-				dp[i+1].same = max(dp[i+1].same, dp[i].same+cost0)
-			}
+		dpNext := &Dp{}
+		if dp.equal != -1 {
+			dpNext.lessThan = dp.equal + currentBitValue * currentBitCount
+			dpNext.equal = dp.equal + currentBitValue * (n - currentBitCount)
 		}
-
-		// from lessThan state (自由に選べる)
-		if dp[i].lessThan != -1 {
-			dp[i+1].lessThan = max(dp[i+1].lessThan, dp[i].lessThan+max(cost0, cost1))
-		}
+		dpNext.lessThan = max(dpNext.lessThan, dp.lessThan + currentBitValue * currentBitCount, dp.lessThan + currentBitValue * (n - currentBitCount))
+		dp = dpNext
 	}
 
-	fmt.Println(max(dp[MAX_BIT].same, dp[MAX_BIT].lessThan))
+	ans := max(dp.lessThan, dp.equal)
+	fmt.Println(ans)
 }
-
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -192,7 +176,20 @@ func i2b(i int) bool {
   return i != 0
 }
 
-func i2bit(i int) []string {
+func i2bit(i int) []int {
+	bitStr := strconv.FormatInt(int64(i), 2)
+	bits := make([]int, len(bitStr))
+	for j, c := range bitStr {
+		if c == '1' {
+			bits[j] = 1
+		} else {
+			bits[j] = 0
+		}
+	}
+	return bits
+}
+
+func i2bitString(i int) []string {
 	return strToSlice(strconv.FormatInt(int64(i), 2), "")
 }
 
