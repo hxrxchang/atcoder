@@ -46,28 +46,57 @@ func solve() {
 	type Dp struct {
 		lessThan, equal int
 	}
-	dp := &Dp {
+	dp := Dp {
 		lessThan: 0,
 		equal: -1,
 	}
 
 	for i := 0; i < 40; i++ {
 		currentBit := 40 - i - 1
-		currentBitCount := bitsA[currentBit]
 		currentBitValue := 1 << currentBit
+		currentBitCount := bitsA[currentBit]
+		kBit := (k >> currentBit) & 1
 
-		dpNext := &Dp{}
-		if dp.equal != -1 {
-			dpNext.lessThan = dp.equal + currentBitValue * currentBitCount
-			dpNext.equal = dp.equal + currentBitValue * (n - currentBitCount)
+		dpNext := dp
+		// equalへの遷移
+		if currentBitValue <= k {
+			base := dp.equal
+			if dp.equal == -1 {
+				base = dp.lessThan
+			}
+			if kBit == 1 {
+				dpNext.equal = base + currentBitValue * (n - currentBitCount)
+			} else {
+				dpNext.equal = base + currentBitValue * currentBitCount
+			}
 		}
-		dpNext.lessThan = max(dpNext.lessThan, dp.lessThan + currentBitValue * currentBitCount, dp.lessThan + currentBitValue * (n - currentBitCount))
+
+		// equalからlessThanへの遷移
+		if dp.equal != -1 {
+			if kBit == 1 {
+				dpNext.lessThan = dp.equal + currentBitValue * (n - currentBitCount)
+			} else {
+				dpNext.lessThan = dp.equal + currentBitValue * currentBitCount
+			}
+		}
+
+		// lessThanからlessThanへの遷移
+		if currentBitValue <= k {
+			if kBit == 1 {
+				dpNext.lessThan = max(dpNext.lessThan, dp.lessThan + currentBitValue * (n - currentBitCount), dp.lessThan + currentBitValue * currentBitCount)
+			} else {
+				dpNext.lessThan = max(dpNext.lessThan, dp.lessThan + currentBitValue * currentBitCount)
+			}
+		} else {
+			dpNext.lessThan = max(dpNext.lessThan, dp.lessThan + currentBitValue * currentBitCount)
+		}
 		dp = dpNext
 	}
 
 	ans := max(dp.lessThan, dp.equal)
 	fmt.Println(ans)
 }
+
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
