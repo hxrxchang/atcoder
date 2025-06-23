@@ -53,17 +53,16 @@ func solve() {
 		currentBit := 40 - i - 1
 		currentBitValue := 1 << currentBit
 		currentBitCount := bitsA[currentBit]
-		kBit := (k >> currentBit) & 1
 
 		nextDp := dp
 
 		// equalからの遷移
 		// bitが立っていれば、equalからlessThanへの遷移とequalからequalへの遷移がある
-		if kBit == 1 {
-			nextDp.lessThan = dp.equal + currentBitValue * currentBitCount
+		if k & (1 << currentBit) != 0 {
 			nextDp.equal = dp.equal + currentBitValue * (n - currentBitCount)
+			nextDp.lessThan = dp.equal + currentBitValue * currentBitCount
 		} else {
-			// bitが立ってなければ、equalからequalへの遷移のみ
+			// 立ってなければequalへの遷移のみ
 			nextDp.equal = dp.equal + currentBitValue * currentBitCount
 		}
 
@@ -71,6 +70,7 @@ func solve() {
 		if dp.lessThan != -1 {
 			nextDp.lessThan = max(nextDp.lessThan, dp.lessThan + currentBitValue * currentBitCount, dp.lessThan + currentBitValue * (n - currentBitCount))
 		}
+
 
 		dp = nextDp
 	}
