@@ -44,12 +44,10 @@ func solve() {
 	}
 
 	type Dp struct {
-		lessThan, equal int
+		equal, lessThan int
 	}
-	dp := Dp {
-		lessThan: 0,
-		equal: -1,
-	}
+
+	dp := Dp{0, -1}
 
 	for i := 0; i < 40; i++ {
 		currentBit := 40 - i - 1
@@ -57,46 +55,29 @@ func solve() {
 		currentBitCount := bitsA[currentBit]
 		kBit := (k >> currentBit) & 1
 
-		dpNext := dp
-		// equalへの遷移
-		if currentBitValue <= k {
-			base := dp.equal
-			if dp.equal == -1 {
-				base = dp.lessThan
-			}
-			if kBit == 1 {
-				dpNext.equal = base + currentBitValue * (n - currentBitCount)
-			} else {
-				dpNext.equal = base + currentBitValue * currentBitCount
-			}
-		}
+		nextDp := dp
 
-		// equalからlessThanへの遷移
-		if dp.equal != -1 {
-			if kBit == 1 {
-				dpNext.lessThan = dp.equal + currentBitValue * (n - currentBitCount)
-			} else {
-				dpNext.lessThan = dp.equal + currentBitValue * currentBitCount
-			}
-		}
-
-		// lessThanからlessThanへの遷移
-		if currentBitValue <= k {
-			if kBit == 1 {
-				dpNext.lessThan = max(dpNext.lessThan, dp.lessThan + currentBitValue * (n - currentBitCount), dp.lessThan + currentBitValue * currentBitCount)
-			} else {
-				dpNext.lessThan = max(dpNext.lessThan, dp.lessThan + currentBitValue * currentBitCount)
-			}
+		// equalからの遷移
+		// bitが立っていれば、equalからlessThanへの遷移とequalからequalへの遷移がある
+		if kBit == 1 {
+			nextDp.lessThan = dp.equal + currentBitValue * currentBitCount
+			nextDp.equal = dp.equal + currentBitValue * (n - currentBitCount)
 		} else {
-			dpNext.lessThan = max(dpNext.lessThan, dp.lessThan + currentBitValue * currentBitCount)
+			// bitが立ってなければ、equalからequalへの遷移のみ
+			nextDp.equal = dp.equal + currentBitValue * currentBitCount
 		}
-		dp = dpNext
+
+		// lessThanからの遷移
+		if dp.lessThan != -1 {
+			nextDp.lessThan = max(nextDp.lessThan, dp.lessThan + currentBitValue * currentBitCount, dp.lessThan + currentBitValue * (n - currentBitCount))
+		}
+
+		dp = nextDp
 	}
 
-	ans := max(dp.lessThan, dp.equal)
+	ans := max(dp.equal, dp.lessThan)
 	fmt.Println(ans)
 }
-
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
