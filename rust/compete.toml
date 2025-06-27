@@ -1,3 +1,5 @@
+
+
 # Path to the test file (Liquid template)
 #
 # Variables:
@@ -26,9 +28,9 @@ use proconio::input;
 
 fn main() {
     input! {}
+    println!("Hello world!")
 }
 '''
-
 [template.new]
 # `edition` for `Cargo.toml`.
 edition = "2018"
