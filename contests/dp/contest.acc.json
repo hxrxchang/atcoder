@@ -129,7 +129,11 @@
       "id": "dp_s",
       "label": "S",
       "title": "Digit Sum",
-      "url": "https://atcoder.jp/contests/dp/tasks/dp_s"
+      "url": "https://atcoder.jp/contests/dp/tasks/dp_s",
+      "directory": {
+        "path": "s",
+        "testdir": "tests"
+      }
     },
     {
       "id": "dp_t",
