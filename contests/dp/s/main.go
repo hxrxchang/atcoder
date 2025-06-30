@@ -30,51 +30,61 @@ func main() {
 }
 
 func solve() {
-	k := getInt()
+	k := getStr()
 	d := getInt()
 
-	nums := make([]int, len(i2s(k)))
-	for i, v := range strToSlice(i2s(k), "") {
+	nums := make([]int, len(k))
+	for i, v := range strToSlice(k, "") {
 		nums[i] = s2i(v)
 	}
 
-	type DpItem struct {
-		equal, lessThan []int
-	}
-	dp := DpItem{
-		equal: make([]int, d),
-		lessThan: make([]int, d),
-	}
-	dp.equal[0] = 1
+	// equal[i]: 上位桁がKと等しい状態で、mod D が i になる通り数
+	// less[i]: 上位桁がKより小さい状態で、mod D が i になる通り数
+	equal := make([]int, d)
+	less := make([]int, d)
+	equal[0] = 1
 
 	for i := 0; i < len(nums); i++ {
 		current := nums[i]
-		dpNext := dp
+
+		nextEqual := make([]int, d)
+		nextLess := make([]int, d)
+
 		// equalからの遷移
-		for i := 0; i < d; i++ {
-			for j := 0; j <= 9; j++ {
-				if j > current {
-					break
-				}
-				// equalからequalへの遷移
-				if j == current {
+		for mod := 0; mod < d; mod++ {
+			if equal[mod] == 0 {
+				continue
+			}
+			for digit := 0; digit <= 9; digit++ {
+				newMod := (mod + digit) % d
 
-				} else
-				// equalからlessThanへの遷移
-				{
-
+				if digit < current {
+					nextLess[newMod] = (nextLess[newMod] + equal[mod]) % MOD
+				} else if digit == current {
+					nextEqual[newMod] = (nextEqual[newMod] + equal[mod]) % MOD
 				}
 			}
-
 		}
 
-		// lessThanからの遷移
-		for i := 0; i < d; i++ {
-			for j := 0; j <= 9; j++ {
+		// lessからの遷移（すでにK未満なので0〜9なんでもOK）
+		for mod := 0; mod < d; mod++ {
+			if less[mod] == 0 {
+				continue
+			}
+			for digit := 0; digit <= 9; digit++ {
+				newMod := (mod + digit) % d
+				nextLess[newMod] = (nextLess[newMod] + less[mod]) % MOD
 			}
 		}
+
+		equal = nextEqual
+		less = nextLess
 	}
+
+	ans := (equal[0] - 1 + less[0] + MOD) % MOD
+	fmt.Println(ans)
 }
+
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
