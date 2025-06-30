@@ -32,70 +32,64 @@ func main() {
 func solve() {
 	n := getStr()
 	k := getInt()
-
 	nums := make([]int, len(n))
 	for i, v := range strToSlice(n, "") {
 		nums[i] = s2i(v)
 	}
 
 	equal := make([]int, k+1)
-	for i := 0; i <= k; i++ {
-		equal[i] = -1
-	}
-	lessThan := make([]int, k+1)
-	for i := 0; i <= k; i++ {
-		lessThan[i] = -1
-	}
-	equal[0] = 0
+	less := make([]int, k+1)
+	equal[0] = 1
 
 	for _, current := range nums {
 		nextEqual := make([]int, k+1)
-		nextLessThan := make([]int, k+1)
+		nextLess := make([]int, k+1)
 
 		// equalからの遷移
-		for i := 0; i < k; i++ {
-			if equal[i] == -1 {
+		for cnt := 0; cnt <= k; cnt++ {
+			val := equal[cnt]
+			if val == 0 {
 				continue
 			}
-			for j := 0; j <= 9; j++ {
-				if j == current {
-					if j == 0 {
-						nextEqual[i+1] = equal[i+1]
-					} else {
-						nextEqual[i+1] = equal[i] + 1
+			for d := 0; d <= 9; d++ {
+				if d == current {
+					if d == 0 {
+						nextEqual[cnt] += val
+					} else if cnt+1 <= k {
+						nextEqual[cnt+1] += val
 					}
-				} else if j < current {
-					if j == 0 {
-						nextLessThan[i+1] = equal[i+1]
-					} else {
-						nextLessThan[i+1] = equal[i] + 1
+				} else if d < current {
+					if d == 0 {
+						nextLess[cnt] += val
+					} else if cnt+1 <= k {
+						nextLess[cnt+1] += val
 					}
 				}
 			}
 		}
 
-		// lessThanからの遷移
-		for i := 0; i < k; i++ {
-			if lessThan[i] == -1 {
+		// lessからの遷移
+		for cnt := 0; cnt <= k; cnt++ {
+			val := less[cnt]
+			if val == 0 {
 				continue
 			}
-			for j := 0; j <= 9; j++ {
-				if j == 0 {
-					continue
-				} else {
-					nextLessThan[i+1] = nextLessThan[i] + 1
+			for d := 0; d <= 9; d++ {
+				if d == 0 {
+					nextLess[cnt] += val
+				} else if cnt+1 <= k {
+					nextLess[cnt+1] += val
 				}
 			}
 		}
 
 		equal = nextEqual
-		lessThan = nextLessThan
-
-		fmt.Println(equal, lessThan)
+		less = nextLess
 	}
 
-	fmt.Println(equal[k] + lessThan[k])
+	fmt.Println(equal[k] + less[k])
 }
+
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
