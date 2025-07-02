@@ -30,29 +30,40 @@ func main() {
 }
 
 func solve() {
-	l := strToSlice(getStr(), "")
-	n := len(l)
+	L := strToSlice(getStr(), "")
 
-	equal := 0
-	less := -1
+	equal := 1
+	less := 0
 
-	for _, bit := range l {
-		nextEqual := equal
-		nextLess := less
+	for _, bit := range L {
+		var nextEqual, nextLess int
 
 		// equalからの遷移
 		if bit == "1" {
-			// equalへの遷移
-			nextEqual *= 2
+			// equal への遷移
+			// (0,1), (1,0) の2通り
+			nextEqual = equal * 2 % MOD
+
+			// lessへの遷移
+			// (0, 0)の1通り
+			nextLess = equal % MOD
+		} else {
+			// equal への遷移のみ
+			// (0, 0) の1通り
+			nextEqual = equal % MOD
 		}
 
-		if less != -1 {
-			// lessからの遷移
+		// less から lessへの遷移
+		// (0,0), (1,0), (0,1) の3通り
+		nextLess = (nextLess + less * 3) % MOD
 
-		}
-
+		equal = nextEqual
+		less = nextLess
 	}
+
+	fmt.Println((equal + less) % MOD)
 }
+
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
