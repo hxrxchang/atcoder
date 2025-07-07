@@ -105,7 +105,11 @@
       "id": "dp_o",
       "label": "O",
       "title": "Matching",
-      "url": "https://atcoder.jp/contests/dp/tasks/dp_o"
+      "url": "https://atcoder.jp/contests/dp/tasks/dp_o",
+      "directory": {
+        "path": "o",
+        "testdir": "tests"
+      }
     },
     {
       "id": "dp_p",
