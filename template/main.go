@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"math/bits"
 	"os"
 	"sort"
 	"strconv"
@@ -151,6 +152,10 @@ func bit2i(bits []string) int {
 		panic(err)
 	}
 	return int(result)
+}
+
+func bitCount(n int) int {
+	return bits.OnesCount(uint(n))
 }
 
 func abs(v int) int {
