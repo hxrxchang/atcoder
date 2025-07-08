@@ -62,6 +62,36 @@ func bitCount(n int) int {
 	return bits.OnesCount(uint(n))
 }
 
+func solve2() {
+	n := getInt()
+	a := make([][]int, n)
+	for i := 0; i < n; i++ {
+		a[i] = getInts()
+	}
+
+
+	idx := rangeSlice(n)
+	ans := 0
+	for {
+		ok := true
+		for i := 0; i < n; i++ {
+			if a[i][idx[i]] == 0 {
+				ok = false
+				break
+			}
+		}
+
+		if ok {
+			ans += 1
+			ans %= MOD
+		}
+		if !nextPermutation(sort.IntSlice(idx)) {
+			break
+		}
+	}
+
+	fmt.Println(ans)
+}
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 func getInt() int {
