@@ -41,7 +41,7 @@ func solve() {
 	dp[0] = 1
 
 	for tmp := 0; tmp < (1 << n); tmp++ {
-		i := bitsCount(tmp)
+		i := bitCount(tmp)
 		for j := 0; j < n; j++ {
 			// すでに使用済みなのでスキップ
 			if (tmp>>j)&1 == 1 {
@@ -58,7 +58,7 @@ func solve() {
 	fmt.Println(dp[(1<<n)-1])
 }
 
-func bitsCount(n int) int {
+func bitCount(n int) int {
 	return bits.OnesCount(uint(n))
 }
 
