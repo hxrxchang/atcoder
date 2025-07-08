@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"math/bits"
 	"os"
 	"sort"
 	"strconv"
@@ -39,14 +40,17 @@ func solve() {
 	dp := make([]int, 1<<n)
 	dp[0] = 1
 
-	for bit := 0; bit < (1 << n); bit++ {
-		i := bitsCount(bit)
+	for tmp := 0; tmp < (1 << n); tmp++ {
+		i := bitsCount(tmp)
 		for j := 0; j < n; j++ {
-			if (bit>>j)&1 == 1 {
+			// すでに使用済みなのでスキップ
+			if (tmp>>j)&1 == 1 {
 				continue
 			}
+			// jをつかってiとマッチングできる
 			if a[i][j] == 1 {
-				dp[bit|(1<<j)] = (dp[bit|(1<<j)] + dp[bit]) % MOD
+				next := tmp | (1 << j)
+				dp[next] = (dp[next] + dp[tmp]) % MOD
 			}
 		}
 	}
@@ -55,12 +59,7 @@ func solve() {
 }
 
 func bitsCount(n int) int {
-	count := 0
-	for n > 0 {
-		count += n & 1
-		n >>= 1
-	}
-	return count
+	return bits.OnesCount(uint(n))
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -183,6 +182,8 @@ func bit2i(bits []string) int {
 	}
 	return int(result)
 }
+
+
 
 func abs(v int) int {
 	if v < 0 {
