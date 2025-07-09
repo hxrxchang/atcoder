@@ -37,10 +37,12 @@ func solve() {
 		a[i] = getInts()
 	}
 
+	// dp[i]: iのbitがたっている女性を使ってマッチングできるパターン数
 	dp := make([]int, 1<<n)
 	dp[0] = 1
 
 	for tmp := 0; tmp < (1 << n); tmp++ {
+		// bitが立っている数 = 先頭から何人の男性を使うか
 		i := bitCount(tmp)
 		for j := 0; j < n; j++ {
 			// すでに使用済みなのでスキップ
