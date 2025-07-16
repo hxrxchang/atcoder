@@ -33,25 +33,24 @@ func main() {
 func solve() {
 	in := getInts()
 	n, k := in[0], in[1]
-	a := getInts()
-	idxes := rangeSlice(n)
+	a := sortSlice(getInts())
 
-	set := newSet[int]()
-	for i := 1; i <= n; i++ {
-		combinations := getCombinations(idxes, i)
-		for _, comb := range combinations {
-			tmp := 0
-			for _, v := range comb {
-				tmp += a[v]
-			}
-			set.Add(tmp)
+	heap := newMyHeap[int]()
+	heap.push(0)
+
+	res := newSet[int]()
+	for res.Size() <= k {
+		tmp := heap.pop()
+		if res.Has(tmp) {
+			continue
+		}
+		res.Add(tmp)
+		for i := 0; i < n; i++ {
+			heap.push(a[i] + tmp)
 		}
 	}
 
-	res := set.Values()
-	res = sortSlice(res)
-	ans := res[k-1]
-	fmt.Println(res)
+	ans := sortSlice(res.Values())[k]
 	fmt.Println(ans)
 }
 
