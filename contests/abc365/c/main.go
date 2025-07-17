@@ -35,26 +35,27 @@ func solve() {
 	n, m := in[0], in[1]
 	a := getInts()
 
-	ok := 0
-	ng := pow(10, 9) + 1
+	// ngの境界を探索する
+	left := 0
+	right := pow(10, 9) + 1
 
-	for ng - ok > 1 {
-		mid := (ok + ng) / 2
+	for left < right {
+		x := (left + right) / 2
 		tmp := 0
 		for i := 0; i < n; i++ {
-			tmp += min(mid, a[i])
+			tmp += min(x, a[i])
 		}
 		if tmp <= m {
-			ok = mid
+			left = x + 1
 		} else {
-			ng = mid
+			right = x
 		}
 	}
 
-	if ok == pow(10, 9) {
+	if left == pow(10, 9) + 1 {
 		fmt.Println("infinite")
 	} else {
-		fmt.Println(ok)
+		fmt.Println(left-1)
 	}
 }
 
