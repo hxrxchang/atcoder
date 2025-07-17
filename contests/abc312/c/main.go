@@ -41,7 +41,7 @@ func solve() {
 	left := 0
 	right := pow(10, 9) + 1
 
-	for right - left > 1 {
+	for left < right {
 		price := (right + left) / 2
 
 		// priceで売っていい売り手の数
@@ -53,7 +53,7 @@ func solve() {
 		if cntA >= cntB {
 			right = price
 		} else {
-			left = price
+			left = price + 1
 		}
 	}
 
