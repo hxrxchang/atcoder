@@ -31,7 +31,11 @@
       "id": "abc257_d",
       "label": "D",
       "title": "Jumping Takahashi 2",
-      "url": "https://atcoder.jp/contests/abc257/tasks/abc257_d"
+      "url": "https://atcoder.jp/contests/abc257/tasks/abc257_d",
+      "directory": {
+        "path": "d",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc257_e",
