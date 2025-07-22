@@ -37,7 +37,11 @@
       "id": "abc174_e",
       "label": "E",
       "title": "Logs",
-      "url": "https://atcoder.jp/contests/abc174/tasks/abc174_e"
+      "url": "https://atcoder.jp/contests/abc174/tasks/abc174_e",
+      "directory": {
+        "path": "e",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc174_f",
