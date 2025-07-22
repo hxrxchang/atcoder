@@ -36,16 +36,17 @@ type Jump struct {
 
 func solve() {
 	n := getInt()
-
 	jumps := make([]Jump, n)
+
 	for i := 0; i < n; i++ {
 		in := getInts()
 		x, y, p := in[0], in[1], in[2]
 		jumps[i] = Jump{x, y, p}
 	}
 
-	left := 1
-	right := pow(10, 12)
+	left := 0
+	right := pow(10, 10)
+
 	for left < right {
 		mid := (left + right) / 2
 		if check(jumps, mid) {
@@ -60,28 +61,33 @@ func solve() {
 
 func check(jumps []Jump, power int) bool {
 	n := len(jumps)
+	s := int64(power)
 	graph := make([][]int, n)
+
 	for i := 0; i < n; i++ {
 		for j := 0; j < n; j++ {
 			if i == j {
 				continue
 			}
-			d := abs(jumps[i].x - jumps[j].x) + abs(jumps[i].y - jumps[j].y)
-			if jumps[i].p * power >= d {
+			dx := abs(jumps[i].x - jumps[j].x)
+			dy := abs(jumps[i].y - jumps[j].y)
+			dist := int64(dx + dy)
+			p := int64(jumps[i].p)
+			if p * s >= dist {
 				graph[i] = append(graph[i], j)
 			}
 		}
 	}
 
-	for i := 0; i < n; i++ {
+	for start := 0; start < n; start++ {
 		visited := make([]bool, n)
-		visited[i] = true
 		que := newQueue[int]()
-		que.PushBack(i)
+		visited[start] = true
+		que.PushBack(start)
 
 		for que.Size() > 0 {
-			tmp := que.PopFront()
-			for _, next := range graph[tmp] {
+			curr := que.PopFront()
+			for _, next := range graph[curr] {
 				if !visited[next] {
 					visited[next] = true
 					que.PushBack(next)
@@ -97,7 +103,6 @@ func check(jumps []Jump, power int) bool {
 
 	return false
 }
-
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 func getInt() int {
