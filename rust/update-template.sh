@@ -29,7 +29,7 @@ read -r -d '' TEMPLATE_CONTENT < "$TEMPLATE_RS"
 STATE="NORMAL" # NORMAL, IN_TEMPLATE_SECTION
 
 # 一時ファイルを空にし、処理を開始
-echo "" > "$TEMP_TOML"
+> "$TEMP_TOML"
 
 while IFS= read -r line; do
     if [[ "$line" =~ ^\[template\] ]]; then
