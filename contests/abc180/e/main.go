@@ -53,15 +53,12 @@ func solve() {
 
 	dp[1][0] = 0
 
-	for bit := 0; bit < (1 << n); bit++ {
+	for bit := 1; bit < (1 << n); bit++ {
 		for from := 0; from < n; from++ {
 			if dp[bit][from] == BIGGEST {
 				continue
 			}
 			for to := 0; to < n; to++ {
-				if bit&(1<<to) != 0 {
-					continue
-				}
 				cost := abs(cities[from].x-cities[to].x) + abs(cities[from].y-cities[to].y) + max(0, cities[to].z-cities[from].z)
 				nextBit := bit | (1 << to)
 				dp[nextBit][to] = min(dp[nextBit][to], dp[bit][from]+cost)
