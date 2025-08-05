@@ -37,7 +37,11 @@
       "id": "abc215_e",
       "label": "E",
       "title": "Chain Contestant",
-      "url": "https://atcoder.jp/contests/abc215/tasks/abc215_e"
+      "url": "https://atcoder.jp/contests/abc215/tasks/abc215_e",
+      "directory": {
+        "path": "e",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc215_f",
