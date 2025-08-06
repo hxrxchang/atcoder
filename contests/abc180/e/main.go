@@ -53,7 +53,7 @@ func solve() {
 
 	dp[1][0] = 0
 
-	for bit := 1; bit < (1 << n); bit++ {
+	for bit := 1; bit < (1 << n)-1; bit++ {
 		for from := 0; from < n; from++ {
 			if dp[bit][from] == BIGGEST {
 				continue
