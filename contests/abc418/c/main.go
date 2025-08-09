@@ -32,9 +32,11 @@ func main() {
 
 func solve() {
 	in := getInts()
-	n, q := in[0], in[1]
+	n, m := in[0], in[1]
+
 	a := getInts()
 	a = sortSlice(a)
+
 	sumA := sum(a)
 
 	accm := make([]int, n+1)
@@ -42,21 +44,17 @@ func solve() {
 		accm[i+1] = accm[i] + a[i]
 	}
 
-	for i := 0; i < q; i++ {
-		b := getInt()
-		limit := b - 1
+	for i := 0; i < m; i++ {
+		b := getInt() - 1
+		idx := upperBound(a, b)
 
-		idx := upperBound(a, limit)
-
-		leftSum := accm[idx]
-		cntRight := n - idx
-		sumRight := cntRight * limit
-		ans := leftSum + sumRight + 1
-
-		if ans > sumA {
+		cnt := accm[idx]
+		leftCnt := (n - idx) * b
+		needsCnt := cnt + leftCnt + 1
+		if needsCnt > sumA {
 			fmt.Println(-1)
 		} else {
-			fmt.Println(ans)
+			fmt.Println(needsCnt)
 		}
 	}
 }
