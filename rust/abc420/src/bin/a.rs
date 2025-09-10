@@ -9,6 +9,6 @@ fn main() {
     if ans == 0 {
         println!("12");
     } else {
-        println!("{}", ans);
+        println!("{ans}");
     }
 }
