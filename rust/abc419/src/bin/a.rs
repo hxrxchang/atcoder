@@ -13,5 +13,5 @@ fn main() {
     ]);
 
     let ans = *mp.get(s.as_str()).unwrap_or(&"Unknown");
-    println!("{}", ans);
+    println!("{ans}");
 }
