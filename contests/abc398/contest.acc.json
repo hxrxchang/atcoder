@@ -31,7 +31,11 @@
       "id": "abc398_d",
       "label": "D",
       "title": "Bonfire",
-      "url": "https://atcoder.jp/contests/abc398/tasks/abc398_d"
+      "url": "https://atcoder.jp/contests/abc398/tasks/abc398_d",
+      "directory": {
+        "path": "d",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc398_e",
