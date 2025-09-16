@@ -33,34 +33,36 @@ func main() {
 func solve() {
 	in := getInts()
 	n, r, c := in[0], in[1], in[2]
+
 	s := strToSlice(getStr(), "")
 
 	type Item struct {
 		y, x int
 	}
 	st := newSet[Item]()
-	cur := Item{0, 0}
-	st.Add(cur)
+	currentTakahashiPosition := Item{r, c}
+	currentFirePosition := Item{0, 0}
+	st.Add(currentFirePosition)
 
 	ans := make([]string, n)
 	for i := 0; i < n; i++ {
 		switch s[i] {
 		case "N":
-			r++
-			cur.y++
+			currentTakahashiPosition.y++
+			currentFirePosition.y++
 		case "S":
-			r--
-			cur.y--
+			currentTakahashiPosition.y--
+			currentFirePosition.y--
 		case "E":
-			c--
-			cur.x--
+			currentTakahashiPosition.x--
+			currentFirePosition.x--
 		case "W":
-			c++
-			cur.x++
+			currentTakahashiPosition.x++
+			currentFirePosition.x++
 		}
-		st.Add(cur)
+		st.Add(currentFirePosition)
 
-		if st.Has(Item{r, c}) {
+		if st.Has(currentTakahashiPosition) {
 			ans[i] = "1"
 		} else {
 			ans[i] = "0"
