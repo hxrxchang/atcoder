@@ -39,7 +39,11 @@
       "id": "abc399_d",
       "label": "D",
       "title": "Switch Seats",
-      "url": "https://atcoder.jp/contests/abc399/tasks/abc399_d"
+      "url": "https://atcoder.jp/contests/abc399/tasks/abc399_d",
+      "directory": {
+        "path": "d",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc399_e",
