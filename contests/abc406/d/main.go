@@ -32,29 +32,46 @@ func main() {
 
 func solve() {
 	in := getInts()
-	n := in[2]
+	h, w, n := in[0], in[1], in[2]
 
 	// 各行ごとに、どこにゴミがあるか
-	mpH := make(map[int][]int)
+	mpH := make(map[int]*Set[int])
+	for i := 0; i < h; i++ {
+		mpH[i] = newSet[int]()
+	}
 
 	// 各列ごとに、何個ゴミがあるか
-	mpW := make(map[int]int)
+	mpW := make(map[int]*Set[int])
+	for i := 0; i < w; i++ {
+		mpW[i] = newSet[int]()
+	}
 
 	for i := 0; i < n; i++ {
 		in := getInts()
 		y, x := in[0]-1, in[1]-1
-		mpH[y] = append(mpH[y], x)
-		mpW[x]++
+		mpH[y].Add(x)
+		mpW[x].Add(y)
 	}
 
 	q := getInt()
 	for i := 0; i < q; i++ {
 		in := getInts()
 		if in[0] == 1 { // 縦
-			x := in[1] - 1
-
-		} else { // 横
 			y := in[1] - 1
+			xs := mpH[y]
+			fmt.Println(xs.Size())
+			for _, x := range xs.Values() {
+				mpW[x].Remove(y)
+			}
+			mpH[y] = newSet[int]()
+		} else { // 横
+			x := in[1] - 1
+			ys := mpW[x]
+			fmt.Println(ys.Size())
+			for _, y := range ys.Values() {
+				mpH[y].Remove(x)
+			}
+			mpW[x] = newSet[int]()
 		}
 	}
 }
