@@ -45,18 +45,27 @@ func solve() {
 	l = sortSlice(l)
 	r = sortSlice(r)
 
-	cnt := n * (n-1) / 2
+	// 組み合わせの数は最大 nC2
+	ans := n * (n-1) / 2
 
-	j := 0
+	// intervalを一つずつみる。
+	// 今着目しているintervalの始点より、終点が左にあるintervalの個数
+	cnt := 0
+
 	for i := 0; i < n; i++ {
-		for r[j] < l[i] {
-			j++
+		for  {
+			lastIntervalEnd := r[cnt]
+			intervalStart := l[i]
+			if lastIntervalEnd < intervalStart {
+				cnt++
+			} else {
+				break
+			}
 		}
-		fmt.Println(i, j)
-		cnt -= j
+		ans -= cnt
 	}
 
-	fmt.Println(cnt)
+	fmt.Println(ans)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
