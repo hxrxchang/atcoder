@@ -32,37 +32,38 @@ func main() {
 
 func solve() {
 	n := getInt()
-	l := make([]int, n)
-	r := make([]int, n)
 
+	type Event struct {
+		idx int
+		typ string
+	}
+	events := make([]Event, 0)
 	for i := 0; i < n; i++ {
 		in := getInts()
-		a, b := in[0], in[1]
-		l[i] = a
-		r[i] = b
+		l, r := in[0], in[1]
+		events = append(events, Event{l, "open"})
+		events = append(events, Event{r, "close"})
 	}
 
-	l = sortSlice(l)
-	r = sortSlice(r)
-
-	// 組み合わせの数は最大 nC2
-	ans := n * (n-1) / 2
-
-	// intervalを一つずつみる。
-	// 今着目しているintervalの始点より、終点が左にあるintervalの個数
-	cnt := 0
-
-	for i := 0; i < n; i++ {
-		for  {
-			lastIntervalEnd := r[cnt]
-			intervalStart := l[i]
-			if lastIntervalEnd < intervalStart {
-				cnt++
-			} else {
-				break
-			}
+	sort.Slice(events, func(a, b int) bool {
+		if events[a].idx != events[b].idx {
+			return events[a].idx < events[b].idx
 		}
-		ans -= cnt
+		if events[a].typ == "open" {
+			return true
+		}
+		return false
+	})
+
+	ans := 0
+	open := 0
+	for _, e := range events {
+		if e.typ == "open" {
+			ans += open
+			open++
+		} else {
+			open--
+		}
 	}
 
 	fmt.Println(ans)
