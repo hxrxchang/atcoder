@@ -35,15 +35,9 @@ func solve() {
 	n, m := in[0], in[1]
 
 	a := getInts()
+	sumA := sum(a)
 	for i := 0; i < n; i++ {
-		tmp := 0
-		for j := 0; j < n; j++ {
-			if i == j {
-				continue
-			}
-			tmp += a[j]
-		}
-		if tmp == m {
+		if sumA - a[i] == m {
 			fmt.Println("Yes")
 			return
 		}
