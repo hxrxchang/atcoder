@@ -41,11 +41,11 @@ func solve() {
 	st := newSet[string]()
 
 	for i := 0; i < n; i++ {
-		if i + m > n {
+		if i + m - 1 >= n {
 			break
 		}
 		for j := 0; j < n; j++ {
-			if j + m > n {
+			if j + m - 1 >= n {
 				break
 			}
 			tmp := ""
