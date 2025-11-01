@@ -33,56 +33,32 @@ func main() {
 func solve() {
 	in := getInts()
 	n, m := in[0], in[1]
-	baseGrid := make([][]string, n)
+	grid := make([][]string, n)
 	for i := 0; i < n; i++ {
-		baseGrid[i] = strToSlice(getStr(), "")
+		grid[i] = strToSlice(getStr(), "")
 	}
 
-	grids := make([][][]string, 0)
-	for i := 0; i + m <= n; i++ {
-		for j := 0; j + m <= n; j++ {
-			grid := make([][]string, 0)
-			for i2 := 0; i2 < m; i2++ {
-				grid = append(grid, baseGrid[i+i2][j:j+m])
-			}
-			grids = append(grids, grid)
+	st := newSet[string]()
+
+	for i := 0; i < n; i++ {
+		if i + m > n {
+			break
 		}
-	}
-	fmt.Println(calc(grids))
-}
-
-func calc(grids [][][]string) int {
-	checked := make([][][]string, 0)
-	cnt := 0
-	for _, grid := range grids {
-		if !same(checked, grid) {
-			cnt++
-			checked = append(checked, grid)
-		}
-	}
-	return cnt
-}
-
-func same(grids [][][]string, grid [][]string) bool {
-	for _, tmpGrid := range grids {
-		equal := true
-		for i := range tmpGrid {
-			for j := range tmpGrid[i] {
-				if tmpGrid[i][j] != grid[i][j] {
-					equal = false
-					break
-				}
-			}
-			if !equal {
+		for j := 0; j < n; j++ {
+			if j + m > n {
 				break
 			}
-		}
-		if equal {
-			return true
+			tmp := ""
+			for i2 := 0; i2 < m; i2++ {
+				tmp += sliceToStr(grid[i+i2][j:j+m], "")
+			}
+			st.Add(tmp)
 		}
 	}
-	return false
+	fmt.Println(st.Size())
 }
+
+
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
