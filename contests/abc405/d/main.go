@@ -32,50 +32,65 @@ func main() {
 func solve() {
 	in := getInts()
 	h, w := in[0], in[1]
-
 	grid := make([][]string, h)
 	for i := 0; i < h; i++ {
-		grid[i] = strToSlice(getStr(), "")
+		row := strToSlice(getStr(), "")
+		grid[i] = row
 	}
 
+	dist := make([][]int, h)
+	for i := 0; i < h; i++ {
+		row := make([]int, w)
+		for j := 0; j < w; j++ {
+			row[j] = BIGGEST
+		}
+		dist[i] = row
+	}
+
+	type Position struct {
+		y, x int
+	}
+
+	// 非常口の位置をあらかじめ探す
+	exits := make([]Position, 0)
+	for i := 0; i < h; i++ {
+		for j := 0; j < w; j++ {
+			if grid[i][j] == "E" {
+				exits = append(exits, Position{i, j})
+			}
+		}
+	}
+
+	// 非常口からBFSをスタート
 	type BfsItem struct {
 		y, x, dist int
 	}
 	que := newQueue[BfsItem]()
-	type DistItem struct {
-		dist int
-		direction string
+	for _, position := range exits {
+		que.PushBack(BfsItem{position.y, position.x, 0})
+		dist[position.y][position.x] = 0
 	}
 
-	dist := make([][]DistItem, h)
-	for i := 0; i < h; i++ {
-		dist[i] = make([]DistItem, w)
-		for j := 0; j < w; j++ {
-			dist[i][j] = DistItem{dist: BIGGEST, direction: ""}
-		}
-	}
-
-	for i := 0; i < h; i++ {
-		for j := 0; j < w; j++ {
-			if grid[i][j] == "E" {
-				que.PushBack(BfsItem{y: i, x: j, dist: 0})
-				dist[i][j] = DistItem{dist: 0, direction: ""}
-			}
-		}
-	}
-
-	for que.Size() > 0 {
-		item := que.PopFront()
-		y, x, d := item.y, item.x, item.dist
-		for _, next := range getNexts(y, x, h, w) {
-			ny, nx, ndir := next.y, next.x, next.direction
-			if grid[ny][nx] == "#" {
+	for !que.Empty() {
+		position := que.PopFront()
+		tmpY, tmpX, tmpDist := position.y, position.x, position.dist
+		for _, next := range []Position{
+			{tmpY-1, tmpX},
+			{tmpY+1, tmpX},
+			{tmpY, tmpX-1},
+			{tmpY, tmpX+1},
+		} {
+			if next.y < 0 || next.y >= h || next.x < 0 || next.x >= w {
 				continue
 			}
-			if dist[ny][nx].dist == BIGGEST {
-				dist[ny][nx] = DistItem{dist: d + 1, direction: ndir}
-				que.PushBack(BfsItem{y: ny, x: nx, dist: d + 1})
+			if grid[next.y][next.x] == "#" {
+				continue
 			}
+			if dist[next.y][next.x] != BIGGEST {
+				continue
+			}
+			que.PushBack(BfsItem{next.y, next.x, tmpDist+1})
+			dist[next.y][next.x] = tmpDist + 1
 		}
 	}
 
@@ -84,25 +99,43 @@ func solve() {
 		ans[i] = make([]string, w)
 	}
 
-	reverseArrow := map[string]string{
-		"U": "v",
-		"D": "^",
-		"L": ">",
-		"R": "<",
-	}
-
 	for i := 0; i < h; i++ {
 		for j := 0; j < w; j++ {
-			if grid[i][j] != "." {
+			if grid[i][j] == "#" || grid[i][j] == "E" {
 				ans[i][j] = grid[i][j]
 				continue
 			}
-			ans[i][j] = reverseArrow[dist[i][j].direction]
+			var direction int
+			minimum := BIGGEST
+			for i, check := range[]Position{
+				{i-1, j},
+				{i+1, j},
+				{i, j-1},
+				{i, j+1},
+			} {
+				if check.y < 0 || check.y >= h || check.x < 0 || check.x >= w {
+					continue
+				}
+				if dist[check.y][check.x] < minimum {
+					minimum = dist[check.y][check.x]
+					direction = i
+				}
+			}
+			switch direction {
+			case 0:
+				ans[i][j] = "^"
+			case 1:
+				ans[i][j] = "v"
+			case 2:
+				ans[i][j] = "<"
+			case 3:
+				ans[i][j] = ">"
+			}
 		}
 	}
 
-	for i := 0; i < h; i++ {
-		fmt.Println(strings.Join(ans[i], ""))
+	for _, row := range ans {
+		fmt.Println(sliceToStr(row, ""))
 	}
 }
 
