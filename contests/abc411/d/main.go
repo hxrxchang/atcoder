@@ -53,7 +53,7 @@ func solve() {
 	queries = reverse(queries)
 
 	server := 0
-	ans := make([]string, 0)
+	var res strings.Builder
 	for _, query := range queries {
 		switch query.op {
 		case 3:
@@ -62,8 +62,7 @@ func solve() {
 			}
 		case 2:
 			if query.target == server {
-				st := reverse(strToSlice(query.str, ""))
-				ans = append(ans, st...)
+				res.WriteString(reverseString(query.str))
 			}
 		case 1:
 			if query.target == server {
@@ -72,8 +71,8 @@ func solve() {
 		}
 	}
 
-	ans = reverse(ans)
-	fmt.Println(sliceToStr(ans, ""))
+	ans := reverseString(res.String())
+	fmt.Println(ans)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
