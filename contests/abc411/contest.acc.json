@@ -1,0 +1,55 @@
+{
+  "contest": {
+    "id": "abc411",
+    "title": "UNIQUE VISION Programming Contest 2025 Summer (AtCoder Beginner Contest 411)",
+    "url": "https://atcoder.jp/contests/abc411"
+  },
+  "tasks": [
+    {
+      "id": "abc411_a",
+      "label": "A",
+      "title": "Required Length",
+      "url": "https://atcoder.jp/contests/abc411/tasks/abc411_a"
+    },
+    {
+      "id": "abc411_b",
+      "label": "B",
+      "title": "Distance Table",
+      "url": "https://atcoder.jp/contests/abc411/tasks/abc411_b"
+    },
+    {
+      "id": "abc411_c",
+      "label": "C",
+      "title": "Black Intervals",
+      "url": "https://atcoder.jp/contests/abc411/tasks/abc411_c"
+    },
+    {
+      "id": "abc411_d",
+      "label": "D",
+      "title": "Conflict 2",
+      "url": "https://atcoder.jp/contests/abc411/tasks/abc411_d",
+      "directory": {
+        "path": "d",
+        "testdir": "tests"
+      }
+    },
+    {
+      "id": "abc411_e",
+      "label": "E",
+      "title": "E [max]",
+      "url": "https://atcoder.jp/contests/abc411/tasks/abc411_e"
+    },
+    {
+      "id": "abc411_f",
+      "label": "F",
+      "title": "Contraction",
+      "url": "https://atcoder.jp/contests/abc411/tasks/abc411_f"
+    },
+    {
+      "id": "abc411_g",
+      "label": "G",
+      "title": "Count Cycles",
+      "url": "https://atcoder.jp/contests/abc411/tasks/abc411_g"
+    }
+  ]
+}
