@@ -34,7 +34,40 @@ func solve() {
 
 	for i := 0; i < t; i++ {
 		n := getInt()
-		s := getStr()
+		s := strToSlice(getStr(), "")
+
+		// l: sの中で1つ前の文字と比較して辞書順が逆になっている最初の文字
+		// r: lが決まったあと、lより後ろになるlより辞書順が大きい最初の文字
+		// s[l:r+1] の区間を探す
+		l := -1
+		r := n - 1
+		comparison := s[0]
+		for i, v := range s[1:] {
+			// lを探す
+			if l == -1 {
+				if comparison > v {
+					l = i
+				} else {
+					comparison = v
+				}
+			}
+			// rを探す
+			if l != -1 && comparison < v {
+				r = i
+				// rが見つかった段階で終了
+				break
+			}
+		}
+
+		// 操作なし
+		if l == -1 {
+			fmt.Println(sliceToStr(s, ""))
+		} else {
+			pre := sliceToStr(s[:l], "")
+			interval := sliceToStr(s[l+1:r+1], "") + s[l]
+			suf := sliceToStr(s[r+1:], "")
+			fmt.Println(pre + interval + suf)
+		}
 	}
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
