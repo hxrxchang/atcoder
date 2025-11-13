@@ -36,7 +36,7 @@ func solve() {
 	for i := 0; i < t; i++ {
 		in := getInts()
 		n, m, x, y := in[0], in[1], in[2]-1, in[3]-1
-		graph := make([][]int, n)
+		graph := make([][]int, n+1)
 		for i := 0; i < m; i++ {
 			in := getInts()
 			a, b := in[0]-1, in[1]-1
@@ -48,34 +48,54 @@ func solve() {
 			graph[i] = sortSlice(graph[i])
 		}
 
-		visited := make([]bool, n)
-		path := make([]int, 0)
-		var dfs func(x, y int)
-		dfs = func(x, y int) {
-			path = append(path, x)
-			visited[x] = true
-			if x == y {
-				out(path)
-				return
+		path := []int{x}
+		for {
+			tmp := path[len(path)-1]
+			if tmp == y {
+				break
 			}
-			for _, next := range graph[x] {
-				if !visited[next] {
-					dfs(next, y)
+			for _, next := range graph[tmp] {
+				reached := false
+				visited := make([]bool, n)
+				for _, v := range path {
+					visited[v] = true
+				}
+				if visited[next] {
+					continue
+				}
+				que := newQueue[int]()
+				que.PushBack(next)
+				visited[next] = true
+				for que.Size() > 0 {
+					v := que.PopFront()
+					if v == y {
+						reached = true
+						break
+					}
+
+					for _, next := range graph[v] {
+						if !visited[next] {
+							que.PushBack(next)
+							visited[next] = true
+						}
+					}
+				}
+				if reached  {
+					path = append(path, next)
+					break
 				}
 			}
-			path = path[:len(path)-1]
 		}
-		dfs(x, y)
+
+		res := make([]int, len(path))
+		for i, v := range path {
+			res[i] = v + 1
+		}
+		printSlice(res)
 	}
 }
 
-func out(x []int) {
-	res := make([]int, len(x))
-	for i, v := range x {
-		res[i] = v + 1
-	}
-	printSlice(res)
-}
+
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
