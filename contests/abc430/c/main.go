@@ -35,7 +35,32 @@ func solve() {
 	n, a, b := in[0], in[1], in[2]
 	s := strToSlice(getStr(), "")
 
+	accmA := make([]int, n+1)
+	accmB := make([]int, n+1)
 
+	for i, v := range s {
+		accmA[i+1] = accmA[i]
+		accmB[i+1] = accmB[i]
+		if v == "a" {
+			accmA[i+1]++
+		} else {
+			accmB[i+1]++
+		}
+	}
+
+	cnt := 0
+	for l := 1; l <= n; l++ {
+		r := lowerBound(accmA, accmA[l-1]+a)
+		if r <= n {
+			// aに関しては[r:]の区間はrとして選択可能なので n-r+1種類になる
+			rangeCnt := n - r + 1
+			// bに関しては[r:]の区間の中で、選択不可能な数を引く
+			rangeCnt -= countInRange(accmB[r:], accmB[l-1]+b, BIGGEST)
+			cnt += rangeCnt
+		}
+	}
+
+	fmt.Println(cnt)
 }
 
 
