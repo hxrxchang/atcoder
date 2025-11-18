@@ -37,23 +37,20 @@ func solve() {
 		in := getInts()
 		_, m := in[0], in[1]
 		a := getInts()
-		b := sortSlice(getInts())
+		b := getInts()
 
-		aSet := newSortedSet[int]()
+		aSet := newMultiset[int]()
 		for _, v := range a {
-			aSet.add(v)
+			aSet.Add(v)
 		}
-
-		aSet.add(1)
-		fmt.Println(aSet.String())
 
 		cnt := 0
 		for _, v := range b {
 			x := m - v
-			find := aSet.lowerBound(x)
+			find := aSet.LowerBound(x)
 			if find.IsValid() {
 				cnt++
-				aSet.remove(find.Value())
+				aSet.Remove(find.Value())
 			}
 		}
 
@@ -730,35 +727,29 @@ func (s *SortedSet[T]) lessThan(v T) (*T, error) {
 	return nil, fmt.Errorf("not found")
 }
 
-// multiset
 type MultiSet[T comparable] struct {
-	set *Set[T]
+	*set.MultiSet[T]
 	mapping map[T]int
 }
+// multiset
 func newMultiset[T comparator.Ordered]() *MultiSet[T] {
-	set := newSet[T]()
-	mapping := make(map[T]int)
-	return &MultiSet[T]{
-		set, mapping,
-	}
+	var comparatorFn comparator.Comparator[T] = comparator.OrderedTypeCmp[T]
+	ms := set.NewMultiSet[T](comparatorFn, set.WithGoroutineSafe())
+	return &MultiSet[T]{MultiSet: ms, mapping: make(map[T]int)}
 }
 func (ms *MultiSet[T]) Add(v T) {
+	ms.Insert(v)
 	ms.mapping[v]++
-	ms.set.Add(v)
 }
 func (ms *MultiSet[T]) Remove(v T) {
 	ms.mapping[v] = max(0, ms.mapping[v] - 1)
 	if ms.mapping[v] == 0 {
-		ms.set.Remove(v)
+		ms.Erase(v)
 	}
 }
 func (ms *MultiSet[T]) Has(v T) bool {
-	return ms.set.Has(v)
+	return ms.Contains(v)
 }
-func (ms *MultiSet[T]) Size() int {
-	return ms.set.Size()
-}
-
 
 // heap (priority queue)
 // 1.21 以上になったら cmp.Ordered に変更する
