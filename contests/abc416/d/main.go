@@ -44,17 +44,21 @@ func solve() {
 			aSet.Add(v)
 		}
 
-		cnt := 0
+		ans := 0
 		for _, v := range b {
 			x := m - v
 			find := aSet.LowerBound(x)
 			if find.IsValid() {
-				cnt++
+				ans += (v + find.Value()) % m
 				aSet.Remove(find.Value())
+			} else {
+				ans += v
 			}
 		}
 
-		ans := sum(a) + sum(b) - cnt * m
+		// 余ったaを足し合わせる
+		ans += sum(aSet.All())
+
 		fmt.Println(ans)
 	}
 }
@@ -749,6 +753,22 @@ func (ms *MultiSet[T]) Remove(v T) {
 }
 func (ms *MultiSet[T]) Has(v T) bool {
 	return ms.Contains(v)
+}
+func (ms *MultiSet[T]) All() []T {
+	// 全部取ってくる
+	res := make([]T, 0, ms.Size())
+	for ms.Size() > 0 {
+		first := ms.First()
+		res = append(res, first.Value())
+		ms.Remove(first.Value())
+	}
+
+	// 元に戻す
+	for _, v := range res {
+		ms.Add(v)
+	}
+
+	return res
 }
 
 // heap (priority queue)
