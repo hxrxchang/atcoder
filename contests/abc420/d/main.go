@@ -52,73 +52,78 @@ func solve() {
 		}
 	}
 
-	visited := make([][][]bool, h)
+	dist := make([][][]int, h)
 	for i := 0; i < h; i++ {
-		visited[i] = make([][]bool, w)
+		dist[i] = make([][]int, w)
 		for j := 0; j < w; j++ {
-			visited[i][j] = make([]bool, 2)
+			dist[i][j] = make([]int, 2)
+			dist[i][j][0] = BIGGEST
+			dist[i][j][1] = BIGGEST
 		}
 	}
 
 	type QueItem struct {
 		GridItem
-		cnt int
-		switchOn bool
+		z int
+		dist int
 	}
 	que := newQueue[QueItem]()
-	que.PushBack(QueItem{start, 0, false})
-	visited[0][0][0] = true
+	que.PushBack(QueItem{start, 0, 0})
+	dist[start.y][start.x][0] = 0
 	for que.Size() > 0 {
 		tmp := que.PopFront()
-		fmt.Println(tmp)
-		if tmp.y == goal.y && tmp.x == goal.x {
-			fmt.Println(tmp.cnt)
-			return
-		}
 		for _, next := range []GridItem{
 			{tmp.y - 1, tmp.x},
 			{tmp.y + 1, tmp.x},
 			{tmp.y, tmp.x - 1},
 			{tmp.y, tmp.x + 1},
 		}{
-			if next.y < 0 || next.y >= h || next.x < 0 || next.x >= w {
+			nextY := next.y
+			nextX := next.x
+			if nextY < 0 || nextY >= h || nextX < 0 || nextX >= w {
 				continue
 			}
-			nextGridVisited := visited[next.y][next.x]
-			if tmp.switchOn && nextGridVisited[1] {
+
+			nextGrid := grid[next.y][next.x]
+			if nextGrid == "#" {
 				continue
 			}
-			if !tmp.switchOn && nextGridVisited[0] {
-				continue
-			}
-			if grid[next.y][next.x] == "#" {
-				continue
-			}
-			if grid[next.y][next.x] == "o" && tmp.switchOn {
-				continue
-			}
-			if grid[next.y][next.x] == "x" && !tmp.switchOn {
-				continue
-			}
-			if grid[next.y][next.x] == "?" {
-				que.PushBack(QueItem{GridItem{next.y, next.x}, tmp.cnt+1, !tmp.switchOn})
-				if tmp.switchOn {
-					visited[next.y][next.x][0] = true
-				} else {
-					visited[next.y][next.x][1] = true
+			if nextGrid == "o" {
+				// スイッチが奇数回押されているのでoは閉じている
+				if tmp.z == 1 {
+					continue
 				}
+			}
+			if nextGrid == "x" {
+				// スイッチが偶数回 or 0回押されているのでxは閉じている
+				if tmp.z == 0 {
+					continue
+				}
+			}
+			if nextGrid == "?" {
+				nextZ := (tmp.z + 1) % 2
+				if dist[nextY][nextX][nextZ] != BIGGEST {
+					continue
+				}
+				dist[nextY][nextX][nextZ] = tmp.dist + 1
+				que.PushBack(QueItem{GridItem{nextY, nextX}, nextZ, tmp.dist + 1})
 			} else {
-				que.PushBack(QueItem{GridItem{next.y, next.x}, tmp.cnt+1, tmp.switchOn})
-				if tmp.switchOn {
-					visited[next.y][next.x][1] = true
-				} else {
-					visited[next.y][next.x][0] = true
+				if dist[nextY][nextX][tmp.z] != BIGGEST {
+					continue
 				}
+				dist[nextY][nextX][tmp.z] = tmp.dist + 1
+				que.PushBack(QueItem{GridItem{nextY, nextX}, tmp.z, tmp.dist + 1})
 			}
 		}
+
 	}
 
-	fmt.Println(-1)
+	if dist[goal.y][goal.x][0] == BIGGEST && dist[goal.y][goal.x][1] == BIGGEST {
+		fmt.Println(-1)
+	} else {
+		ans := min(dist[goal.y][goal.x][0], dist[goal.y][goal.x][1])
+		fmt.Println(ans)
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
