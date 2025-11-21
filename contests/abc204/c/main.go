@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"math/bits"
 	"os"
 	"sort"
 	"strconv"
@@ -32,37 +33,36 @@ func main() {
 func solve() {
 	in := getInts()
 	n, m := in[0], in[1]
-
 	graph := make([][]int, n)
+
 	for i := 0; i < m; i++ {
-		in = getInts()
+		in := getInts()
 		a, b := in[0]-1, in[1]-1
 		graph[a] = append(graph[a], b)
 	}
 
-	cnt := 0
+	ans := 0
 	for i := 0; i < n; i++ {
 		visited := make([]bool, n)
-		var dfs func(int)
-		dfs = func(node int) {
-			if visited[node] {
-				return
-			}
-			visited[node] = true
-			for _, next := range graph[node] {
-				dfs(next)
+		var dfs func(x int)
+		dfs = func(x int) {
+			visited[x] = true
+			for _, next := range graph[x] {
+				if !visited[next] {
+					dfs(next)
+				}
 			}
 		}
 		dfs(i)
 
-		for j := 0; j < n; j++ {
-			if visited[j] {
-				cnt++
+		for _, v := range visited {
+			if v {
+				ans++
 			}
 		}
 	}
 
-	fmt.Println(cnt)
+	fmt.Println(ans)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -186,6 +186,10 @@ func bit2i(bits []string) int {
 	return int(result)
 }
 
+func bitCount(n int) int {
+	return bits.OnesCount(uint(n))
+}
+
 func abs(v int) int {
 	if v < 0 {
 		return -v
@@ -276,23 +280,23 @@ func modInverse(a, m int) int {
 }
 
 //----------------------------------------
-// modint
+// ModInt
 //----------------------------------------
-type modint struct {
+type ModInt struct {
 	mod       int
 	factMemo  []int
 	ifactMemo []int
 }
 
-func newModint(m int) *modint {
-	var ret modint
+func newModint(m int) *ModInt {
+	var ret ModInt
 	ret.mod = m
 	ret.factMemo = []int{1, 1}
 	ret.ifactMemo = []int{1, 1}
 	return &ret
 }
 
-func (m *modint) add(a, b int) int {
+func (m *ModInt) add(a, b int) int {
 	ret := (a + b) % m.mod
 	if ret < 0 {
 		ret += m.mod
@@ -300,7 +304,7 @@ func (m *modint) add(a, b int) int {
 	return ret
 }
 
-func (m *modint) sub(a, b int) int {
+func (m *ModInt) sub(a, b int) int {
 	ret := (a - b) % m.mod
 	if ret < 0 {
 		ret += m.mod
@@ -308,7 +312,7 @@ func (m *modint) sub(a, b int) int {
 	return ret
 }
 
-func (m *modint) mul(a, b int) int {
+func (m *ModInt) mul(a, b int) int {
 	a %= m.mod
 	b %= m.mod
 	ret := a * b % m.mod
@@ -318,14 +322,14 @@ func (m *modint) mul(a, b int) int {
 	return ret
 }
 
-func (m *modint) div(a, b int) int {
+func (m *ModInt) div(a, b int) int {
 	a %= m.mod
-	ret := a * m.modinv(b)
+	ret := a * m.modInv(b)
 	ret %= m.mod
 	return ret
 }
 
-func (m *modint) pow(p, n int) int {
+func (m *ModInt) pow(p, n int) int {
 	ret := 1
 	x := p % m.mod
 	for n != 0 {
@@ -341,7 +345,7 @@ func (m *modint) pow(p, n int) int {
 
 
 // 拡張オイラーの互除法で逆元を求める
-func (mm *modint) modinv(a int) int {
+func (mm *ModInt) modInv(a int) int {
 	m := mm.mod
 	b, u, v := m, 1, 0
 	for b != 0 {
@@ -362,7 +366,7 @@ func (mm *modint) modinv(a int) int {
 // 行列累乗
 // 　A[][]のp乗を求める
 //-----------------------------------------------
-func (m *modint) powModMatrix(A [][]int, p int) [][]int {
+func (m *ModInt) powModMatrix(A [][]int, p int) [][]int {
 	N := len(A)
 	ret := make([][]int, N)
 	for i := 0; i < N; i++ {
@@ -381,7 +385,7 @@ func (m *modint) powModMatrix(A [][]int, p int) [][]int {
 	return ret
 }
 
-func (m *modint) mulMod(A, B [][]int) [][]int {
+func (m *ModInt) mulMod(A, B [][]int) [][]int {
 	H := len(A)
 	W := len(B[0])
 	K := len(A[0])
@@ -407,7 +411,7 @@ func (m *modint) mulMod(A, B [][]int) [][]int {
 //                ※pow(x, p-2)を何度も取るので
 // 厳しそうな場合は、ここを削除して高速なのを使う
 //---------------------------------------------------
-func (m *modint) mfact(n int) int {
+func (m *ModInt) mfact(n int) int {
 	if len(m.factMemo) > n {
 		return m.factMemo[n]
 	}
@@ -421,7 +425,7 @@ func (m *modint) mfact(n int) int {
 	return m.factMemo[n]
 }
 
-func (m *modint) mifact(n int) int {
+func (m *ModInt) mifact(n int) int {
 	if len(m.ifactMemo) > n {
 		return m.ifactMemo[n]
 	}
@@ -435,7 +439,7 @@ func (m *modint) mifact(n int) int {
 	return m.ifactMemo[n]
 }
 
-func (m *modint) nCr(n, r int) int {
+func (m *ModInt) nCr(n, r int) int {
 	if n == r {
 		return 1
 	}
@@ -682,6 +686,9 @@ func(s *Set[V]) Pop() V {
 	s.Remove(v)
 	return v
 }
+func (s *Set[V]) Clear() {
+	s.values = make(map[V]struct{})
+}
 
 
 // sorted set
@@ -692,28 +699,19 @@ func newSortedSet[T comparator.Ordered]() *SortedSet[T] {
 	var comparatorFn comparator.Comparator[T] = comparator.OrderedTypeCmp[T]
 	return &SortedSet[T]{set.New[T](comparatorFn)}
 }
-func (s *SortedSet[T]) add(v T) {
+func (s *SortedSet[T]) Add(v T) {
 	s.Insert(v)
 }
-func (s *SortedSet[T]) remove(v T) {
+func (s *SortedSet[T]) Remove(v T) {
 	s.Erase(v)
 }
-func (s *SortedSet[T]) has(v T) bool {
+func (s *SortedSet[T]) Has(v T) bool {
 	return s.Contains(v)
 }
-func (s *SortedSet[T]) size() int {
-	return s.Size()
-}
-func (s *SortedSet[T]) lowerBound(v T) *set.SetIterator[T] {
-	return s.LowerBound(v)
-}
-func (s *SortedSet[T]) upperBound(v T) *set.SetIterator[T] {
-	return s.UpperBound(v)
-}
 // 指定した値未満の最大の値を取得
-func (s *SortedSet[T]) lessThan(v T) (*T, error) {
-	if s.lowerBound(v).Prev().IsValid() {
-		res := s.lowerBound(v).Prev().Value()
+func (s *SortedSet[T]) LessThan(v T) (*T, error) {
+	if s.LowerBound(v).Prev().IsValid() {
+		res := s.LowerBound(v).Prev().Value()
 		return &res, nil
 	}
 	if s.Last().IsValid() {
@@ -731,7 +729,7 @@ type MultiSet[T comparable] struct {
 	mapping map[T]int
 }
 // multiset
-func newMultiset[T comparator.Ordered]() *MultiSet[T] {
+func newMultiSet[T comparator.Ordered]() *MultiSet[T] {
 	var comparatorFn comparator.Comparator[T] = comparator.OrderedTypeCmp[T]
 	ms := set.NewMultiSet[T](comparatorFn, set.WithGoroutineSafe())
 	return &MultiSet[T]{MultiSet: ms, mapping: make(map[T]int)}
@@ -748,6 +746,22 @@ func (ms *MultiSet[T]) Remove(v T) {
 }
 func (ms *MultiSet[T]) Has(v T) bool {
 	return ms.Contains(v)
+}
+func (ms *MultiSet[T]) All() []T {
+	// 全部取ってくる
+	res := make([]T, 0, ms.Size())
+	for ms.Size() > 0 {
+		first := ms.First()
+		res = append(res, first.Value())
+		ms.Remove(first.Value())
+	}
+
+	// 元に戻す
+	for _, v := range res {
+		ms.Add(v)
+	}
+
+	return res
 }
 
 // heap (priority queue)
@@ -1416,6 +1430,7 @@ func gridBfs(height, width int, nextNodes map[GridBfsNode][]GridBfsNode, start G
 // ワーシャルフロイド法
 // graphは、到達不能な場合はmath.MaxInt64を入れる
 // 自分自身への経路は0を入れる
+// 計算量はO(V^3) ただし、Vは頂点数
 func warshallFloyd(graph [][]int) [][]int {
 	// ノード数
 	n := len(graph)
@@ -1443,7 +1458,8 @@ func warshallFloyd(graph [][]int) [][]int {
 }
 
 // ダイクストラ法
-func dijkstra(graph [][]dijkstraItem, start int) []int {
+// 計算量は O((V + E) log V) ただし、Vは頂点数、Eは辺の数
+func dijkstra(graph [][]DijkstraItem, start int) []int {
 	n := len(graph)
 	dist := make([]int, n)
 	for i := range dist {
@@ -1462,12 +1478,12 @@ func dijkstra(graph [][]dijkstraItem, start int) []int {
 		dist[start] = 0
 	}
 
-	pq := &dijkstraPriorityQueue{}
+	pq := &DijkstraPriorityQueue{}
 	heap.Init(pq)
-	heap.Push(pq, &dijkstraItem{node: start, dist: 0})
+	heap.Push(pq, &DijkstraItem{node: start, dist: 0})
 
 	for pq.Len() > 0 {
-		u := heap.Pop(pq).(*dijkstraItem)
+		u := heap.Pop(pq).(*DijkstraItem)
 		if u.dist > dist[u.node] {
 			continue
 		}
@@ -1477,29 +1493,29 @@ func dijkstra(graph [][]dijkstraItem, start int) []int {
 			alt := u.dist + edge.dist
 			if alt < dist[v] {
 				dist[v] = alt
-				heap.Push(pq, &dijkstraItem{node: v, dist: alt})
+				heap.Push(pq, &DijkstraItem{node: v, dist: alt})
 			}
 		}
 	}
 
 	return dist
 }
-type dijkstraItem struct {
+type DijkstraItem struct {
 	node int
 	dist   int
 }
-type dijkstraPriorityQueue []*dijkstraItem
-func (pq dijkstraPriorityQueue) Len() int { return len(pq) }
-func (pq dijkstraPriorityQueue) Less(i, j int) bool {
+type DijkstraPriorityQueue []*DijkstraItem
+func (pq DijkstraPriorityQueue) Len() int { return len(pq) }
+func (pq DijkstraPriorityQueue) Less(i, j int) bool {
 	return pq[i].dist < pq[j].dist
 }
-func (pq dijkstraPriorityQueue) Swap(i, j int) {
+func (pq DijkstraPriorityQueue) Swap(i, j int) {
 	pq[i], pq[j] = pq[j], pq[i]
 }
-func (pq *dijkstraPriorityQueue) Push(x interface{}) {
-	*pq = append(*pq, x.(*dijkstraItem))
+func (pq *DijkstraPriorityQueue) Push(x interface{}) {
+	*pq = append(*pq, x.(*DijkstraItem))
 }
-func (pq *dijkstraPriorityQueue) Pop() interface{} {
+func (pq *DijkstraPriorityQueue) Pop() interface{} {
 	old := *pq
 	n := len(old)
 	item := old[n-1]
