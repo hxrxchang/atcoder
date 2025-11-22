@@ -37,37 +37,33 @@ func solve() {
 		s[i] = s2i(v)
 	}
 
-	// s[i]が属する連続部分文字列で、自分と同じ文字が何文字連続しているか
-	data := make([]int, len(s))
+	// ラフレングス圧縮
+	type Item struct {
+		x int
+		cnt int
+	}
+	data := make([]Item, 0)
 
-	prev := -1
-	start := -1
-	cnt := 0
-
-	for i, v := range s {
-		if v != prev {
-			if start != -1 {
-				for j := start; j < i; j++ {
-					data[j] = cnt
-				}
-			}
-			prev = v
-			start = i
+	tmp := s[0]
+	cnt := 1
+	for _, v := range s[1:] {
+		if v != tmp {
+			data = append(data, Item{tmp, cnt})
+			tmp = v
 			cnt = 1
 		} else {
 			cnt++
 		}
 	}
-	for i := start; i < len(s); i++ {
-		data[i] = cnt
-	}
+	data = append(data, Item{tmp, cnt})
 
 	ans := 0
-	for i := 0; i < len(s)-1; i++ {
-		l := s[i]
-		r := s[i+1]
-		if r - l == 1 {
-			ans += min(data[i], data[i+1])
+	for i := range data[:len(data)-1] {
+		left := data[i]
+		right := data[i+1]
+
+		if right.x - left.x == 1 {
+			ans += min(left.cnt, right.cnt)
 		}
 	}
 
