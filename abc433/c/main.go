@@ -31,39 +31,47 @@ func main() {
 }
 
 func solve() {
-	s := getStr()
-
-	cnt := 0
-	var rec func(s string)
-	rec = func(s string) {
-		fmt.Println(s)
-		if (len(s) < 2) {
-			return
-		}
-		pre := s[:len(s)/2]
-		sub := s[len(s)/2:]
-		pre2 := s[:len(s)/2+1]
-		sub2 := s[len(s)/2+1:]
-
-		if pre == sub || pre2 == sub2 {
-			cnt++
-		}
-
-		rec(pre)
-		rec(sub)
-
-		// if (len(s) % 2 == 1) {
-		// 	pre2 := s[:len(s)/2+1]
-		// 	rec(pre2)
-		// 	sub2 := s[len(s)/2+1:]
-		// 	rec(sub2)
-		// }
+	_s := strToSlice(getStr(), "")
+	s := make([]int, len(_s))
+	for i, v := range _s {
+		s[i] = s2i(v)
 	}
 
-	rec(s)
+	// s[i]が属する連続部分文字列で、自分と同じ文字が何文字連続しているか
+	data := make([]int, len(s))
 
-	fmt.Println("-----------------")
-	fmt.Println(cnt)
+	prev := -1
+	start := -1
+	cnt := 0
+
+	for i, v := range s {
+		if v != prev {
+			if start != -1 {
+				for j := start; j < i; j++ {
+					data[j] = cnt
+				}
+			}
+			prev = v
+			start = i
+			cnt = 1
+		} else {
+			cnt++
+		}
+	}
+	for i := start; i < len(s); i++ {
+		data[i] = cnt
+	}
+
+	ans := 0
+	for i := 0; i < len(s)-1; i++ {
+		l := s[i]
+		r := s[i+1]
+		if r - l == 1 {
+			ans += min(data[i], data[i+1])
+		}
+	}
+
+	fmt.Println(ans)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
