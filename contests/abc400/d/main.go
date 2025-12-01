@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"math/bits"
 	"os"
 	"sort"
 	"strconv"
@@ -35,76 +36,81 @@ func solve() {
 
 	grid := make([][]string, h)
 	for i := 0; i < h; i++ {
-		grid[i] = strToSlice(input(), "")
+		grid[i] = strToSlice(getStr(), "")
 	}
+
+	in = getInts()
+	startY, startX, goalY, goalX := in[0]-1, in[1]-1, in[2]-1, in[3]-1
+
+	type BfsItem struct {
+		y, x, dist int
+	}
+	que := newQueue[BfsItem]()
+	que.PushBack(BfsItem{startY, startX, 0})
+
 	dist := make([][]int, h)
 	for i := 0; i < h; i++ {
 		dist[i] = make([]int, w)
 		for j := 0; j < w; j++ {
-			dist[i][j] = -1
+			dist[i][j] = BIGGEST
 		}
 	}
-
-	type BfsItem struct {
-		y int
-		x int
-		steps int
-	}
-	que := newQueue[BfsItem]()
-
-	in = getInts()
-	sy, sx, gy, gx := in[0]-1, in[1]-1, in[2]-1, in[3]-1
-	que.PushBack(BfsItem{sy, sx, 0})
 
 	for que.Size() > 0 {
 		item := que.PopFront()
-		currentSteps := item.steps
-		for i, next := range [][2]int{{item.y-1, item.x}, {item.y+1, item.x}, {item.y, item.x-1}, {item.y, item.x+1}} {
-			ny, nx := next[0], next[1]
-			if ny < 0 || ny >= h || nx < 0 || nx >= w {
+		tmpY, tmpX, tmpDist := item.y, item.x, item.dist
+		if dist[tmpY][tmpX] != BIGGEST {
+			continue
+		}
+		dist[tmpY][tmpX] = tmpDist
+
+		type Position struct {
+			y, x int
+		}
+		for i, next := range []Position{
+			{tmpY-1, tmpX},
+			{tmpY+1, tmpX},
+			{tmpY, tmpX-1},
+			{tmpY, tmpX+1},
+		} {
+			nextY, nextX := next.y, next.x
+			if nextY < 0 || nextY >= h || nextX < 0 || nextX >= w {
 				continue
 			}
-			if dist[ny][nx] != -1 {
+			if dist[nextY][nextX] != BIGGEST {
 				continue
 			}
 
-			dist[ny][nx] = currentSteps
+			if grid[nextY][nextX] == "." {
+				que.PushFront(BfsItem{nextY, nextX, tmpDist})
+				continue
+			}
 
-			// 前蹴り
+			// 壁の場合
+			que.PushBack(BfsItem{nextY, nextX, tmpDist+1})
+			// 更にもう一つ壁を突破できる
 			switch i {
-			// 上
 			case 0:
-				if ny - 1 >= 0 {
-					que.PushBack(BfsItem{ny-1, nx, currentSteps + 1})
+				if nextY-1 >= 0 && grid[nextY-1][nextX] == "#" {
+					que.PushBack(BfsItem{nextY-1, nextX, tmpDist+1})
 				}
-			// 下
 			case 1:
-				if ny + 1 < h {
-					que.PushBack(BfsItem{ny+1, nx, currentSteps + 1})
+				if nextY+1 < h && grid[nextY+1][nextX] == "#" {
+					que.PushBack(BfsItem{nextY+1, nextX, tmpDist+1})
 				}
-			// 左
 			case 2:
-				if nx - 1 >= 0 {
-					que.PushBack(BfsItem{ny, nx-1, currentSteps + 1})
+				if nextX-1 >= 0 && grid[nextY][nextX-1] == "#" {
+					que.PushBack(BfsItem{nextY, nextX-1, tmpDist+1})
 				}
-			// 右
 			case 3:
-				if nx + 1 < w {
-					que.PushBack(BfsItem{ny, nx+1, currentSteps + 1})
+				if nextX+1 < w && grid[nextY][nextX+1] == "#" {
+					que.PushBack(BfsItem{nextY, nextX+1, tmpDist+1})
 				}
-			default:
-				panic("Invalid direction")
-			}
-
-			if grid[ny][nx] == "#" {
-				que.PushBack(BfsItem{ny, nx, currentSteps + 1})
-			} else {
-				que.PushFront(BfsItem{ny, nx, currentSteps})
 			}
 		}
 	}
 
-	fmt.Println(dist[gy][gx])
+	fmt.Println(dist[goalY][goalX])
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -228,6 +234,10 @@ func bit2i(bits []string) int {
 	return int(result)
 }
 
+func bitCount(n int) int {
+	return bits.OnesCount(uint(n))
+}
+
 func abs(v int) int {
 	if v < 0 {
 		return -v
@@ -295,29 +305,46 @@ func modPow(base, exp, mod int) int {
 	return result
 }
 
+// fromからtoまでincrementした値の合計を求める
+func sumFromTo(from, to int) int {
+	if from > to {
+		return 0
+	}
+	return (to - from + 1) * (from + to) / 2
+}
+
+// n桁の整数の個数を求める
+// 例: n=3 の場合、100~999 までの整数の個数は 900
+func countNDigitIntegers(n int) int {
+    if n <= 0 {
+        return 0
+    }
+    return int(9 * int(math.Pow(10, float64(n-1))))
+}
+
 // modInverse は a の m における逆元 (a^{-1} mod m) を返す (m は素数を想定)
 func modInverse(a, m int) int {
     return modPow(a, m-2, m)
 }
 
 //----------------------------------------
-// modint
+// ModInt
 //----------------------------------------
-type modint struct {
+type ModInt struct {
 	mod       int
 	factMemo  []int
 	ifactMemo []int
 }
 
-func newModint(m int) *modint {
-	var ret modint
+func newModint(m int) *ModInt {
+	var ret ModInt
 	ret.mod = m
 	ret.factMemo = []int{1, 1}
 	ret.ifactMemo = []int{1, 1}
 	return &ret
 }
 
-func (m *modint) add(a, b int) int {
+func (m *ModInt) add(a, b int) int {
 	ret := (a + b) % m.mod
 	if ret < 0 {
 		ret += m.mod
@@ -325,7 +352,7 @@ func (m *modint) add(a, b int) int {
 	return ret
 }
 
-func (m *modint) sub(a, b int) int {
+func (m *ModInt) sub(a, b int) int {
 	ret := (a - b) % m.mod
 	if ret < 0 {
 		ret += m.mod
@@ -333,7 +360,7 @@ func (m *modint) sub(a, b int) int {
 	return ret
 }
 
-func (m *modint) mul(a, b int) int {
+func (m *ModInt) mul(a, b int) int {
 	a %= m.mod
 	b %= m.mod
 	ret := a * b % m.mod
@@ -343,14 +370,14 @@ func (m *modint) mul(a, b int) int {
 	return ret
 }
 
-func (m *modint) div(a, b int) int {
+func (m *ModInt) div(a, b int) int {
 	a %= m.mod
-	ret := a * m.modinv(b)
+	ret := a * m.modInv(b)
 	ret %= m.mod
 	return ret
 }
 
-func (m *modint) pow(p, n int) int {
+func (m *ModInt) pow(p, n int) int {
 	ret := 1
 	x := p % m.mod
 	for n != 0 {
@@ -366,7 +393,7 @@ func (m *modint) pow(p, n int) int {
 
 
 // 拡張オイラーの互除法で逆元を求める
-func (mm *modint) modinv(a int) int {
+func (mm *ModInt) modInv(a int) int {
 	m := mm.mod
 	b, u, v := m, 1, 0
 	for b != 0 {
@@ -387,7 +414,7 @@ func (mm *modint) modinv(a int) int {
 // 行列累乗
 // 　A[][]のp乗を求める
 //-----------------------------------------------
-func (m *modint) powModMatrix(A [][]int, p int) [][]int {
+func (m *ModInt) powModMatrix(A [][]int, p int) [][]int {
 	N := len(A)
 	ret := make([][]int, N)
 	for i := 0; i < N; i++ {
@@ -406,7 +433,7 @@ func (m *modint) powModMatrix(A [][]int, p int) [][]int {
 	return ret
 }
 
-func (m *modint) mulMod(A, B [][]int) [][]int {
+func (m *ModInt) mulMod(A, B [][]int) [][]int {
 	H := len(A)
 	W := len(B[0])
 	K := len(A[0])
@@ -432,7 +459,7 @@ func (m *modint) mulMod(A, B [][]int) [][]int {
 //                ※pow(x, p-2)を何度も取るので
 // 厳しそうな場合は、ここを削除して高速なのを使う
 //---------------------------------------------------
-func (m *modint) mfact(n int) int {
+func (m *ModInt) mfact(n int) int {
 	if len(m.factMemo) > n {
 		return m.factMemo[n]
 	}
@@ -446,7 +473,7 @@ func (m *modint) mfact(n int) int {
 	return m.factMemo[n]
 }
 
-func (m *modint) mifact(n int) int {
+func (m *ModInt) mifact(n int) int {
 	if len(m.ifactMemo) > n {
 		return m.ifactMemo[n]
 	}
@@ -460,7 +487,7 @@ func (m *modint) mifact(n int) int {
 	return m.ifactMemo[n]
 }
 
-func (m *modint) nCr(n, r int) int {
+func (m *ModInt) nCr(n, r int) int {
 	if n == r {
 		return 1
 	}
@@ -484,9 +511,25 @@ func logXY(x, y int) int {
 	return int(math.Log(float64(y)) / math.Log(float64(x)))
 }
 
-// intのまま計算できるように
-func sqrt(x int) int {
-	return int(math.Sqrt(float64(x)))
+// 整数平方根: x*x <= n を満たす最大の x を返す
+// 二分探索を使うことで誤差を生まない。ref: https://atcoder.jp/contests/abc400/editorial/12642
+// pythonのmath.isqrtと同じ
+func isqrt(n int) int {
+	if n == 0 || n == 1 {
+		return n
+	}
+	low, high := 1, n
+	var ans int
+	for low <= high {
+		mid := (low + high) / 2
+		if mid <= n/mid {
+			ans = mid
+			low = mid + 1
+		} else {
+			high = mid - 1
+		}
+	}
+	return ans
 }
 
 // xのn乗根
@@ -691,6 +734,9 @@ func(s *Set[V]) Pop() V {
 	s.Remove(v)
 	return v
 }
+func (s *Set[V]) Clear() {
+	s.values = make(map[V]struct{})
+}
 
 
 // sorted set
@@ -701,28 +747,19 @@ func newSortedSet[T comparator.Ordered]() *SortedSet[T] {
 	var comparatorFn comparator.Comparator[T] = comparator.OrderedTypeCmp[T]
 	return &SortedSet[T]{set.New[T](comparatorFn)}
 }
-func (s *SortedSet[T]) add(v T) {
+func (s *SortedSet[T]) Add(v T) {
 	s.Insert(v)
 }
-func (s *SortedSet[T]) remove(v T) {
+func (s *SortedSet[T]) Remove(v T) {
 	s.Erase(v)
 }
-func (s *SortedSet[T]) has(v T) bool {
+func (s *SortedSet[T]) Has(v T) bool {
 	return s.Contains(v)
 }
-func (s *SortedSet[T]) size() int {
-	return s.Size()
-}
-func (s *SortedSet[T]) lowerBound(v T) *set.SetIterator[T] {
-	return s.LowerBound(v)
-}
-func (s *SortedSet[T]) upperBound(v T) *set.SetIterator[T] {
-	return s.UpperBound(v)
-}
 // 指定した値未満の最大の値を取得
-func (s *SortedSet[T]) lessThan(v T) (*T, error) {
-	if s.lowerBound(v).Prev().IsValid() {
-		res := s.lowerBound(v).Prev().Value()
+func (s *SortedSet[T]) LessThan(v T) (*T, error) {
+	if s.LowerBound(v).Prev().IsValid() {
+		res := s.LowerBound(v).Prev().Value()
 		return &res, nil
 	}
 	if s.Last().IsValid() {
@@ -740,7 +777,7 @@ type MultiSet[T comparable] struct {
 	mapping map[T]int
 }
 // multiset
-func newMultiset[T comparator.Ordered]() *MultiSet[T] {
+func newMultiSet[T comparator.Ordered]() *MultiSet[T] {
 	var comparatorFn comparator.Comparator[T] = comparator.OrderedTypeCmp[T]
 	ms := set.NewMultiSet[T](comparatorFn, set.WithGoroutineSafe())
 	return &MultiSet[T]{MultiSet: ms, mapping: make(map[T]int)}
@@ -757,6 +794,22 @@ func (ms *MultiSet[T]) Remove(v T) {
 }
 func (ms *MultiSet[T]) Has(v T) bool {
 	return ms.Contains(v)
+}
+func (ms *MultiSet[T]) All() []T {
+	// 全部取ってくる
+	res := make([]T, 0, ms.Size())
+	for ms.Size() > 0 {
+		first := ms.First()
+		res = append(res, first.Value())
+		ms.Remove(first.Value())
+	}
+
+	// 元に戻す
+	for _, v := range res {
+		ms.Add(v)
+	}
+
+	return res
 }
 
 // heap (priority queue)
@@ -1425,6 +1478,7 @@ func gridBfs(height, width int, nextNodes map[GridBfsNode][]GridBfsNode, start G
 // ワーシャルフロイド法
 // graphは、到達不能な場合はmath.MaxInt64を入れる
 // 自分自身への経路は0を入れる
+// 計算量はO(V^3) ただし、Vは頂点数
 func warshallFloyd(graph [][]int) [][]int {
 	// ノード数
 	n := len(graph)
@@ -1452,7 +1506,8 @@ func warshallFloyd(graph [][]int) [][]int {
 }
 
 // ダイクストラ法
-func dijkstra(graph [][]dijkstraItem, start int) []int {
+// 計算量は O((V + E) log V) ただし、Vは頂点数、Eは辺の数
+func dijkstra(graph [][]DijkstraItem, start int) []int {
 	n := len(graph)
 	dist := make([]int, n)
 	for i := range dist {
@@ -1471,12 +1526,12 @@ func dijkstra(graph [][]dijkstraItem, start int) []int {
 		dist[start] = 0
 	}
 
-	pq := &dijkstraPriorityQueue{}
+	pq := &DijkstraPriorityQueue{}
 	heap.Init(pq)
-	heap.Push(pq, &dijkstraItem{node: start, dist: 0})
+	heap.Push(pq, &DijkstraItem{node: start, dist: 0})
 
 	for pq.Len() > 0 {
-		u := heap.Pop(pq).(*dijkstraItem)
+		u := heap.Pop(pq).(*DijkstraItem)
 		if u.dist > dist[u.node] {
 			continue
 		}
@@ -1486,29 +1541,29 @@ func dijkstra(graph [][]dijkstraItem, start int) []int {
 			alt := u.dist + edge.dist
 			if alt < dist[v] {
 				dist[v] = alt
-				heap.Push(pq, &dijkstraItem{node: v, dist: alt})
+				heap.Push(pq, &DijkstraItem{node: v, dist: alt})
 			}
 		}
 	}
 
 	return dist
 }
-type dijkstraItem struct {
+type DijkstraItem struct {
 	node int
 	dist   int
 }
-type dijkstraPriorityQueue []*dijkstraItem
-func (pq dijkstraPriorityQueue) Len() int { return len(pq) }
-func (pq dijkstraPriorityQueue) Less(i, j int) bool {
+type DijkstraPriorityQueue []*DijkstraItem
+func (pq DijkstraPriorityQueue) Len() int { return len(pq) }
+func (pq DijkstraPriorityQueue) Less(i, j int) bool {
 	return pq[i].dist < pq[j].dist
 }
-func (pq dijkstraPriorityQueue) Swap(i, j int) {
+func (pq DijkstraPriorityQueue) Swap(i, j int) {
 	pq[i], pq[j] = pq[j], pq[i]
 }
-func (pq *dijkstraPriorityQueue) Push(x interface{}) {
-	*pq = append(*pq, x.(*dijkstraItem))
+func (pq *DijkstraPriorityQueue) Push(x interface{}) {
+	*pq = append(*pq, x.(*DijkstraItem))
 }
-func (pq *dijkstraPriorityQueue) Pop() interface{} {
+func (pq *DijkstraPriorityQueue) Pop() interface{} {
 	old := *pq
 	n := len(old)
 	item := old[n-1]
