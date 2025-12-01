@@ -100,12 +100,22 @@ func solve() {
 				continue
 			}
 
+			// スイッチが押されている状態では最初に空いていたドアは閉まる
+			if tmpIsSwitchOn && nextPos == "o" {
+				continue
+			}
+
+			// スイッチが押されていない状態では最初に閉じていたドアは閉まったまま
+			if !tmpIsSwitchOn && nextPos == "x" {
+				continue
+			}
+
+			nextIsSwitchOn := tmpIsSwitchOn
 			// スイッチマス
 			if nextPos == "?" {
-				que.PushBack(BfsItem{nextY, nextX, tmpDist+1, !tmpIsSwitchOn})
-			} else if (nextPos == "o" && !tmpIsSwitchOn) || (nextPos == "x" && tmpIsSwitchOn) || nextPos == "." || nextPos == "G" || nextPos == "S" {
-				que.PushBack(BfsItem{nextY, nextX, tmpDist+1, tmpIsSwitchOn})
+				nextIsSwitchOn = !nextIsSwitchOn
 			}
+			que.PushBack(BfsItem{nextY, nextX, tmpDist+1, nextIsSwitchOn})
 		}
 	}
 
