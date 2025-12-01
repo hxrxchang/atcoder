@@ -34,96 +34,86 @@ func solve() {
 	in := getInts()
 	h, w := in[0], in[1]
 
-	type GridItem struct {
+	grid := make([][]string, h)
+	type Position struct {
 		y, x int
 	}
-	grid := make([][]string, h)
-	var start GridItem
-	var goal GridItem
+	var start Position
+	var goal Position
 	for i := 0; i < h; i++ {
 		grid[i] = strToSlice(getStr(), "")
 		for j := 0; j < w; j++ {
 			if grid[i][j] == "S" {
-				start = GridItem{i, j}
+				start = Position{i, j}
 			}
 			if grid[i][j] == "G" {
-				goal = GridItem{i, j}
+				goal = Position{i, j}
 			}
 		}
 	}
 
-	dist := make([][][]int, h)
+	type DistanceState struct {
+		off, on int
+	}
+	dist := make([][]DistanceState, h)
 	for i := 0; i < h; i++ {
-		dist[i] = make([][]int, w)
+		dist[i] = make([]DistanceState, w)
 		for j := 0; j < w; j++ {
-			dist[i][j] = make([]int, 2)
-			dist[i][j][0] = BIGGEST
-			dist[i][j][1] = BIGGEST
+			dist[i][j] = DistanceState{BIGGEST, BIGGEST}
 		}
 	}
 
-	type QueItem struct {
-		GridItem
-		z int
-		dist int
+	type BfsItem struct {
+		y, x, dist int
+		isSwitchOn bool
 	}
-	que := newQueue[QueItem]()
-	que.PushBack(QueItem{start, 0, 0})
-	dist[start.y][start.x][0] = 0
+	que := newQueue[BfsItem]()
+	que.PushBack(BfsItem{start.y, start.x, 0, false})
+
 	for que.Size() > 0 {
 		tmp := que.PopFront()
-		for _, next := range []GridItem{
-			{tmp.y - 1, tmp.x},
-			{tmp.y + 1, tmp.x},
-			{tmp.y, tmp.x - 1},
-			{tmp.y, tmp.x + 1},
-		}{
-			nextY := next.y
-			nextX := next.x
+		tmpY, tmpX, tmpDist, tmpIsSwitchOn := tmp.y, tmp.x, tmp.dist, tmp.isSwitchOn
+		if tmpIsSwitchOn {
+			if dist[tmpY][tmpX].on != BIGGEST {
+				continue
+			}
+			dist[tmpY][tmpX].on = tmpDist
+		} else {
+			if dist[tmpY][tmpX].off != BIGGEST {
+				continue
+			}
+			dist[tmpY][tmpX].off = tmpDist
+		}
+
+		for _, next := range [][]int{
+			{tmpY-1, tmpX},
+			{tmpY+1, tmpX},
+			{tmpY, tmpX-1},
+			{tmpY, tmpX+1},
+		} {
+			nextY, nextX := next[0], next[1]
 			if nextY < 0 || nextY >= h || nextX < 0 || nextX >= w {
 				continue
 			}
-
-			nextGrid := grid[next.y][next.x]
-			if nextGrid == "#" {
+			nextPos := grid[nextY][nextX]
+			if nextPos == "#" {
 				continue
 			}
-			if nextGrid == "o" {
-				// スイッチが奇数回押されているのでoは閉じている
-				if tmp.z == 1 {
-					continue
-				}
-			}
-			if nextGrid == "x" {
-				// スイッチが偶数回 or 0回押されているのでxは閉じている
-				if tmp.z == 0 {
-					continue
-				}
-			}
-			if nextGrid == "?" {
-				nextZ := (tmp.z + 1) % 2
-				if dist[nextY][nextX][nextZ] != BIGGEST {
-					continue
-				}
-				dist[nextY][nextX][nextZ] = tmp.dist + 1
-				que.PushBack(QueItem{GridItem{nextY, nextX}, nextZ, tmp.dist + 1})
-			} else {
-				if dist[nextY][nextX][tmp.z] != BIGGEST {
-					continue
-				}
-				dist[nextY][nextX][tmp.z] = tmp.dist + 1
-				que.PushBack(QueItem{GridItem{nextY, nextX}, tmp.z, tmp.dist + 1})
+
+			// スイッチマス
+			if nextPos == "?" {
+				que.PushBack(BfsItem{nextY, nextX, tmpDist+1, !tmpIsSwitchOn})
+			} else if (nextPos == "o" && !tmpIsSwitchOn) || (nextPos == "x" && tmpIsSwitchOn) || nextPos == "." || nextPos == "G" || nextPos == "S" {
+				que.PushBack(BfsItem{nextY, nextX, tmpDist+1, tmpIsSwitchOn})
 			}
 		}
-
 	}
 
-	if dist[goal.y][goal.x][0] == BIGGEST && dist[goal.y][goal.x][1] == BIGGEST {
-		fmt.Println(-1)
-	} else {
-		ans := min(dist[goal.y][goal.x][0], dist[goal.y][goal.x][1])
-		fmt.Println(ans)
+	ans := min(dist[goal.y][goal.x].on, dist[goal.y][goal.x].off)
+	if ans == BIGGEST {
+		ans = - 1
 	}
+	fmt.Println(ans)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
