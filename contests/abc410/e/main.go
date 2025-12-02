@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"math/bits"
 	"os"
 	"sort"
 	"strconv"
@@ -31,48 +32,46 @@ func main() {
 
 func solve() {
 	in := getInts()
-	n, h, m := in[0], in[1], in[2]
-	monsters := make([][]int, n)
-	for i := 0; i < n; i++ {
-		monsters[i] = getInts()
-	}
+	n, h, w := in[0], in[1], in[2]
 
-	dp := make([][][]int, n+1)
-	for i := range dp {
-		dp[i] = make([][]int, h+1)
-		for j := range dp[i] {
-			dp[i][j] = make([]int, m+1)
+	dp := make([][]int, n+1)
+	for i := 0; i <= n; i++ {
+		dp[i] = make([]int, 3001)
+		for j := 0; j <= 3000; j++ {
+			dp[i][j] = -1
 		}
 	}
+	dp[0][h] = w
 
 	for i := 0; i < n; i++ {
-		a := monsters[i][0]
-		b := monsters[i][1]
-		for j := 0; j <= h; j++ {
-			for k := 0; k <= m; k++ {
-				dp[i+1][j][k] = max(dp[i+1][j][k], dp[i][j][k])
+		in := getInts()
+		a, b := in[0], in[1]
+		for j := 0; j <= 3000; j++ {
+			if dp[i][j] == -1 {
+				continue
+			}
+			// 体力をa使ってモンスターを倒す
+			if j - a >= 0 {
+				dp[i+1][j-a] = max(dp[i+1][j-a], dp[i][j])
+			}
 
-				if k >= a {
-					dp[i+1][j][k-a] = max(dp[i+1][j][k-a], dp[i][j][k]+1)
-				}
-
-				if j >= b {
-					dp[i+1][j-b][k] = max(dp[i+1][j-b][k], dp[i][j][k]+1)
-				}
+			// 魔力をb使ってモンスターを倒す
+			if dp[i][j] - b >= 0 {
+				dp[i+1][j] = max(dp[i+1][j], dp[i][j]-b)
 			}
 		}
 	}
 
 	ans := 0
-	for j := 0; j <= h; j++ {
-		for k := 0; k <= m; k++ {
-			ans = max(ans, dp[n][j][k])
+	for i := 1; i <= n; i++ {
+		if max(dp[i]...) == -1 {
+			break
 		}
+		ans = i
 	}
 
 	fmt.Println(ans)
 }
-
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -193,6 +192,10 @@ func bit2i(bits []string) int {
 		panic(err)
 	}
 	return int(result)
+}
+
+func bitCount(n int) int {
+	return bits.OnesCount(uint(n))
 }
 
 func abs(v int) int {
@@ -704,28 +707,19 @@ func newSortedSet[T comparator.Ordered]() *SortedSet[T] {
 	var comparatorFn comparator.Comparator[T] = comparator.OrderedTypeCmp[T]
 	return &SortedSet[T]{set.New[T](comparatorFn)}
 }
-func (s *SortedSet[T]) add(v T) {
+func (s *SortedSet[T]) Add(v T) {
 	s.Insert(v)
 }
-func (s *SortedSet[T]) remove(v T) {
+func (s *SortedSet[T]) Remove(v T) {
 	s.Erase(v)
 }
-func (s *SortedSet[T]) has(v T) bool {
+func (s *SortedSet[T]) Has(v T) bool {
 	return s.Contains(v)
 }
-func (s *SortedSet[T]) size() int {
-	return s.Size()
-}
-func (s *SortedSet[T]) lowerBound(v T) *set.SetIterator[T] {
-	return s.LowerBound(v)
-}
-func (s *SortedSet[T]) upperBound(v T) *set.SetIterator[T] {
-	return s.UpperBound(v)
-}
 // 指定した値未満の最大の値を取得
-func (s *SortedSet[T]) lessThan(v T) (*T, error) {
-	if s.lowerBound(v).Prev().IsValid() {
-		res := s.lowerBound(v).Prev().Value()
+func (s *SortedSet[T]) LessThan(v T) (*T, error) {
+	if s.LowerBound(v).Prev().IsValid() {
+		res := s.LowerBound(v).Prev().Value()
 		return &res, nil
 	}
 	if s.Last().IsValid() {
@@ -743,7 +737,7 @@ type MultiSet[T comparable] struct {
 	mapping map[T]int
 }
 // multiset
-func newMultiset[T comparator.Ordered]() *MultiSet[T] {
+func newMultiSet[T comparator.Ordered]() *MultiSet[T] {
 	var comparatorFn comparator.Comparator[T] = comparator.OrderedTypeCmp[T]
 	ms := set.NewMultiSet[T](comparatorFn, set.WithGoroutineSafe())
 	return &MultiSet[T]{MultiSet: ms, mapping: make(map[T]int)}
@@ -760,6 +754,22 @@ func (ms *MultiSet[T]) Remove(v T) {
 }
 func (ms *MultiSet[T]) Has(v T) bool {
 	return ms.Contains(v)
+}
+func (ms *MultiSet[T]) All() []T {
+	// 全部取ってくる
+	res := make([]T, 0, ms.Size())
+	for ms.Size() > 0 {
+		first := ms.First()
+		res = append(res, first.Value())
+		ms.Remove(first.Value())
+	}
+
+	// 元に戻す
+	for _, v := range res {
+		ms.Add(v)
+	}
+
+	return res
 }
 
 // heap (priority queue)
