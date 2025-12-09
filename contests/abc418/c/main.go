@@ -32,8 +32,7 @@ func main() {
 
 func solve() {
 	in := getInts()
-	n, m := in[0], in[1]
-
+	n, q := in[0], in[1]
 	a := sortSlice(getInts())
 	sumA := sum(a)
 
@@ -42,15 +41,16 @@ func solve() {
 		accm[i+1] = accm[i] + a[i]
 	}
 
-	for i := 0; i < m; i++ {
-		b := getInt() - 1
-		idx := upperBound(a, b)
-		needsCnt := accm[idx] + (n - idx) * b + 1
-		if needsCnt > sumA {
-			fmt.Println(-1)
-		} else {
-			fmt.Println(needsCnt)
+	for i := 0; i < q; i++ {
+		b := getInt()
+		idx := lowerBound(a, b)
+		pre := accm[idx]
+		sub := (n-idx) * (b-1)
+		ans := pre + sub + 1
+		if ans > sumA {
+			ans = -1
 		}
+		fmt.Println(ans)
 	}
 }
 
@@ -688,28 +688,19 @@ func newSortedSet[T comparator.Ordered]() *SortedSet[T] {
 	var comparatorFn comparator.Comparator[T] = comparator.OrderedTypeCmp[T]
 	return &SortedSet[T]{set.New[T](comparatorFn)}
 }
-func (s *SortedSet[T]) add(v T) {
+func (s *SortedSet[T]) Add(v T) {
 	s.Insert(v)
 }
-func (s *SortedSet[T]) remove(v T) {
+func (s *SortedSet[T]) Remove(v T) {
 	s.Erase(v)
 }
-func (s *SortedSet[T]) has(v T) bool {
+func (s *SortedSet[T]) Has(v T) bool {
 	return s.Contains(v)
 }
-func (s *SortedSet[T]) size() int {
-	return s.Size()
-}
-func (s *SortedSet[T]) lowerBound(v T) *set.SetIterator[T] {
-	return s.LowerBound(v)
-}
-func (s *SortedSet[T]) upperBound(v T) *set.SetIterator[T] {
-	return s.UpperBound(v)
-}
 // 指定した値未満の最大の値を取得
-func (s *SortedSet[T]) lessThan(v T) (*T, error) {
-	if s.lowerBound(v).Prev().IsValid() {
-		res := s.lowerBound(v).Prev().Value()
+func (s *SortedSet[T]) LessThan(v T) (*T, error) {
+	if s.LowerBound(v).Prev().IsValid() {
+		res := s.LowerBound(v).Prev().Value()
 		return &res, nil
 	}
 	if s.Last().IsValid() {
@@ -727,7 +718,7 @@ type MultiSet[T comparable] struct {
 	mapping map[T]int
 }
 // multiset
-func newMultiset[T comparator.Ordered]() *MultiSet[T] {
+func newMultiSet[T comparator.Ordered]() *MultiSet[T] {
 	var comparatorFn comparator.Comparator[T] = comparator.OrderedTypeCmp[T]
 	ms := set.NewMultiSet[T](comparatorFn, set.WithGoroutineSafe())
 	return &MultiSet[T]{MultiSet: ms, mapping: make(map[T]int)}
@@ -744,6 +735,22 @@ func (ms *MultiSet[T]) Remove(v T) {
 }
 func (ms *MultiSet[T]) Has(v T) bool {
 	return ms.Contains(v)
+}
+func (ms *MultiSet[T]) All() []T {
+	// 全部取ってくる
+	res := make([]T, 0, ms.Size())
+	for ms.Size() > 0 {
+		first := ms.First()
+		res = append(res, first.Value())
+		ms.Remove(first.Value())
+	}
+
+	// 元に戻す
+	for _, v := range res {
+		ms.Add(v)
+	}
+
+	return res
 }
 
 // heap (priority queue)
