@@ -1,0 +1,55 @@
+{
+  "contest": {
+    "id": "abc425",
+    "title": "UNIQUE VISION Programming Contest 2025 Autumn (AtCoder Beginner Contest 425)",
+    "url": "https://atcoder.jp/contests/abc425"
+  },
+  "tasks": [
+    {
+      "id": "abc425_a",
+      "label": "A",
+      "title": "Sigma Cubes",
+      "url": "https://atcoder.jp/contests/abc425/tasks/abc425_a"
+    },
+    {
+      "id": "abc425_b",
+      "label": "B",
+      "title": "Find Permutation 2",
+      "url": "https://atcoder.jp/contests/abc425/tasks/abc425_b"
+    },
+    {
+      "id": "abc425_c",
+      "label": "C",
+      "title": "Rotate and Sum Query",
+      "url": "https://atcoder.jp/contests/abc425/tasks/abc425_c"
+    },
+    {
+      "id": "abc425_d",
+      "label": "D",
+      "title": "Ulam-Warburton Automaton",
+      "url": "https://atcoder.jp/contests/abc425/tasks/abc425_d",
+      "directory": {
+        "path": "d",
+        "testdir": "tests"
+      }
+    },
+    {
+      "id": "abc425_e",
+      "label": "E",
+      "title": "Count Sequences 2",
+      "url": "https://atcoder.jp/contests/abc425/tasks/abc425_e"
+    },
+    {
+      "id": "abc425_f",
+      "label": "F",
+      "title": "Inserting Process",
+      "url": "https://atcoder.jp/contests/abc425/tasks/abc425_f"
+    },
+    {
+      "id": "abc425_g",
+      "label": "G",
+      "title": "Sum of Min of XOR",
+      "url": "https://atcoder.jp/contests/abc425/tasks/abc425_g"
+    }
+  ]
+}
