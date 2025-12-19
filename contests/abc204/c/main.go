@@ -34,18 +34,18 @@ func solve() {
 	in := getInts()
 	n, m := in[0], in[1]
 	graph := make([][]int, n)
-
 	for i := 0; i < m; i++ {
 		in := getInts()
 		a, b := in[0]-1, in[1]-1
 		graph[a] = append(graph[a], b)
 	}
 
-	ans := 0
+	cnt := 0
 	for i := 0; i < n; i++ {
 		visited := make([]bool, n)
 		var dfs func(x int)
 		dfs = func(x int) {
+			cnt++
 			visited[x] = true
 			for _, next := range graph[x] {
 				if !visited[next] {
@@ -54,15 +54,9 @@ func solve() {
 			}
 		}
 		dfs(i)
-
-		for _, v := range visited {
-			if v {
-				ans++
-			}
-		}
 	}
 
-	fmt.Println(ans)
+	fmt.Println(cnt)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
