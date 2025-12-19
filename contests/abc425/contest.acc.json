@@ -21,7 +21,11 @@
       "id": "abc425_c",
       "label": "C",
       "title": "Rotate and Sum Query",
-      "url": "https://atcoder.jp/contests/abc425/tasks/abc425_c"
+      "url": "https://atcoder.jp/contests/abc425/tasks/abc425_c",
+      "directory": {
+        "path": "c",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc425_d",
