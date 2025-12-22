@@ -33,10 +33,10 @@ func main() {
 func solve() {
 	in := getInts()
 	_, m := in[0], in[1]
-	a := getInts()
 
-	b := getInts()
-	b = sortSlice(b)
+	a := getInts()
+	b := sortSlice(getInts())
+
 	accmB := make([]int, m+1)
 	for i := 0; i < m; i++ {
 		accmB[i+1] = accmB[i] + b[i]
@@ -45,13 +45,13 @@ func solve() {
 	ans := 0
 	for _, v := range a {
 		idx := lowerBound(b, v)
-		left := v * idx - accmB[idx]
+
+		left := idx * v - accmB[idx]
 		var right int
 		if idx == m {
 			right = 0
-		} else {
-			right = abs((m-idx) * v - (accmB[m] - accmB[idx]))
 		}
+		right = abs((m-idx) * v - (accmB[m] - accmB[idx]))
 		ans = ans + left + right
 		ans %= MOD
 	}

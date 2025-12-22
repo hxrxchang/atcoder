@@ -34,38 +34,34 @@ func solve() {
 	t := getInt()
 	for i := 0; i < t; i++ {
 		n := getInt()
-		type Animal struct {
-			w, p, cost int
+		type Dear struct {
+			weight, power, total int
 		}
-		animals := make([]Animal, n)
-		for i := 0; i < n; i++ {
+		dears := make([]Dear, n)
+
+		for j := 0; j < n; j++ {
 			in := getInts()
 			w, p := in[0], in[1]
-			cost := p + w
-			animals[i] = Animal{w, p, cost}
+			dears[j] = Dear{w, p, w+p}
 		}
 
-		sort.Slice(animals, func(i, j int) bool {
-			if animals[i].cost == animals[j].cost {
-				return animals[i].w < animals[j].w
-			}
-			return animals[i].cost < animals[j].cost
+		totalPower := 0
+		for _, d := range dears {
+			totalPower += d.power
+		}
+
+		sort.Slice(dears, func(i, j int) bool {
+			return dears[i].total < dears[j].total
 		})
 
-		total := 0
-		for _, v := range animals {
-			total += v.p
-		}
-
 		cnt := 0
-		for _, v := range animals {
-			total -= v.cost
-			if total < 0 {
+		for _, d := range dears {
+			totalPower -= d.total
+			if totalPower < 0 {
 				break
 			}
 			cnt++
 		}
-
 		fmt.Println(cnt)
 	}
 }
