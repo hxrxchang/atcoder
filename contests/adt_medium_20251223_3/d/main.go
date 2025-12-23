@@ -32,17 +32,15 @@ func main() {
 
 func solve() {
 	getInt()
-	d := getInts()
+	m := getInts()
+	mid := (sum(m) + 1) / 2
 
-	cnt := sum(d)
-	mid := (1 + cnt) / 2
-
-	for i, v := range d {
-		if mid <= v {
-			fmt.Println(i+1, mid)
-			return
-		} else {
+	for i, v := range m {
+		if mid - v > 0 {
 			mid -= v
+		} else {
+			fmt.Println(i+1, mid)
+			break
 		}
 	}
 }
@@ -215,6 +213,7 @@ func mod(x, y int) int {
 	return m
 }
 
+// 浮動小数点の誤差に注意
 func pow(base, exp int) int {
 	result := 1
 	for exp > 0 {
