@@ -201,6 +201,7 @@ func mod(x, y int) int {
 	return m
 }
 
+// 浮動小数点の誤差に注意
 func pow(base, exp int) int {
 	result := 1
 	for exp > 0 {
