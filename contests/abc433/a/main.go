@@ -34,14 +34,16 @@ func solve() {
 	in := getInts()
 	x, y, z := in[0], in[1], in[2]
 
-	cond1 := x - z * y >= 0
-	cond2 := (x - z * y) % (z - 1) == 0
-
-	if cond1 && cond2 {
-		fmt.Println("Yes")
-	} else {
-		fmt.Println("No")
+	for i := 0; i <= 100000; i++ {
+		if x == y * z {
+			fmt.Println("Yes")
+			return
+		}
+		x++
+		y++
 	}
+
+	fmt.Println("No")
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -212,6 +214,8 @@ func mod(x, y int) int {
 	return m
 }
 
+// 繰り返し二乗法
+// 浮動小数点の誤差に注意
 func pow(base, exp int) int {
 	result := 1
 	for exp > 0 {
