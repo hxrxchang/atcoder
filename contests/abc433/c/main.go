@@ -31,39 +31,33 @@ func main() {
 }
 
 func solve() {
-	_s := strToSlice(getStr(), "")
-	s := make([]int, len(_s))
-	for i, v := range _s {
-		s[i] = s2i(v)
-	}
+	s := strToIntSlice(getStr(), "")
 
-	// ラフレングス圧縮
+	// ランレングス圧縮
 	type Item struct {
-		x int
-		cnt int
+		val, length int
 	}
-	data := make([]Item, 0)
-
-	tmp := s[0]
-	cnt := 1
+	var tmp Item
+	tmp.val = s[0]
+	tmp.length = 1
+	compressed := make([]Item, 0)
 	for _, v := range s[1:] {
-		if v != tmp {
-			data = append(data, Item{tmp, cnt})
-			tmp = v
-			cnt = 1
+		if v == tmp.val {
+			tmp.length++
 		} else {
-			cnt++
+			compressed = append(compressed, tmp)
+			tmp.val = v
+			tmp.length = 1
 		}
 	}
-	data = append(data, Item{tmp, cnt})
+	compressed = append(compressed, tmp)
 
 	ans := 0
-	for i := range data[:len(data)-1] {
-		left := data[i]
-		right := data[i+1]
-
-		if right.x - left.x == 1 {
-			ans += min(left.cnt, right.cnt)
+	for i, v := range compressed[:len(compressed)-1] {
+		left := v
+		right := compressed[i+1]
+		if right.val - left.val == 1 {
+			ans += min(left.length, right.length)
 		}
 	}
 
@@ -113,6 +107,15 @@ func getBigInt(x int) *big.Int {
 // 第２引数で渡された文字列でsplitする
 func strToSlice(input, sep string) []string {
 	return strings.Split(input, sep)
+}
+
+func strToIntSlice(input, sep string) []int {
+	s := strToSlice(input, sep)
+	res := make([]int, len(s))
+	for i, v := range s {
+		res[i] = s2i(v)
+	}
+	return res
 }
 
 
@@ -238,6 +241,8 @@ func mod(x, y int) int {
 	return m
 }
 
+// 繰り返し二乗法
+// 浮動小数点の誤差に注意
 func pow(base, exp int) int {
 	result := 1
 	for exp > 0 {
