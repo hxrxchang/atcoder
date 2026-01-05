@@ -109,6 +109,8 @@ func strToSlice(input, sep string) []string {
 	return strings.Split(input, sep)
 }
 
+// string -> []int
+// 第２引数で渡された文字列でsplitする
 func strToIntSlice(input, sep string) []int {
 	s := strToSlice(input, sep)
 	res := make([]int, len(s))
