@@ -72,14 +72,25 @@ func getBigInt(x int) *big.Int {
 	return big.NewInt(int64(x))
 }
 
-// string <-> []string
+// string -> []string
 // 第２引数で渡された文字列でsplitする
 func strToSlice(input, sep string) []string {
 	return strings.Split(input, sep)
 }
 
+// string -> []int
+// 第２引数で渡された文字列でsplitする
+func strToIntSlice(input, sep string) []int {
+	s := strToSlice(input, sep)
+	res := make([]int, len(s))
+	for i, v := range s {
+		res[i] = s2i(v)
+	}
+	return res
+}
 
-// // string <-> []int
+
+// // string -> []int
 func mapToIntSlice(input string) []int {
 	slice := make([]int, 0)
 	lines := strToSlice(input, " ")
@@ -90,7 +101,7 @@ func mapToIntSlice(input string) []int {
 	return slice
 }
 
-// string <-> int
+// string -> int
 func s2i(s string) int {
 	v, err := strconv.Atoi(s)
 	if err != nil {
@@ -128,7 +139,7 @@ func reverseString(s string) string {
     return string(runes)
 }
 
-// bool <-> int
+// bool -> int
 func b2i(b bool) int {
 	if b {
 		return 1
