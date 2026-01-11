@@ -37,34 +37,24 @@ func solve() {
 		n, w := in[0], in[1]
 		c := getInts()
 
-		m := 2 * w
-
-		s := make([]int, m)
+		costs := make([]int, w*2)
 		for i := 0; i < n; i++ {
-			k := (i + 1) % m
-			s[k] += c[i]
+			costs[i % (2 * w)] += c[i]
 		}
 
-		s2 := make([]int, 0, 2*m)
-		s2 = append(s2, s...)
-		s2 = append(s2, s...)
+		costs2 := append(costs, costs...)
 
-		sum := 0
-		for i := 0; i < w; i++ {
-			sum += s2[i]
-		}
-
-		ans := sum
-		for i := w; i < w+m; i++ {
-			sum += s2[i]
-			sum -= s2[i-w]
-			ans = min(ans, sum)
+		ans := sum(costs2[:w])
+		tmp := ans
+		for i := w; i < len(costs2); i++ {
+			tmp -= costs2[i-w]
+			tmp += costs2[i]
+			ans = min(ans, tmp)
 		}
 
 		fmt.Println(ans)
 	}
 }
-
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
