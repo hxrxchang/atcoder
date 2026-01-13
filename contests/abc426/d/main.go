@@ -60,7 +60,7 @@ func calc(s []string, c string) int {
 	return cnt
 }
 
-func longestRun(s []string, c string) (int, int) {
+func longestRun[T comparable](s []T, c T) (int, int) {
 	maxLen := 0
 	bestL, bestR := -1, -1
 

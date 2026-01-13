@@ -943,6 +943,35 @@ func splitAndReverse[T any](slice []T, index int) []T {
     return append(back, front...)
 }
 
+// スライスの中で、指定した値の最大連続区間のindexを取得
+// 例:
+// s := []string{"0", "1", "0", "0", "1"}
+// longestRun(s, "0")
+// -> (2, 3)
+func longestRun[T comparable](s []T, c T) (int, int) {
+	maxLen := 0
+	bestL, bestR := -1, -1
+
+	curL := -1
+	for i := 0; i < len(s); i++ {
+		if s[i] == c {
+			if curL == -1 {
+				curL = i
+			}
+			curLen := i - curL + 1
+			if curLen > maxLen {
+				maxLen = curLen
+				bestL = curL
+				bestR = i
+			}
+		} else {
+			curL = -1
+		}
+	}
+
+	return bestL, bestR
+}
+
 
 // スライスを文字列に変換
 func sliceToStr[T any](data []T, separator string) string {
