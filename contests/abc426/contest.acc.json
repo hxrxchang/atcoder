@@ -31,7 +31,11 @@
       "id": "abc426_d",
       "label": "D",
       "title": "Pop and Insert",
-      "url": "https://atcoder.jp/contests/abc426/tasks/abc426_d"
+      "url": "https://atcoder.jp/contests/abc426/tasks/abc426_d",
+      "directory": {
+        "path": "d",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc426_e",
