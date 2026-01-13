@@ -33,10 +33,40 @@ func main() {
 func solve() {
 	n := getInt()
 
+	type State struct {
+		cnt, minimum int
+	}
+	que := newQueue[State]()
 	for i := 0; i < n; i++ {
 		in := getStrs()
 		if in[0] == "1" {
+			var cnt int
+			var minimum int
+			if que.Size() == 0 {
+				cnt = 0
+				minimum = 0
+			} else {
+				last := que.Back()
+				cnt = last.cnt
+				minimum = last.minimum
+			}
+			c := in[1]
+			if c == "(" {
+				cnt++
+			} else {
+				cnt--
+			}
+			que.PushBack(State{cnt, min(minimum, cnt)})
+		} else {
+			que.PopBack()
+		}
 
+		if que.Size() == 0 {
+			fmt.Println("Yes")
+		} else if last := que.Back(); last.cnt == 0 && last.minimum == 0 {
+			fmt.Println("Yes")
+		} else {
+			fmt.Println("No")
 		}
 	}
 }
