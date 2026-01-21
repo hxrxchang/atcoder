@@ -50,30 +50,14 @@ func solve() {
 	}
 
 	cnt := 0
-	for i := 1; i <= n; i++ {
-		leftA := i - 1
-		rightA := n + 1
-		for rightA-leftA > 1 {
-			mid := (leftA + rightA) / 2
-			if accmA[mid]-accmA[i-1] >= a {
-				rightA = mid
-			} else {
-				leftA = mid
-			}
-		}
+	for l := 1; l <= n; l++ {
+		// aの条件を満たすaccmA[idx:]を決める
+		idx := lowerBound(accmA, accmA[l-1]+a)
 
-		leftB := rightA - 1
-		rightB := n + 1
-		for rightB-leftB > 1 {
-			mid := (leftB + rightB) / 2
-			if accmB[mid]-accmB[i-1] < b {
-				leftB = mid
-			} else {
-				rightB = mid
-			}
-		}
-
-		cnt += leftB - rightA + 1
+		rangeCnt := n-idx+1
+		// bの条件を満たさないaccmB[idx:]を引く
+		rangeCnt -= countInRange(accmB[idx:], accmB[l-1]+b, BIGGEST)
+		cnt += rangeCnt
 	}
 
 	fmt.Println(cnt)
