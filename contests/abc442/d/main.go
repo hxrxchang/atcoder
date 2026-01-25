@@ -35,25 +35,43 @@ func solve() {
 	n, q := in[0], in[1]
 	a := getInts()
 
-	segTree := NewSegmentTree(n, 0, func(a, b int) int { return a + b})
-	for i := 0; i < n; i++ {
-		segTree.Update(i, a[i])
+	accm := make([]int, n+1)
+	for i, v := range a {
+		accm[i+1] = accm[i] + v
 	}
 
 	for i := 0; i < q; i++ {
 		in := getInts()
 		if in[0] == 1 {
 			x := in[1]-1
-			tmpX := segTree.Query(x, x+1)
-			tmpNextX := segTree.Query(x+1, x+2)
-			segTree.Update(x, tmpNextX)
-			segTree.Update(x+1, tmpX)
+			accm[x+1] -= a[x]
+			accm[x+1] += a[x+1]
+			a[x], a[x+1] = a[x+1], a[x]
 		} else {
-			l, r := in[1]-1, in[2]-1
-			ans := segTree.Query(l, r+1)
-			fmt.Println(ans)
+			l, r := in[1], in[2]
+			fmt.Println(accm[r] - accm[l-1])
 		}
 	}
+
+	// segTree := NewSegmentTree(n, 0, func(a, b int) int { return a + b})
+	// for i := 0; i < n; i++ {
+	// 	segTree.Update(i, a[i])
+	// }
+
+	// for i := 0; i < q; i++ {
+	// 	in := getInts()
+	// 	if in[0] == 1 {
+	// 		x := in[1]-1
+	// 		tmpX := segTree.Query(x, x+1)
+	// 		tmpNextX := segTree.Query(x+1, x+2)
+	// 		segTree.Update(x, tmpNextX)
+	// 		segTree.Update(x+1, tmpX)
+	// 	} else {
+	// 		l, r := in[1]-1, in[2]-1
+	// 		ans := segTree.Query(l, r+1)
+	// 		fmt.Println(ans)
+	// 	}
+	// }
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
