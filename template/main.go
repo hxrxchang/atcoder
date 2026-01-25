@@ -1195,7 +1195,7 @@ func lessThan[T constraints.Ordered](slice []T, value T) *T {
 }
 // ソート済みのsliceの中でx以上、y未満の要素数を返す(半開区間)
 // 例: countInRange([]int{1, 2, 3, 4, 5}, 1, 4) => 3
-func countInRange(nums []int, x, y int) int {
+func countInRange[T constraints.Ordered](nums []T, x, y T) int {
 	left := sort.Search(len(nums), func(i int) bool { return nums[i] >= x })
 	right := sort.Search(len(nums), func(i int) bool { return nums[i] >= y })
 	return right - left
