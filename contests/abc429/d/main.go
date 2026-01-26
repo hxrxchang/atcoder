@@ -32,28 +32,37 @@ func main() {
 
 func solve() {
 	in := getInts()
-	_, m, c := in[0], in[1], in[2]
-	a := getInts()
+	n, m, c := in[0], in[1], in[2]
 
-	mp := make(map[int]int)
-	for _, v := range a {
-		mp[v+1]++
-		mp[(v+1)+m]++
+	a := sortSlice(getInts())
+	a2 := make([]int, n*2)
+	for i, v := range a {
+		a2[i] = v
+		a2[i+n] = v + m
 	}
 
-	accm := make([]int, 2*m+1)
-	for i := 0; i < 2*m; i++ {
-		accm[i+1] = accm[i]
-		accm[i+1] += mp[i+1]
+	ans := 0
+	for i := 0; i < n; i++ {
+		prev := 0
+		if i == 0 {
+			prev = a[n-1] - m
+		} else {
+			prev = a2[i-1]
+		}
+		// 地点の数
+		posCnt := a2[i] - prev
+
+		// C 人目
+		pos := a2[i+c-1]
+
+		// 同じ地点の人を全部含める
+		k2 := upperBound(a2, pos) - 1
+		peopleCnt := k2 - i + 1
+
+		ans += posCnt * peopleCnt
 	}
 
-	cnt := 0
-	for i := 1; i <= m; i++ {
-		idx := lowerBound(accm, accm[i]+c)
-		cnt += accm[idx] - accm[i]
-	}
-
-	fmt.Println(cnt)
+	fmt.Println(ans)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
