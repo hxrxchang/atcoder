@@ -32,8 +32,35 @@ func main() {
 
 func solve() {
 	in := getInts()
-	n, x, y := in[0], in[1], in[2]
+	_, x, y := in[0], in[1], in[2]
 	a := getInts()
+
+	diff := y-x
+	minA := min(a...)
+	maxA := max(a...)
+
+	if maxA * x > minA * y {
+		fmt.Println(-1)
+		return
+	}
+
+	st := newSet[int]()
+	for _, v := range a {
+		st.Add((x * v) % diff)
+	}
+
+	if st.Size() != 1 {
+		fmt.Println(-1)
+		return
+	}
+
+	goal := y * minA
+	ans := 0
+	for _, v := range a {
+		ans += (goal - x * v) / diff
+	}
+
+	fmt.Println(ans)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
