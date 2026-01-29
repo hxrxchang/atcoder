@@ -37,24 +37,23 @@ func solve() {
 
 	diff := y-x
 	minA := min(a...)
-	maxA := max(a...)
-
-	if maxA * x > minA * y {
-		fmt.Println(-1)
-		return
-	}
-
-	st := newSet[int]()
-	for _, v := range a {
-		st.Add((x * v) % diff)
-	}
-
-	if st.Size() != 1 {
-		fmt.Println(-1)
-		return
-	}
 
 	goal := y * minA
+
+	// 条件1: 全て小さい飴を与えたときの重さ `A[i] * X` にいくら `Y - X` を足してもぴったり目標の重さに到達しない子供がいるとき
+	for _, v := range a {
+		if (goal - v * x) % diff != 0 {
+			fmt.Println(-1)
+			return
+		}
+	}
+
+	// 条件2: 全て小さい飴を与えたときの重さがすでに目標の重さを超えてしまっているとき。
+	if max(a...) * x > goal {
+		fmt.Println(-1)
+		return
+	}
+
 	ans := 0
 	for _, v := range a {
 		ans += (goal - x * v) / diff
