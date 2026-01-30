@@ -31,7 +31,11 @@
       "id": "abc427_d",
       "label": "D",
       "title": "The Simple Game",
-      "url": "https://atcoder.jp/contests/abc427/tasks/abc427_d"
+      "url": "https://atcoder.jp/contests/abc427/tasks/abc427_d",
+      "directory": {
+        "path": "d",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc427_e",
