@@ -56,8 +56,8 @@ func solve() {
 		pos := a2[i+c-1]
 
 		// 同じ地点の人を全部含める
-		k2 := upperBound(a2, pos) - 1
-		peopleCnt := k2 - i + 1
+		to := upperBound(a2, pos) - 1
+		peopleCnt := to - i + 1
 
 		ans += posCnt * peopleCnt
 	}
