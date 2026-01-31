@@ -55,32 +55,34 @@ func solve() {
 		// 終盤から元に戻していく
 		// お互いk回操作するので操作回数は2*kになる
 		for step := 2 * k; step > 0; step-- {
-			// 終盤から元に戻すのでAliceの番は奇数のときになる
-			isAlice := (step % 2) == 1
+			// 終盤から元に戻すので偶数回がBob、奇数回がAliceになる
+			isBob := (step % 2) == 0
 			next := make([]bool, n)
 
-			for v := 0; v < n; v++ {
-				if isAlice {
-					win := false
-					for _, to := range graph[v] {
-						if dp[to] {
-							win = true
+			// BobとしてはAliceが勝てない頂点に行きたい
+			if isBob {
+				for i := 0; i < n; i++ {
+					isWin := true
+					for _, v := range graph[i] {
+						if !dp[v] {
+							isWin = false
 							break
 						}
 					}
-					next[v] = win
-				} else {
-					win := true
-					for _, to := range graph[v] {
-						if !dp[to] {
-							win = false
+					next[i] = isWin
+				}
+ 			} else { // Aliceとしては、自分が勝てる頂点に行きたい
+				for i := 0; i < n; i++ {
+					isWin := false
+					for _, v := range graph[i] {
+						if dp[v] {
+							isWin = true
 							break
 						}
 					}
-					next[v] = win
+					next[i] = isWin
 				}
 			}
-
 			dp = next
 		}
 
