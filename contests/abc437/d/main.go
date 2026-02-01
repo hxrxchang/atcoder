@@ -38,22 +38,22 @@ func solve() {
 	b := sortSlice(getInts())
 
 	accmB := make([]int, m+1)
-	for i := 0; i < m; i++ {
-		accmB[i+1] = accmB[i] + b[i]
+	for i, v := range b {
+		accmB[i+1] = accmB[i]+v
 	}
 
 	ans := 0
 	for _, v := range a {
 		idx := lowerBound(b, v)
+		// vより小さい = 差がプラスになる範囲
+		left := accmB[idx]
 
-		left := idx * v - accmB[idx]
-		var right int
-		if idx == m {
-			right = 0
-		}
-		right = abs((m-idx) * v - (accmB[m] - accmB[idx]))
-		ans = ans + left + right
-		ans %= MOD
+		// vより大きい = 差がマイナスになる範囲
+		right := accmB[len(accmB)-1]-accmB[idx]
+
+		ans += idx * v - left
+		ans += abs((m-idx) * v - right)
+		ans %= 998244353
 	}
 
 	fmt.Println(ans)
