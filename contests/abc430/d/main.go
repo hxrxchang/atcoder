@@ -31,6 +31,40 @@ func main() {
 }
 
 func solve() {
+	getInt()
+	x := getInts()
+
+	que := newQueue[int]()
+	for _, v := range x {
+		que.PushBack(v)
+	}
+
+	ss := newSortedSet[int]()
+	ss.Add(0)
+	head := que.PopFront()
+	ss.Add(head)
+
+	// ans := head * 2
+
+	for que.Size() > 0 {
+		fmt.Println(ss)
+		head := que.PopFront()
+		prev, err := ss.LessThan(head)
+		after := ss.LowerBound(head)
+
+		pre := -1
+		aft := -1
+		if err == nil {
+			pre = *prev
+		}
+		if after.IsValid() {
+			aft = after.Value()
+		}
+
+		if pre != -1 & aft != -1 {
+		}
+
+		ss.Add(head)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -72,14 +106,25 @@ func getBigInt(x int) *big.Int {
 	return big.NewInt(int64(x))
 }
 
-// string <-> []string
+// string -> []string
 // 第２引数で渡された文字列でsplitする
 func strToSlice(input, sep string) []string {
 	return strings.Split(input, sep)
 }
 
+// string -> []int
+// 第２引数で渡された文字列でsplitする
+func strToIntSlice(input, sep string) []int {
+	s := strToSlice(input, sep)
+	res := make([]int, len(s))
+	for i, v := range s {
+		res[i] = s2i(v)
+	}
+	return res
+}
 
-// // string <-> []int
+
+// // string -> []int
 func mapToIntSlice(input string) []int {
 	slice := make([]int, 0)
 	lines := strToSlice(input, " ")
@@ -90,7 +135,7 @@ func mapToIntSlice(input string) []int {
 	return slice
 }
 
-// string <-> int
+// string -> int
 func s2i(s string) int {
 	v, err := strconv.Atoi(s)
 	if err != nil {
@@ -128,7 +173,7 @@ func reverseString(s string) string {
     return string(runes)
 }
 
-// bool <-> int
+// bool -> int
 func b2i(b bool) int {
 	if b {
 		return 1
@@ -201,6 +246,8 @@ func mod(x, y int) int {
 	return m
 }
 
+// 繰り返し二乗法
+// 浮動小数点の誤差に注意
 func pow(base, exp int) int {
 	result := 1
 	for exp > 0 {
@@ -667,28 +714,19 @@ func newSortedSet[T comparator.Ordered]() *SortedSet[T] {
 	var comparatorFn comparator.Comparator[T] = comparator.OrderedTypeCmp[T]
 	return &SortedSet[T]{set.New[T](comparatorFn)}
 }
-func (s *SortedSet[T]) add(v T) {
+func (s *SortedSet[T]) Add(v T) {
 	s.Insert(v)
 }
-func (s *SortedSet[T]) remove(v T) {
+func (s *SortedSet[T]) Remove(v T) {
 	s.Erase(v)
 }
-func (s *SortedSet[T]) has(v T) bool {
+func (s *SortedSet[T]) Has(v T) bool {
 	return s.Contains(v)
 }
-func (s *SortedSet[T]) size() int {
-	return s.Size()
-}
-func (s *SortedSet[T]) lowerBound(v T) *set.SetIterator[T] {
-	return s.LowerBound(v)
-}
-func (s *SortedSet[T]) upperBound(v T) *set.SetIterator[T] {
-	return s.UpperBound(v)
-}
 // 指定した値未満の最大の値を取得
-func (s *SortedSet[T]) lessThan(v T) (*T, error) {
-	if s.lowerBound(v).Prev().IsValid() {
-		res := s.lowerBound(v).Prev().Value()
+func (s *SortedSet[T]) LessThan(v T) (*T, error) {
+	if s.LowerBound(v).Prev().IsValid() {
+		res := s.LowerBound(v).Prev().Value()
 		return &res, nil
 	}
 	if s.Last().IsValid() {
@@ -706,7 +744,7 @@ type MultiSet[T comparable] struct {
 	mapping map[T]int
 }
 // multiset
-func newMultiset[T comparator.Ordered]() *MultiSet[T] {
+func newMultiSet[T comparator.Ordered]() *MultiSet[T] {
 	var comparatorFn comparator.Comparator[T] = comparator.OrderedTypeCmp[T]
 	ms := set.NewMultiSet[T](comparatorFn, set.WithGoroutineSafe())
 	return &MultiSet[T]{MultiSet: ms, mapping: make(map[T]int)}
@@ -723,6 +761,22 @@ func (ms *MultiSet[T]) Remove(v T) {
 }
 func (ms *MultiSet[T]) Has(v T) bool {
 	return ms.Contains(v)
+}
+func (ms *MultiSet[T]) All() []T {
+	// 全部取ってくる
+	res := make([]T, 0, ms.Size())
+	for ms.Size() > 0 {
+		first := ms.First()
+		res = append(res, first.Value())
+		ms.Remove(first.Value())
+	}
+
+	// 元に戻す
+	for _, v := range res {
+		ms.Add(v)
+	}
+
+	return res
 }
 
 // heap (priority queue)
@@ -921,6 +975,35 @@ func splitAndReverse[T any](slice []T, index int) []T {
     back := slice[index:]
 
     return append(back, front...)
+}
+
+// スライスの中で、指定した値の最大連続区間のindexを取得
+// 例:
+// s := []string{"0", "1", "0", "0", "1"}
+// longestRun(s, "0")
+// -> (2, 3)
+func longestRun[T comparable](s []T, c T) (int, int) {
+	maxLen := 0
+	bestL, bestR := -1, -1
+
+	curL := -1
+	for i := 0; i < len(s); i++ {
+		if s[i] == c {
+			if curL == -1 {
+				curL = i
+			}
+			curLen := i - curL + 1
+			if curLen > maxLen {
+				maxLen = curLen
+				bestL = curL
+				bestR = i
+			}
+		} else {
+			curL = -1
+		}
+	}
+
+	return bestL, bestR
 }
 
 
@@ -1146,7 +1229,7 @@ func lessThan[T constraints.Ordered](slice []T, value T) *T {
 }
 // ソート済みのsliceの中でx以上、y未満の要素数を返す(半開区間)
 // 例: countInRange([]int{1, 2, 3, 4, 5}, 1, 4) => 3
-func countInRange(nums []int, x, y int) int {
+func countInRange[T constraints.Ordered](nums []T, x, y T) int {
 	left := sort.Search(len(nums), func(i int) bool { return nums[i] >= x })
 	right := sort.Search(len(nums), func(i int) bool { return nums[i] >= y })
 	return right - left
