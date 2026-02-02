@@ -31,7 +31,31 @@ func main() {
 }
 
 func solve() {
+	in := getInts()
+	_, m := in[0], in[1]
+	a := getInts()
+
+	modByKeta := make(map[int][]int)
+	for _, v := range a {
+		keta := len(i2s(v))
+		modByKeta[keta] = append(modByKeta[keta], v%m)
+	}
+
+	for k, v := range modByKeta {
+		modByKeta[k] = sortSlice(v)
+	}
+
+	cnt := 0
+	for _, v := range a {
+		for keta := 1; keta <= 10; keta++ {
+			target := (m - (v * modPow(10, keta, m) % m)) % m
+			cnt += countInRange(modByKeta[keta], target, target+1)
+		}
+	}
+
+	fmt.Println(cnt)
 }
+
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -72,14 +96,25 @@ func getBigInt(x int) *big.Int {
 	return big.NewInt(int64(x))
 }
 
-// string <-> []string
+// string -> []string
 // 第２引数で渡された文字列でsplitする
 func strToSlice(input, sep string) []string {
 	return strings.Split(input, sep)
 }
 
+// string -> []int
+// 第２引数で渡された文字列でsplitする
+func strToIntSlice(input, sep string) []int {
+	s := strToSlice(input, sep)
+	res := make([]int, len(s))
+	for i, v := range s {
+		res[i] = s2i(v)
+	}
+	return res
+}
 
-// // string <-> []int
+
+// // string -> []int
 func mapToIntSlice(input string) []int {
 	slice := make([]int, 0)
 	lines := strToSlice(input, " ")
@@ -90,7 +125,7 @@ func mapToIntSlice(input string) []int {
 	return slice
 }
 
-// string <-> int
+// string -> int
 func s2i(s string) int {
 	v, err := strconv.Atoi(s)
 	if err != nil {
@@ -128,7 +163,7 @@ func reverseString(s string) string {
     return string(runes)
 }
 
-// bool <-> int
+// bool -> int
 func b2i(b bool) int {
 	if b {
 		return 1
@@ -201,6 +236,8 @@ func mod(x, y int) int {
 	return m
 }
 
+// 繰り返し二乗法
+// 浮動小数点の誤差に注意
 func pow(base, exp int) int {
 	result := 1
 	for exp > 0 {
@@ -930,6 +967,35 @@ func splitAndReverse[T any](slice []T, index int) []T {
     return append(back, front...)
 }
 
+// スライスの中で、指定した値の最大連続区間のindexを取得
+// 例:
+// s := []string{"0", "1", "0", "0", "1"}
+// longestRun(s, "0")
+// -> (2, 3)
+func longestRun[T comparable](s []T, c T) (int, int) {
+	maxLen := 0
+	bestL, bestR := -1, -1
+
+	curL := -1
+	for i := 0; i < len(s); i++ {
+		if s[i] == c {
+			if curL == -1 {
+				curL = i
+			}
+			curLen := i - curL + 1
+			if curLen > maxLen {
+				maxLen = curLen
+				bestL = curL
+				bestR = i
+			}
+		} else {
+			curL = -1
+		}
+	}
+
+	return bestL, bestR
+}
+
 
 // スライスを文字列に変換
 func sliceToStr[T any](data []T, separator string) string {
@@ -1153,7 +1219,7 @@ func lessThan[T constraints.Ordered](slice []T, value T) *T {
 }
 // ソート済みのsliceの中でx以上、y未満の要素数を返す(半開区間)
 // 例: countInRange([]int{1, 2, 3, 4, 5}, 1, 4) => 3
-func countInRange(nums []int, x, y int) int {
+func countInRange[T constraints.Ordered](nums []T, x, y T) int {
 	left := sort.Search(len(nums), func(i int) bool { return nums[i] >= x })
 	right := sort.Search(len(nums), func(i int) bool { return nums[i] >= y })
 	return right - left
