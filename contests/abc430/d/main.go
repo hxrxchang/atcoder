@@ -41,13 +41,11 @@ func solve() {
 
 	ss := newSortedSet[int]()
 	ss.Add(0)
-	head := que.PopFront()
-	ss.Add(head)
-
-	// ans := head * 2
+	minState := make(map[int]int)
+	minState[0] = x[0]
+	ans := x[0]
 
 	for que.Size() > 0 {
-		fmt.Println(ss)
 		head := que.PopFront()
 		prev, err := ss.LessThan(head)
 		after := ss.LowerBound(head)
@@ -61,10 +59,44 @@ func solve() {
 			aft = after.Value()
 		}
 
-		if pre != -1 & aft != -1 {
-		}
-
 		ss.Add(head)
+
+		if pre != -1 && aft != -1 { // 真ん中の場合
+			preMin := minState[pre]
+			if preMin > head - pre {
+				ans -= preMin
+				ans += head - pre
+				minState[pre] = head - pre
+			}
+			aftMin := minState[aft]
+			if aftMin > aft - head {
+				ans -= aftMin
+				ans += aft - head
+				minState[aft] = aft - head
+			}
+			ans += min(head - pre, aft - head)
+			minState[head] = min(head - pre, aft - head)
+		} else if pre == -1 { // 左端の場合
+			aftMin := minState[aft]
+			if aftMin > aft - head {
+				ans -= aftMin
+				ans += aft - head
+				minState[aft] = aft - head
+			}
+			ans += aft - head
+			minState[head] = aft - head
+		} else { // 右端の場合
+			preMin := minState[pre]
+			if preMin > head - pre {
+				ans -= preMin
+				ans += head - pre
+				minState[pre] = head - pre
+			}
+			ans += head - pre
+			minState[head] = head - pre
+		}
+		fmt.Println(ans)
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
