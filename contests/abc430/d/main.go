@@ -41,20 +41,9 @@ func solve() {
 
 	ss := newSortedSet[int]()
 	ss.Add(0)
-<<<<<<< HEAD
 	minState := make(map[int]int)
 	minState[0] = x[0]
 	ans := x[0]
-=======
-	head := que.PopFront()
-	ss.Add(head)
-	minState := make(map[int]int)
-	minState[0] = head
-	minState[head] = head
-
-	ans := head * 2
-	fmt.Println(ans)
->>>>>>> 11f27c13e47d088a8c158920a741442c27a0782d
 
 	for que.Size() > 0 {
 		head := que.PopFront()
