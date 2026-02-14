@@ -51,17 +51,16 @@ func solve() {
 	ans := make([]int, n+1)
 
 	for _, v := range same.Values() {
-		que := newQueue[int]()
-		que.PushBack(v)
-		for que.Size() > 0 {
-			tmp := que.PopFront()
-			ans[tmp] = v
-			for _, next := range graph[tmp] {
+		var dfs func(i int)
+		dfs = func(i int) {
+			ans[i] = v
+			for _, next := range graph[i] {
 				if ans[next] == 0 {
-					que.PushBack(next)
+					dfs(next)
 				}
 			}
 		}
+		dfs(v)
 	}
 
 	printSlice(ans[1:])
