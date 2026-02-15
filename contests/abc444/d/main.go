@@ -31,8 +31,37 @@ func main() {
 }
 
 func solve() {
-}
+	getInt()
+	a := sortSlice(getInts())
 
+	maxA := 0
+	for _, v := range a {
+		maxA = max(maxA, v)
+	}
+
+	carry := 0
+	digits := make([]string, 0, maxA+20)
+	for i := 1; i <= maxA; i++ {
+		geCount := countInRange(a, i, BIGGEST)
+		x := geCount + carry
+		digits = append(digits, i2s(x%10))
+		carry = x / 10
+	}
+
+	for carry > 0 {
+		digits = append(digits, i2s(carry%10))
+		carry /= 10
+	}
+
+	if len(digits) == 0 {
+		fmt.Println(0)
+		return
+	}
+
+	digits = reverse(digits)
+
+	fmt.Println(sliceToStr(digits, ""))
+}
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 func getInt() int {
