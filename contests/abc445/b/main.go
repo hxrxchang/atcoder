@@ -31,6 +31,28 @@ func main() {
 }
 
 func solve() {
+	n := getInt()
+
+	maxLen := 0
+	s := make([]string, n)
+	for i := 0; i < n; i++  {
+		v := getStr()
+		maxLen = max(maxLen, len(v))
+		s[i] = v
+	}
+
+	for _, v := range s {
+		l := maxLen - len(v)
+		ans := ""
+		for i := 0; i < l / 2; i++ {
+			ans += "."
+		}
+		ans += v
+		for i := 0; i < l / 2; i++ {
+			ans += "."
+		}
+		fmt.Println(ans)
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -856,17 +878,6 @@ func sortSlice[T constraints.Ordered](slice []T) []T {
     })
 
     return copiedSlice
-}
-
-func sortSliceFn[T any](slice []T, fn func(x, y T) bool) []T {
-	copiedSlice := make([]T, len(slice))
-	copy(copiedSlice, slice)
-
-	sort.Slice(copiedSlice, func(i, j int) bool {
-		return fn(copiedSlice[i], copiedSlice[j])
-	})
-
-	return copiedSlice
 }
 
 func descendingSortSlice[T constraints.Ordered](slice []T) []T {

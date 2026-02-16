@@ -31,6 +31,39 @@ func main() {
 }
 
 func solve() {
+	n := getInt()
+	_a := getInts()
+	a := []int{0}
+	a = append(a, _a...)
+
+	same := newSet[int]()
+	for i := 1; i <= n; i++ {
+		if i == a[i] {
+			same.Add(i)
+		}
+	}
+
+	graph := make([][]int, n+1)
+	for i, v := range a {
+		graph[v] = append(graph[v], i)
+	}
+
+	ans := make([]int, n+1)
+
+	for _, v := range same.Values() {
+		var dfs func(i int)
+		dfs = func(i int) {
+			ans[i] = v
+			for _, next := range graph[i] {
+				if ans[next] == 0 {
+					dfs(next)
+				}
+			}
+		}
+		dfs(v)
+	}
+
+	printSlice(ans[1:])
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -856,17 +889,6 @@ func sortSlice[T constraints.Ordered](slice []T) []T {
     })
 
     return copiedSlice
-}
-
-func sortSliceFn[T any](slice []T, fn func(x, y T) bool) []T {
-	copiedSlice := make([]T, len(slice))
-	copy(copiedSlice, slice)
-
-	sort.Slice(copiedSlice, func(i, j int) bool {
-		return fn(copiedSlice[i], copiedSlice[j])
-	})
-
-	return copiedSlice
 }
 
 func descendingSortSlice[T constraints.Ordered](slice []T) []T {

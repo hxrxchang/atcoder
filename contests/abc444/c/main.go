@@ -31,6 +31,55 @@ func main() {
 }
 
 func solve() {
+	n := getInt()
+	a := sortSlice(getInts())
+
+	// 答えの個数は高々2つ
+	ans := make([]int, 0)
+
+	// 全部分裂の場合
+	if n % 2 == 0 {
+		length := a[0] + a[n-1]
+		flag := true
+		for i := 0; i < n / 2; i++ {
+			if a[i] + a[n-1-i] != length {
+				flag = false
+				break
+			}
+		}
+		if flag {
+			ans = append(ans, length)
+		}
+	}
+
+	// 分裂していない棒が1つ以上ある場合
+	// 全部同じ場合
+	if a[0] == a[n-1] {
+		ans = append(ans, a[0])
+	} else {
+		length := a[n-1]
+		a2 := make([]int, 0)
+		for _, v := range a {
+			if v != length {
+				a2 = append(a2, v)
+			}
+		}
+
+		if len(a2) % 2 == 0 {
+			flag := true
+			for i := 0; i < len(a2)/2; i++ {
+				if a2[i] + a2[len(a2)-1-i] != length {
+					flag = false
+					break
+				}
+			}
+			if flag {
+				ans = append(ans, length)
+			}
+		}
+	}
+
+	printSlice(sortSlice(ans))
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
