@@ -627,8 +627,12 @@ func NewPrefixSum2D(grid [][]int) *PrefixSum2D {
 	}
 }
 
-func (ps *PrefixSum2D) Query(x1, y1, x2, y2 int) int {
+func (ps *PrefixSum2D) QueryRange(x1, y1, x2, y2 int) int {
 	return ps.prefixSum[x2+1][y2+1] - ps.prefixSum[x1][y2+1] - ps.prefixSum[x2+1][y1] + ps.prefixSum[x1][y1]
+}
+
+func (ps *PrefixSum2D) QueryPoint(x, y int) int {
+	return ps.QueryRange(0, 0, x, y)
 }
 
 // 整数nが桁数を満たさなかったら0埋めする
