@@ -63,7 +63,7 @@ func solve() {
 	baseZero := 0
 	for r := 1; r <= size; r++ {
 		for c := 1; c <= size; c++ {
-			cnt := psDiff.Query(0, 0, r, c)
+			cnt := psDiff.QueryPoint(r, c)
 			switch cnt {
 			case 0:
 				baseZero++
@@ -75,7 +75,7 @@ func solve() {
 
 	psOne := NewPrefixSum2D(one)
 	for _, cloud := range clouds {
-		singleCoverInCloud := psOne.Query(cloud.u, cloud.l, cloud.d, cloud.r)
+		singleCoverInCloud := psOne.QueryRange(cloud.u, cloud.l, cloud.d, cloud.r)
 		fmt.Println(baseZero + singleCoverInCloud)
 	}
 }
@@ -674,8 +674,12 @@ func NewPrefixSum2D(grid [][]int) *PrefixSum2D {
 	}
 }
 
-func (ps *PrefixSum2D) Query(x1, y1, x2, y2 int) int {
+func (ps *PrefixSum2D) QueryRange(x1, y1, x2, y2 int) int {
 	return ps.prefixSum[x2+1][y2+1] - ps.prefixSum[x1][y2+1] - ps.prefixSum[x2+1][y1] + ps.prefixSum[x1][y1]
+}
+
+func (ps *PrefixSum2D) QueryPoint(x, y int) int {
+	return ps.QueryRange(0, 0, x, y)
 }
 
 // 整数nが桁数を満たさなかったら0埋めする
