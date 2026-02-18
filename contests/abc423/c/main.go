@@ -31,56 +31,47 @@ func main() {
 }
 
 func solve() {
-	n := getInt()
-	p := getInts()
-
-	// < か > どちらか
-	chars := make([]string, n-1)
-	tmp := p[0]
-	for i, v := range p[1:] {
-		if tmp > v {
-			chars[i] = ">"
-		} else {
-			chars[i] = "<"
-		}
-		tmp = v
-	}
-
-	// ランレングス圧縮
-	type Item struct {
-		char string
-		length int
-	}
-	compressed := make([]Item, 0)
-	tmpItem := Item{
-		char: chars[0],
-		length: 1,
-	}
-
-	for _, v := range chars[1:] {
-		if tmpItem.char == v {
-			tmpItem.length++
-		} else {
-			compressed = append(compressed, tmpItem)
-			tmpItem = Item{
-				char: v,
-				length: 1,
-			}
-		}
-	}
-	compressed = append(compressed, tmpItem)
-
-	if len(compressed) < 3 {
-		fmt.Println(0)
-		return
-	}
+	in := getInts()
+	_, r := in[0], in[1]
+	l := getInts()
 
 	cnt := 0
-	for i := 0; i < len(compressed)-2; i++ {
-		left := compressed[i]
-		right := compressed[i+2]
-		if left.char == "<" {
-			cnt += left.length * right.length
+
+	left := l[:r]
+	farLeftOpen := -1
+	for i := 0; i < len(left); i++ {
+		if left[i] == 0 {
+			farLeftOpen = i
+			break
+		}
+	}
+
+	if farLeftOpen != -1 {
+		for _, v := range left[farLeftOpen:] {
+			// 閉じているものは一度開けてから閉じる必要がある
+			if v == 1 {
+				cnt++
+			}
+			cnt++
+		}
+	}
+
+	right := l[r:]
+	farRightOpen := BIGGEST
+	for i := len(right)-1; i >= 0; i-- {
+		if right[i] == 0 {
+			farRightOpen = i
+			break
+		}
+	}
+
+	if farRightOpen != BIGGEST {
+		for _, v := range right[:farRightOpen+1] {
+		// 閉じているものは一度開けてから閉じる必要がある
+			if v == 1 {
+				cnt++
+			}
+			cnt++
 		}
 	}
 
