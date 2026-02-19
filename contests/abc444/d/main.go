@@ -31,37 +31,26 @@ func main() {
 }
 
 func solve() {
-	getInt()
+	n := getInt()
 	a := sortSlice(getInts())
+	maxA := a[n-1]
 
-	maxA := 0
-	for _, v := range a {
-		maxA = max(maxA, v)
-	}
-
+	ans := make([]int, 0)
 	carry := 0
-	digits := make([]string, 0, maxA+20)
 	for i := 1; i <= maxA; i++ {
-		geCount := countInRange(a, i, BIGGEST)
-		x := geCount + carry
-		digits = append(digits, i2s(x%10))
-		carry = x / 10
+		cnt := countInRange(a, i, BIGGEST)
+		ans = append(ans, (cnt + carry) % 10)
+		carry = (cnt + carry) / 10
 	}
 
-	for carry > 0 {
-		digits = append(digits, i2s(carry%10))
-		carry /= 10
+	if carry != 0 {
+		ans = append(ans, carry)
 	}
 
-	if len(digits) == 0 {
-		fmt.Println(0)
-		return
-	}
-
-	digits = reverse(digits)
-
-	fmt.Println(sliceToStr(digits, ""))
+	ans = reverse(ans)
+	fmt.Println(sliceToStr(ans, ""))
 }
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 func getInt() int {
@@ -656,8 +645,12 @@ func NewPrefixSum2D(grid [][]int) *PrefixSum2D {
 	}
 }
 
-func (ps *PrefixSum2D) Query(x1, y1, x2, y2 int) int {
+func (ps *PrefixSum2D) QueryRange(x1, y1, x2, y2 int) int {
 	return ps.prefixSum[x2+1][y2+1] - ps.prefixSum[x1][y2+1] - ps.prefixSum[x2+1][y1] + ps.prefixSum[x1][y1]
+}
+
+func (ps *PrefixSum2D) QueryPoint(x, y int) int {
+	return ps.QueryRange(0, 0, x, y)
 }
 
 // 整数nが桁数を満たさなかったら0埋めする
