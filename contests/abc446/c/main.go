@@ -43,38 +43,33 @@ func solve() {
 		}
 		que := newQueue[Item]()
 		for i := 0; i < n; i++ {
-			a2 := a[i]
-			b2 := b[i]
-			que.PushBack(Item{i, a2})
+			que.PushBack(Item{i, a[i]})
 
-			cnt := 0
-			for {
-				tmp := que.PopFront()
-				cnt += tmp.cnt
-				if cnt >= b2 {
-					if cnt > b2 {
-						que.PushFront(Item{tmp.day, cnt-b2})
-					}
-					break
+			need := b[i]
+			for need > 0 {
+				head := que.PopFront()
+				need -= head.cnt
+
+				// 使いすぎたら戻す
+				if need < 0 {
+					que.PushFront(Item{head.day, abs(need)})
 				}
 			}
 
 			for que.Size() > 0 {
-				tmp := que.PopFront()
-				if tmp.day <= i-d {
-					continue
+				head := que.PopFront()
+				// d日経っていないものは戻す
+				if i - head.day < d {
+					que.PushFront(head)
+					break
 				}
-				que.PushFront(tmp)
-				break
 			}
 		}
 
 		cnt := 0
 		for que.Size() > 0 {
-			tmp := que.PopFront()
-			cnt += tmp.cnt
+			cnt += que.PopFront().cnt
 		}
-
 		fmt.Println(cnt)
 	}
 }
