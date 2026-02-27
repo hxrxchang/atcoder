@@ -34,28 +34,24 @@ func solve() {
 	in := getInts()
 	_, q := in[0], in[1]
 	a := sortSlice(getInts())
-	// fmt.Println(a)
 
 	for i := 0; i < q; i++ {
 		in := getInts()
 		x, y := in[0], in[1]
-		idx := lowerBound(a, x)
-		base := x - 1 - idx
-		// fmt.Println(x, idx, base)
+		ng := x-1
+		ok := BIGGEST
 
-		left := x
-		right := BIGGEST
-		for right - left > 0 {
-			mid := (left + right) / 2
-			cnt := mid - lowerBound(a, mid+1)
-
-			if cnt >= base+y {
-				right = mid
+		for ok - ng > 1 {
+			mid := (ng + ok) / 2
+			notIncludedCnt := (mid - x + 1) - countInRange(a, x, mid+1)
+			if notIncludedCnt >= y {
+				ok = mid
 			} else {
-				left = mid+1
+				ng = mid
 			}
 		}
-		fmt.Println(left)
+
+		fmt.Println(ok)
 	}
 }
 
@@ -653,8 +649,12 @@ func NewPrefixSum2D(grid [][]int) *PrefixSum2D {
 	}
 }
 
-func (ps *PrefixSum2D) Query(x1, y1, x2, y2 int) int {
+func (ps *PrefixSum2D) QueryRange(x1, y1, x2, y2 int) int {
 	return ps.prefixSum[x2+1][y2+1] - ps.prefixSum[x1][y2+1] - ps.prefixSum[x2+1][y1] + ps.prefixSum[x1][y1]
+}
+
+func (ps *PrefixSum2D) QueryPoint(x, y int) int {
+	return ps.QueryRange(0, 0, x, y)
 }
 
 // 整数nが桁数を満たさなかったら0埋めする
@@ -884,6 +884,17 @@ func sortSlice[T constraints.Ordered](slice []T) []T {
     return copiedSlice
 }
 
+func sortSliceFn[T any](slice []T, fn func(x, y T) bool) []T {
+	copiedSlice := make([]T, len(slice))
+	copy(copiedSlice, slice)
+
+	sort.Slice(copiedSlice, func(i, j int) bool {
+		return fn(copiedSlice[i], copiedSlice[j])
+	})
+
+	return copiedSlice
+}
+
 func descendingSortSlice[T constraints.Ordered](slice []T) []T {
 	copiedSlice := make([]T, len(slice))
 	copy(copiedSlice, slice)
@@ -967,6 +978,35 @@ func splitAndReverse[T any](slice []T, index int) []T {
     back := slice[index:]
 
     return append(back, front...)
+}
+
+// スライスの中で、指定した値の最大連続区間のindexを取得
+// 例:
+// s := []string{"0", "1", "0", "0", "1"}
+// longestRun(s, "0")
+// -> (2, 3)
+func longestRun[T comparable](s []T, c T) (int, int) {
+	maxLen := 0
+	bestL, bestR := -1, -1
+
+	curL := -1
+	for i := 0; i < len(s); i++ {
+		if s[i] == c {
+			if curL == -1 {
+				curL = i
+			}
+			curLen := i - curL + 1
+			if curLen > maxLen {
+				maxLen = curLen
+				bestL = curL
+				bestR = i
+			}
+		} else {
+			curL = -1
+		}
+	}
+
+	return bestL, bestR
 }
 
 
@@ -1192,7 +1232,7 @@ func lessThan[T constraints.Ordered](slice []T, value T) *T {
 }
 // ソート済みのsliceの中でx以上、y未満の要素数を返す(半開区間)
 // 例: countInRange([]int{1, 2, 3, 4, 5}, 1, 4) => 3
-func countInRange(nums []int, x, y int) int {
+func countInRange[T constraints.Ordered](nums []T, x, y T) int {
 	left := sort.Search(len(nums), func(i int) bool { return nums[i] >= x })
 	right := sort.Search(len(nums), func(i int) bool { return nums[i] >= y })
 	return right - left
