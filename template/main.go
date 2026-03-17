@@ -1019,16 +1019,16 @@ type UnionFind struct {
 	// 負の値のときはそのインデックスはルートであり絶対値がそのルートが持つ要素数を表す。
 	parents []int
 }
-func (uf *UnionFind) root(x int) int {
+func (uf *UnionFind) Root(x int) int {
 	if uf.parents[x] < 0 {
 		return x
 	}
-	uf.parents[x] = uf.root(uf.parents[x])
+	uf.parents[x] = uf.Root(uf.parents[x])
 	return uf.parents[x]
 }
-func (uf *UnionFind) unit(x, y int) {
-	x = uf.root(x)
-	y = uf.root(y)
+func (uf *UnionFind) Unit(x, y int) {
+	x = uf.Root(x)
+	y = uf.Root(y)
 	if x == y {
 		return
 	}
@@ -1041,11 +1041,11 @@ func (uf *UnionFind) unit(x, y int) {
 	// サイズが小さい方のルートを大きい方のルートに繋げる
 	uf.parents[y] = x
 }
-func (uf *UnionFind) isSame(x, y int) bool {
-	return uf.root(x) == uf.root(y)
+func (uf *UnionFind) IsSame(x, y int) bool {
+	return uf.Root(x) == uf.Root(y)
 }
-func (uf *UnionFind) size(x int) int {
-	return -uf.parents[uf.root(x)]
+func (uf *UnionFind) Size(x int) int {
+	return -uf.parents[uf.Root(x)]
 }
 func newUnionFind(n int) *UnionFind {
 	parents := make([]int, n)
