@@ -780,13 +780,13 @@ func newMyHeap[T constraints.Ordered]() *MyHeap[T] {
 	heap.Init(&myHeap.heap)
 	return myHeap
 }
-func (h *MyHeap[T]) push(x T) {
+func (h *MyHeap[T]) Push(x T) {
 	heap.Push(&h.heap, x)
 }
-func (h *MyHeap[T]) pop() T {
+func (h *MyHeap[T]) Pop() T {
 	return heap.Pop(&h.heap).(T)
 }
-func (h *MyHeap[T]) len() int {
+func (h *MyHeap[T]) Len() int {
 	return h.heap.Len()
 }
 
