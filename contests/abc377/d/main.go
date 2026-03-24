@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"math/bits"
 	"os"
 	"sort"
 	"strconv"
@@ -20,8 +21,8 @@ import (
 
 const BUFSIZE = 10000000
 const MOD = 1000000007
-const BIGGEST = math.MaxInt64
-const MINIMUM = math.MinInt64
+const BIGGEST = 1 << 60
+const MINIMUM = -BIGGEST
 var rdr *bufio.Reader
 
 func main() {
@@ -33,29 +34,25 @@ func solve() {
 	in := getInts()
 	n, m := in[0], in[1]
 
-	// minLeftPerRight[i]: iを右端とするとき、区間に選べる左端の最小値
-	minLeftPerRight := make([]int, m+1)
+	// validLeft[i]: iをrとするとき、lに選べる左端の最小値
+	validLeft := make([]int, m+1)
 	for i := 0; i <= m; i++ {
-		// 区間は1以上m以下なので、初期状態は最小の1にする
-		minLeftPerRight[i] = 1
+		validLeft[i] = 1
 	}
 
-	// n個の区間を見て、有効な区間を判定していく
 	for i := 0; i < n; i++ {
 		in := getInts()
 		l, r := in[0], in[1]
-		// l+1すると完全には含まなくなる
-		minLeftPerRight[r] = max(minLeftPerRight[r], l+1)
+		validLeft[r] = max(validLeft[r], l+1)
 	}
 
-	// 累積maxを取る
-	for r := 1; r <= m; r++ {
-		minLeftPerRight[r] = max(minLeftPerRight[r], minLeftPerRight[r-1])
+	for i := 1; i <= m; i++ {
+		validLeft[i] = max(validLeft[i-1], validLeft[i])
 	}
 
 	ans := 0
 	for r := 1; r <= m; r++ {
-		ans += r - minLeftPerRight[r] + 1
+		ans += r - validLeft[r] + 1
 	}
 
 	fmt.Println(ans)
@@ -100,14 +97,25 @@ func getBigInt(x int) *big.Int {
 	return big.NewInt(int64(x))
 }
 
-// string <-> []string
+// string -> []string
 // 第２引数で渡された文字列でsplitする
 func strToSlice(input, sep string) []string {
 	return strings.Split(input, sep)
 }
 
+// string -> []int
+// 第２引数で渡された文字列でsplitする
+func strToIntSlice(input, sep string) []int {
+	s := strToSlice(input, sep)
+	res := make([]int, len(s))
+	for i, v := range s {
+		res[i] = s2i(v)
+	}
+	return res
+}
 
-// // string <-> []int
+
+// // string -> []int
 func mapToIntSlice(input string) []int {
 	slice := make([]int, 0)
 	lines := strToSlice(input, " ")
@@ -118,7 +126,7 @@ func mapToIntSlice(input string) []int {
 	return slice
 }
 
-// string <-> int
+// string -> int
 func s2i(s string) int {
 	v, err := strconv.Atoi(s)
 	if err != nil {
@@ -148,7 +156,15 @@ func isPalindrome(s string) bool {
 	return true
 }
 
-// bool <-> int
+func reverseString(s string) string {
+    runes := []rune(s)
+    for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+        runes[i], runes[j] = runes[j], runes[i]
+    }
+    return string(runes)
+}
+
+// bool -> int
 func b2i(b bool) int {
 	if b {
 		return 1
@@ -164,6 +180,20 @@ func i2bit(i int) []string {
 	return strToSlice(strconv.FormatInt(int64(i), 2), "")
 }
 
+func bit2i(bits []string) int {
+	bitStr := strings.Join(bits, "")
+
+	result, err := strconv.ParseInt(bitStr, 2, 64)
+	if err != nil {
+		panic(err)
+	}
+	return int(result)
+}
+
+func bitCount(n int) int {
+	return bits.OnesCount(uint(n))
+}
+
 func abs(v int) int {
 	if v < 0 {
 		return -v
@@ -171,7 +201,7 @@ func abs(v int) int {
 	return v
 }
 
-func min(values ...int) int {
+func min[T constraints.Ordered](values ...T) T {
 	ret := values[0]
 	for _, v := range values {
 		if ret > v {
@@ -181,7 +211,7 @@ func min(values ...int) int {
 	return ret
 }
 
-func max(values ...int) int {
+func max[T constraints.Ordered](values ...T) T {
 	ret := values[0]
 	for _, v := range values {
 		if ret < v {
@@ -191,8 +221,8 @@ func max(values ...int) int {
 	return ret
 }
 
-func sum(slice []int) int {
-	sum := 0
+func sum[T constraints.Ordered](slice []T) T {
+	var sum T
 	for _, v := range slice {
 		sum += v
 	}
@@ -207,6 +237,8 @@ func mod(x, y int) int {
 	return m
 }
 
+// 繰り返し二乗法
+// 浮動小数点の誤差に注意
 func pow(base, exp int) int {
 	result := 1
 	for exp > 0 {
@@ -231,24 +263,46 @@ func modPow(base, exp, mod int) int {
 	return result
 }
 
+// fromからtoまでincrementした値の合計を求める
+func sumFromTo(from, to int) int {
+	if from > to {
+		return 0
+	}
+	return (to - from + 1) * (from + to) / 2
+}
+
+// n桁の整数の個数を求める
+// 例: n=3 の場合、100~999 までの整数の個数は 900
+func countNDigitIntegers(n int) int {
+    if n <= 0 {
+        return 0
+    }
+    return int(9 * int(math.Pow(10, float64(n-1))))
+}
+
+// modInverse は a の m における逆元 (a^{-1} mod m) を返す (m は素数を想定)
+func modInverse(a, m int) int {
+    return modPow(a, m-2, m)
+}
+
 //----------------------------------------
-// modint
+// ModInt
 //----------------------------------------
-type modint struct {
+type ModInt struct {
 	mod       int
 	factMemo  []int
 	ifactMemo []int
 }
 
-func newModint(m int) *modint {
-	var ret modint
+func newModint(m int) *ModInt {
+	var ret ModInt
 	ret.mod = m
 	ret.factMemo = []int{1, 1}
 	ret.ifactMemo = []int{1, 1}
 	return &ret
 }
 
-func (m *modint) add(a, b int) int {
+func (m *ModInt) add(a, b int) int {
 	ret := (a + b) % m.mod
 	if ret < 0 {
 		ret += m.mod
@@ -256,7 +310,7 @@ func (m *modint) add(a, b int) int {
 	return ret
 }
 
-func (m *modint) sub(a, b int) int {
+func (m *ModInt) sub(a, b int) int {
 	ret := (a - b) % m.mod
 	if ret < 0 {
 		ret += m.mod
@@ -264,7 +318,7 @@ func (m *modint) sub(a, b int) int {
 	return ret
 }
 
-func (m *modint) mul(a, b int) int {
+func (m *ModInt) mul(a, b int) int {
 	a %= m.mod
 	b %= m.mod
 	ret := a * b % m.mod
@@ -274,14 +328,14 @@ func (m *modint) mul(a, b int) int {
 	return ret
 }
 
-func (m *modint) div(a, b int) int {
+func (m *ModInt) div(a, b int) int {
 	a %= m.mod
-	ret := a * m.modinv(b)
+	ret := a * m.modInv(b)
 	ret %= m.mod
 	return ret
 }
 
-func (m *modint) pow(p, n int) int {
+func (m *ModInt) pow(p, n int) int {
 	ret := 1
 	x := p % m.mod
 	for n != 0 {
@@ -297,7 +351,7 @@ func (m *modint) pow(p, n int) int {
 
 
 // 拡張オイラーの互除法で逆元を求める
-func (mm *modint) modinv(a int) int {
+func (mm *ModInt) modInv(a int) int {
 	m := mm.mod
 	b, u, v := m, 1, 0
 	for b != 0 {
@@ -318,7 +372,7 @@ func (mm *modint) modinv(a int) int {
 // 行列累乗
 // 　A[][]のp乗を求める
 //-----------------------------------------------
-func (m *modint) powModMatrix(A [][]int, p int) [][]int {
+func (m *ModInt) powModMatrix(A [][]int, p int) [][]int {
 	N := len(A)
 	ret := make([][]int, N)
 	for i := 0; i < N; i++ {
@@ -337,7 +391,7 @@ func (m *modint) powModMatrix(A [][]int, p int) [][]int {
 	return ret
 }
 
-func (m *modint) mulMod(A, B [][]int) [][]int {
+func (m *ModInt) mulMod(A, B [][]int) [][]int {
 	H := len(A)
 	W := len(B[0])
 	K := len(A[0])
@@ -363,7 +417,7 @@ func (m *modint) mulMod(A, B [][]int) [][]int {
 //                ※pow(x, p-2)を何度も取るので
 // 厳しそうな場合は、ここを削除して高速なのを使う
 //---------------------------------------------------
-func (m *modint) mfact(n int) int {
+func (m *ModInt) mfact(n int) int {
 	if len(m.factMemo) > n {
 		return m.factMemo[n]
 	}
@@ -377,7 +431,7 @@ func (m *modint) mfact(n int) int {
 	return m.factMemo[n]
 }
 
-func (m *modint) mifact(n int) int {
+func (m *ModInt) mifact(n int) int {
 	if len(m.ifactMemo) > n {
 		return m.ifactMemo[n]
 	}
@@ -391,7 +445,7 @@ func (m *modint) mifact(n int) int {
 	return m.ifactMemo[n]
 }
 
-func (m *modint) nCr(n, r int) int {
+func (m *ModInt) nCr(n, r int) int {
 	if n == r {
 		return 1
 	}
@@ -415,9 +469,25 @@ func logXY(x, y int) int {
 	return int(math.Log(float64(y)) / math.Log(float64(x)))
 }
 
-// intのまま計算できるように
-func sqrt(x int) int {
-	return int(math.Sqrt(float64(x)))
+// 整数平方根: x*x <= n を満たす最大の x を返す
+// 二分探索を使うことで誤差を生まない。ref: https://atcoder.jp/contests/abc400/editorial/12642
+// pythonのmath.isqrtと同じ
+func isqrt(n int) int {
+	if n == 0 || n == 1 {
+		return n
+	}
+	low, high := 1, n
+	var ans int
+	for low <= high {
+		mid := (low + high) / 2
+		if mid <= n/mid {
+			ans = mid
+			low = mid + 1
+		} else {
+			high = mid - 1
+		}
+	}
+	return ans
 }
 
 // xのn乗根
@@ -582,8 +652,12 @@ func NewPrefixSum2D(grid [][]int) *PrefixSum2D {
 	}
 }
 
-func (ps *PrefixSum2D) Query(x1, y1, x2, y2 int) int {
+func (ps *PrefixSum2D) QueryRange(x1, y1, x2, y2 int) int {
 	return ps.prefixSum[x2+1][y2+1] - ps.prefixSum[x1][y2+1] - ps.prefixSum[x2+1][y1] + ps.prefixSum[x1][y1]
+}
+
+func (ps *PrefixSum2D) QueryPoint(x, y int) int {
+	return ps.QueryRange(0, 0, x, y)
 }
 
 // 整数nが桁数を満たさなかったら0埋めする
@@ -622,6 +696,9 @@ func(s *Set[V]) Pop() V {
 	s.Remove(v)
 	return v
 }
+func (s *Set[V]) Clear() {
+	s.values = make(map[V]struct{})
+}
 
 
 // sorted set
@@ -632,28 +709,19 @@ func newSortedSet[T comparator.Ordered]() *SortedSet[T] {
 	var comparatorFn comparator.Comparator[T] = comparator.OrderedTypeCmp[T]
 	return &SortedSet[T]{set.New[T](comparatorFn)}
 }
-func (s *SortedSet[T]) add(v T) {
+func (s *SortedSet[T]) Add(v T) {
 	s.Insert(v)
 }
-func (s *SortedSet[T]) remove(v T) {
+func (s *SortedSet[T]) Remove(v T) {
 	s.Erase(v)
 }
-func (s *SortedSet[T]) has(v T) bool {
+func (s *SortedSet[T]) Has(v T) bool {
 	return s.Contains(v)
 }
-func (s *SortedSet[T]) size() int {
-	return s.Size()
-}
-func (s *SortedSet[T]) lowerBound(v T) *set.SetIterator[T] {
-	return s.LowerBound(v)
-}
-func (s *SortedSet[T]) upperBound(v T) *set.SetIterator[T] {
-	return s.UpperBound(v)
-}
 // 指定した値未満の最大の値を取得
-func (s *SortedSet[T]) lessThan(v T) (*T, error) {
-	if s.lowerBound(v).Prev().IsValid() {
-		res := s.lowerBound(v).Prev().Value()
+func (s *SortedSet[T]) LessThan(v T) (*T, error) {
+	if s.LowerBound(v).Prev().IsValid() {
+		res := s.LowerBound(v).Prev().Value()
 		return &res, nil
 	}
 	if s.Last().IsValid() {
@@ -671,7 +739,7 @@ type MultiSet[T comparable] struct {
 	mapping map[T]int
 }
 // multiset
-func newMultiset[T comparator.Ordered]() *MultiSet[T] {
+func newMultiSet[T comparator.Ordered]() *MultiSet[T] {
 	var comparatorFn comparator.Comparator[T] = comparator.OrderedTypeCmp[T]
 	ms := set.NewMultiSet[T](comparatorFn, set.WithGoroutineSafe())
 	return &MultiSet[T]{MultiSet: ms, mapping: make(map[T]int)}
@@ -688,6 +756,22 @@ func (ms *MultiSet[T]) Remove(v T) {
 }
 func (ms *MultiSet[T]) Has(v T) bool {
 	return ms.Contains(v)
+}
+func (ms *MultiSet[T]) All() []T {
+	// 全部取ってくる
+	res := make([]T, 0, ms.Size())
+	for ms.Size() > 0 {
+		first := ms.First()
+		res = append(res, first.Value())
+		ms.Remove(first.Value())
+	}
+
+	// 元に戻す
+	for _, v := range res {
+		ms.Add(v)
+	}
+
+	return res
 }
 
 // heap (priority queue)
@@ -721,13 +805,13 @@ func newMyHeap[T constraints.Ordered]() *MyHeap[T] {
 	heap.Init(&myHeap.heap)
 	return myHeap
 }
-func (h *MyHeap[T]) push(x T) {
+func (h *MyHeap[T]) Push(x T) {
 	heap.Push(&h.heap, x)
 }
-func (h *MyHeap[T]) pop() T {
+func (h *MyHeap[T]) Pop() T {
 	return heap.Pop(&h.heap).(T)
 }
-func (h *MyHeap[T]) len() int {
+func (h *MyHeap[T]) Len() int {
 	return h.heap.Len()
 }
 
@@ -803,6 +887,17 @@ func sortSlice[T constraints.Ordered](slice []T) []T {
     return copiedSlice
 }
 
+func sortSliceFn[T any](slice []T, fn func(x, y T) bool) []T {
+	copiedSlice := make([]T, len(slice))
+	copy(copiedSlice, slice)
+
+	sort.Slice(copiedSlice, func(i, j int) bool {
+		return fn(copiedSlice[i], copiedSlice[j])
+	})
+
+	return copiedSlice
+}
+
 func descendingSortSlice[T constraints.Ordered](slice []T) []T {
 	copiedSlice := make([]T, len(slice))
 	copy(copiedSlice, slice)
@@ -868,10 +963,10 @@ func copySlice[T any](original []T) []T {
 }
 
 // 2次元スライスのコピー
-func copy2DSlice(original [][]int) [][]int {
-    newSlice := make([][]int, len(original))
+func copy2DSlice[T any](original [][]T) [][]T {
+    newSlice := make([][]T, len(original))
     for i := range original {
-        newSlice[i] = make([]int, len(original[i]))
+        newSlice[i] = make([]T, len(original[i]))
         copy(newSlice[i], original[i])
     }
     return newSlice
@@ -886,6 +981,35 @@ func splitAndReverse[T any](slice []T, index int) []T {
     back := slice[index:]
 
     return append(back, front...)
+}
+
+// スライスの中で、指定した値の最大連続区間のindexを取得
+// 例:
+// s := []string{"0", "1", "0", "0", "1"}
+// longestRun(s, "0")
+// -> (2, 3)
+func longestRun[T comparable](s []T, c T) (int, int) {
+	maxLen := 0
+	bestL, bestR := -1, -1
+
+	curL := -1
+	for i := 0; i < len(s); i++ {
+		if s[i] == c {
+			if curL == -1 {
+				curL = i
+			}
+			curLen := i - curL + 1
+			if curLen > maxLen {
+				maxLen = curLen
+				bestL = curL
+				bestR = i
+			}
+		} else {
+			curL = -1
+		}
+	}
+
+	return bestL, bestR
 }
 
 
@@ -920,16 +1044,16 @@ type UnionFind struct {
 	// 負の値のときはそのインデックスはルートであり絶対値がそのルートが持つ要素数を表す。
 	parents []int
 }
-func (uf *UnionFind) root(x int) int {
+func (uf *UnionFind) Root(x int) int {
 	if uf.parents[x] < 0 {
 		return x
 	}
-	uf.parents[x] = uf.root(uf.parents[x])
+	uf.parents[x] = uf.Root(uf.parents[x])
 	return uf.parents[x]
 }
-func (uf *UnionFind) unit(x, y int) {
-	x = uf.root(x)
-	y = uf.root(y)
+func (uf *UnionFind) Unit(x, y int) {
+	x = uf.Root(x)
+	y = uf.Root(y)
 	if x == y {
 		return
 	}
@@ -942,11 +1066,11 @@ func (uf *UnionFind) unit(x, y int) {
 	// サイズが小さい方のルートを大きい方のルートに繋げる
 	uf.parents[y] = x
 }
-func (uf *UnionFind) isSame(x, y int) bool {
-	return uf.root(x) == uf.root(y)
+func (uf *UnionFind) IsSame(x, y int) bool {
+	return uf.Root(x) == uf.Root(y)
 }
-func (uf *UnionFind) size(x int) int {
-	return -uf.parents[uf.root(x)]
+func (uf *UnionFind) Size(x int) int {
+	return -uf.parents[uf.Root(x)]
 }
 func newUnionFind(n int) *UnionFind {
 	parents := make([]int, n)
@@ -1109,6 +1233,13 @@ func lessThan[T constraints.Ordered](slice []T, value T) *T {
 	}
 	return &slice[idx-1]
 }
+// ソート済みのsliceの中でx以上、y未満の要素数を返す(半開区間)
+// 例: countInRange([]int{1, 2, 3, 4, 5}, 1, 4) => 3
+func countInRange[T constraints.Ordered](nums []T, x, y T) int {
+	left := sort.Search(len(nums), func(i int) bool { return nums[i] >= x })
+	right := sort.Search(len(nums), func(i int) bool { return nums[i] >= y })
+	return right - left
+}
 
 // 座標圧縮
 type Zaatsu struct {
@@ -1216,7 +1347,7 @@ type LazySegmentTree struct {
 	isNoop func(int) bool
 }
 
-func NewLazySegmentTree(n int, noop int, op, lazyOp func(int, int) int, isNoop func(int) bool) *LazySegmentTree {
+func NewLazySegmentTree(n int, op, lazyOp func(int, int) int, noop int) *LazySegmentTree {
 	seg := &LazySegmentTree{}
 	seg.n = 1
 	for seg.n < n {
@@ -1227,6 +1358,10 @@ func NewLazySegmentTree(n int, noop int, op, lazyOp func(int, int) int, isNoop f
 	seg.noop = noop
 	seg.op = op
 	seg.lazyOp = lazyOp
+
+	isNoop := func(x int) bool {
+		return x == noop
+	}
 	seg.isNoop = isNoop
 	return seg
 }
@@ -1345,6 +1480,7 @@ func gridBfs(height, width int, nextNodes map[GridBfsNode][]GridBfsNode, start G
 // ワーシャルフロイド法
 // graphは、到達不能な場合はmath.MaxInt64を入れる
 // 自分自身への経路は0を入れる
+// 計算量はO(V^3) ただし、Vは頂点数
 func warshallFloyd(graph [][]int) [][]int {
 	// ノード数
 	n := len(graph)
@@ -1372,7 +1508,8 @@ func warshallFloyd(graph [][]int) [][]int {
 }
 
 // ダイクストラ法
-func dijkstra(graph [][]dijkstraItem, start int) []int {
+// 計算量は O((V + E) log V) ただし、Vは頂点数、Eは辺の数
+func dijkstra(graph [][]DijkstraItem, start int) []int {
 	n := len(graph)
 	dist := make([]int, n)
 	for i := range dist {
@@ -1391,12 +1528,12 @@ func dijkstra(graph [][]dijkstraItem, start int) []int {
 		dist[start] = 0
 	}
 
-	pq := &dijkstraPriorityQueue{}
+	pq := &DijkstraPriorityQueue{}
 	heap.Init(pq)
-	heap.Push(pq, &dijkstraItem{node: start, dist: 0})
+	heap.Push(pq, &DijkstraItem{node: start, dist: 0})
 
 	for pq.Len() > 0 {
-		u := heap.Pop(pq).(*dijkstraItem)
+		u := heap.Pop(pq).(*DijkstraItem)
 		if u.dist > dist[u.node] {
 			continue
 		}
@@ -1406,29 +1543,29 @@ func dijkstra(graph [][]dijkstraItem, start int) []int {
 			alt := u.dist + edge.dist
 			if alt < dist[v] {
 				dist[v] = alt
-				heap.Push(pq, &dijkstraItem{node: v, dist: alt})
+				heap.Push(pq, &DijkstraItem{node: v, dist: alt})
 			}
 		}
 	}
 
 	return dist
 }
-type dijkstraItem struct {
+type DijkstraItem struct {
 	node int
 	dist   int
 }
-type dijkstraPriorityQueue []*dijkstraItem
-func (pq dijkstraPriorityQueue) Len() int { return len(pq) }
-func (pq dijkstraPriorityQueue) Less(i, j int) bool {
+type DijkstraPriorityQueue []*DijkstraItem
+func (pq DijkstraPriorityQueue) Len() int { return len(pq) }
+func (pq DijkstraPriorityQueue) Less(i, j int) bool {
 	return pq[i].dist < pq[j].dist
 }
-func (pq dijkstraPriorityQueue) Swap(i, j int) {
+func (pq DijkstraPriorityQueue) Swap(i, j int) {
 	pq[i], pq[j] = pq[j], pq[i]
 }
-func (pq *dijkstraPriorityQueue) Push(x interface{}) {
-	*pq = append(*pq, x.(*dijkstraItem))
+func (pq *DijkstraPriorityQueue) Push(x interface{}) {
+	*pq = append(*pq, x.(*DijkstraItem))
 }
-func (pq *dijkstraPriorityQueue) Pop() interface{} {
+func (pq *DijkstraPriorityQueue) Pop() interface{} {
 	old := *pq
 	n := len(old)
 	item := old[n-1]
@@ -1650,7 +1787,7 @@ func updateString(s string, idx int, c byte) string {
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //　幾何ゾーン
 
-// 2点間の距離
+// 2点間のユークリッド距離
 func distance(x1, y1, x2, y2 int) float64 {
 	x1f := float64(x1)
 	y1f := float64(y1)
@@ -1659,7 +1796,7 @@ func distance(x1, y1, x2, y2 int) float64 {
 	return math.Sqrt((x2f-x1f)*(x2f-x1f) + (y2f-y1f)*(y2f-y1f))
 }
 
-// 2点間の距離の2乗
+// 2点間のユークリッド距離の2乗
 // 平方根を取ると距離になるが、誤差が出るので距離の比較は距離の2乗で行う
 func distanceSquared(x1, y1, x2, y2 int) int {
 	return pow(x1-x2, 2) + pow(y1-y2, 2)
