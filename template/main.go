@@ -260,6 +260,11 @@ func modInverse(a, m int) int {
     return modPow(a, m-2, m)
 }
 
+// 整数を2進数で表したときの1の個数
+func popCount(x int) int {
+	return bits.OnesCount64(uint64(x))
+}
+
 //----------------------------------------
 // ModInt
 //----------------------------------------
