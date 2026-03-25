@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"math/bits"
 	"os"
 	"sort"
 	"strconv"
 	"strings"
-	"unicode"
 
 	"github.com/liyue201/gostl/ds/deque"
 	"github.com/liyue201/gostl/ds/set"
@@ -33,44 +33,30 @@ func main() {
 
 func solve() {
 	s := strToSlice(getStr(), "")
+	_ = getInt()
+	queries := getInts()
 	n := len(s)
+	ans := make([]string, len(queries))
 
-	q := getInt()
-	k := getInts()
-
-	res := make([]string, q)
-	for i, targetIdx := range k {
-		targetIdx--
-		si := targetIdx % n
-		targetIdx /= n
-
-		ans := s[si]
-		cnt := calc(0, pow(2, 60), targetIdx)
-		if cnt%2 != 0 {
-			if unicode.IsUpper(rune(ans[0])) {
-				ans = strings.ToLower(ans)
-			} else {
-				ans = strings.ToUpper(ans)
-			}
+	for i, k := range queries {
+		idx := (k - 1) % n
+		block := (k - 1) / n
+		ch := s[idx]
+		if bitCount(block)%2 == 1 {
+			ch = toggleCase(ch)
 		}
-		res[i] = ans
+		ans[i] = string(ch)
 	}
 
-	printSlice(res)
+	printSlice(ans)
 }
 
-func calc(l, r, k int) int {
-	cnt := 0
-	for r-l > 1 {
-		mid := (l + r) / 2
-		if k < mid {
-			r = mid
-		} else {
-			l = mid
-			cnt++
-		}
+func toggleCase(c string) string {
+	if strings.ToUpper(c) != c  {
+		return strings.ToUpper(c)
+	} else {
+		return strings.ToLower(c)
 	}
-	return cnt
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -112,13 +98,24 @@ func getBigInt(x int) *big.Int {
 	return big.NewInt(int64(x))
 }
 
-// string <-> []string
+// string -> []string
 // 第２引数で渡された文字列でsplitする
 func strToSlice(input, sep string) []string {
 	return strings.Split(input, sep)
 }
 
-// // string <-> []int
+// string -> []int
+// 第２引数で渡された文字列でsplitする
+func strToIntSlice(input, sep string) []int {
+	s := strToSlice(input, sep)
+	res := make([]int, len(s))
+	for i, v := range s {
+		res[i] = s2i(v)
+	}
+	return res
+}
+
+// // string -> []int
 func mapToIntSlice(input string) []int {
 	slice := make([]int, 0)
 	lines := strToSlice(input, " ")
@@ -129,7 +126,7 @@ func mapToIntSlice(input string) []int {
 	return slice
 }
 
-// string <-> int
+// string -> int
 func s2i(s string) int {
 	v, err := strconv.Atoi(s)
 	if err != nil {
@@ -167,7 +164,7 @@ func reverseString(s string) string {
 	return string(runes)
 }
 
-// bool <-> int
+// bool -> int
 func b2i(b bool) int {
 	if b {
 		return 1
@@ -191,6 +188,10 @@ func bit2i(bits []string) int {
 		panic(err)
 	}
 	return int(result)
+}
+
+func bitCount(n int) int {
+	return bits.OnesCount(uint(n))
 }
 
 func abs(v int) int {
@@ -236,6 +237,8 @@ func mod(x, y int) int {
 	return m
 }
 
+// 繰り返し二乗法
+// 浮動小数点の誤差に注意
 func pow(base, exp int) int {
 	result := 1
 	for exp > 0 {
@@ -280,6 +283,10 @@ func countNDigitIntegers(n int) int {
 // modInverse は a の m における逆元 (a^{-1} mod m) を返す (m は素数を想定)
 func modInverse(a, m int) int {
 	return modPow(a, m-2, m)
+}
+
+func popCount(x int) int {
+	return bits.OnesCount64(uint64(x))
 }
 
 // ----------------------------------------
@@ -651,8 +658,12 @@ func NewPrefixSum2D(grid [][]int) *PrefixSum2D {
 	}
 }
 
-func (ps *PrefixSum2D) Query(x1, y1, x2, y2 int) int {
+func (ps *PrefixSum2D) QueryRange(x1, y1, x2, y2 int) int {
 	return ps.prefixSum[x2+1][y2+1] - ps.prefixSum[x1][y2+1] - ps.prefixSum[x2+1][y1] + ps.prefixSum[x1][y1]
+}
+
+func (ps *PrefixSum2D) QueryPoint(x, y int) int {
+	return ps.QueryRange(0, 0, x, y)
 }
 
 // 整数nが桁数を満たさなかったら0埋めする
@@ -705,29 +716,20 @@ func newSortedSet[T comparator.Ordered]() *SortedSet[T] {
 	var comparatorFn comparator.Comparator[T] = comparator.OrderedTypeCmp[T]
 	return &SortedSet[T]{set.New[T](comparatorFn)}
 }
-func (s *SortedSet[T]) add(v T) {
+func (s *SortedSet[T]) Add(v T) {
 	s.Insert(v)
 }
-func (s *SortedSet[T]) remove(v T) {
+func (s *SortedSet[T]) Remove(v T) {
 	s.Erase(v)
 }
-func (s *SortedSet[T]) has(v T) bool {
+func (s *SortedSet[T]) Has(v T) bool {
 	return s.Contains(v)
-}
-func (s *SortedSet[T]) size() int {
-	return s.Size()
-}
-func (s *SortedSet[T]) lowerBound(v T) *set.SetIterator[T] {
-	return s.LowerBound(v)
-}
-func (s *SortedSet[T]) upperBound(v T) *set.SetIterator[T] {
-	return s.UpperBound(v)
 }
 
 // 指定した値未満の最大の値を取得
-func (s *SortedSet[T]) lessThan(v T) (*T, error) {
-	if s.lowerBound(v).Prev().IsValid() {
-		res := s.lowerBound(v).Prev().Value()
+func (s *SortedSet[T]) LessThan(v T) (*T, error) {
+	if s.LowerBound(v).Prev().IsValid() {
+		res := s.LowerBound(v).Prev().Value()
 		return &res, nil
 	}
 	if s.Last().IsValid() {
@@ -746,7 +748,7 @@ type MultiSet[T comparable] struct {
 }
 
 // multiset
-func newMultiset[T comparator.Ordered]() *MultiSet[T] {
+func newMultiSet[T comparator.Ordered]() *MultiSet[T] {
 	var comparatorFn comparator.Comparator[T] = comparator.OrderedTypeCmp[T]
 	ms := set.NewMultiSet[T](comparatorFn, set.WithGoroutineSafe())
 	return &MultiSet[T]{MultiSet: ms, mapping: make(map[T]int)}
@@ -763,6 +765,22 @@ func (ms *MultiSet[T]) Remove(v T) {
 }
 func (ms *MultiSet[T]) Has(v T) bool {
 	return ms.Contains(v)
+}
+func (ms *MultiSet[T]) All() []T {
+	// 全部取ってくる
+	res := make([]T, 0, ms.Size())
+	for ms.Size() > 0 {
+		first := ms.First()
+		res = append(res, first.Value())
+		ms.Remove(first.Value())
+	}
+
+	// 元に戻す
+	for _, v := range res {
+		ms.Add(v)
+	}
+
+	return res
 }
 
 // heap (priority queue)
@@ -798,13 +816,13 @@ func newMyHeap[T constraints.Ordered]() *MyHeap[T] {
 	heap.Init(&myHeap.heap)
 	return myHeap
 }
-func (h *MyHeap[T]) push(x T) {
+func (h *MyHeap[T]) Push(x T) {
 	heap.Push(&h.heap, x)
 }
-func (h *MyHeap[T]) pop() T {
+func (h *MyHeap[T]) Pop() T {
 	return heap.Pop(&h.heap).(T)
 }
-func (h *MyHeap[T]) len() int {
+func (h *MyHeap[T]) Len() int {
 	return h.heap.Len()
 }
 
@@ -876,6 +894,17 @@ func sortSlice[T constraints.Ordered](slice []T) []T {
 
 	sort.Slice(copiedSlice, func(i, j int) bool {
 		return copiedSlice[i] < copiedSlice[j]
+	})
+
+	return copiedSlice
+}
+
+func sortSliceFn[T any](slice []T, fn func(x, y T) bool) []T {
+	copiedSlice := make([]T, len(slice))
+	copy(copiedSlice, slice)
+
+	sort.Slice(copiedSlice, func(i, j int) bool {
+		return fn(copiedSlice[i], copiedSlice[j])
 	})
 
 	return copiedSlice
@@ -966,6 +995,35 @@ func splitAndReverse[T any](slice []T, index int) []T {
 	return append(back, front...)
 }
 
+// スライスの中で、指定した値の最大連続区間のindexを取得
+// 例:
+// s := []string{"0", "1", "0", "0", "1"}
+// longestRun(s, "0")
+// -> (2, 3)
+func longestRun[T comparable](s []T, c T) (int, int) {
+	maxLen := 0
+	bestL, bestR := -1, -1
+
+	curL := -1
+	for i := 0; i < len(s); i++ {
+		if s[i] == c {
+			if curL == -1 {
+				curL = i
+			}
+			curLen := i - curL + 1
+			if curLen > maxLen {
+				maxLen = curLen
+				bestL = curL
+				bestR = i
+			}
+		} else {
+			curL = -1
+		}
+	}
+
+	return bestL, bestR
+}
+
 // スライスを文字列に変換
 func sliceToStr[T any](data []T, separator string) string {
 	var strSlice []string
@@ -998,16 +1056,16 @@ type UnionFind struct {
 	parents []int
 }
 
-func (uf *UnionFind) root(x int) int {
+func (uf *UnionFind) Root(x int) int {
 	if uf.parents[x] < 0 {
 		return x
 	}
-	uf.parents[x] = uf.root(uf.parents[x])
+	uf.parents[x] = uf.Root(uf.parents[x])
 	return uf.parents[x]
 }
-func (uf *UnionFind) unit(x, y int) {
-	x = uf.root(x)
-	y = uf.root(y)
+func (uf *UnionFind) Unit(x, y int) {
+	x = uf.Root(x)
+	y = uf.Root(y)
 	if x == y {
 		return
 	}
@@ -1020,11 +1078,11 @@ func (uf *UnionFind) unit(x, y int) {
 	// サイズが小さい方のルートを大きい方のルートに繋げる
 	uf.parents[y] = x
 }
-func (uf *UnionFind) isSame(x, y int) bool {
-	return uf.root(x) == uf.root(y)
+func (uf *UnionFind) IsSame(x, y int) bool {
+	return uf.Root(x) == uf.Root(y)
 }
-func (uf *UnionFind) size(x int) int {
-	return -uf.parents[uf.root(x)]
+func (uf *UnionFind) Size(x int) int {
+	return -uf.parents[uf.Root(x)]
 }
 func newUnionFind(n int) *UnionFind {
 	parents := make([]int, n)
@@ -1197,7 +1255,7 @@ func lessThan[T constraints.Ordered](slice []T, value T) *T {
 
 // ソート済みのsliceの中でx以上、y未満の要素数を返す(半開区間)
 // 例: countInRange([]int{1, 2, 3, 4, 5}, 1, 4) => 3
-func countInRange(nums []int, x, y int) int {
+func countInRange[T constraints.Ordered](nums []T, x, y T) int {
 	left := sort.Search(len(nums), func(i int) bool { return nums[i] >= x })
 	right := sort.Search(len(nums), func(i int) bool { return nums[i] >= y })
 	return right - left
