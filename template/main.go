@@ -776,7 +776,6 @@ func (h *Heap[T]) Pop() interface{} {
 	*h = old[0 : n-1]
 	return x
 }
-
 type MyHeap[T constraints.Ordered] struct {
 	heap Heap[T]
 }
@@ -792,6 +791,56 @@ func (h *MyHeap[T]) Pop() T {
 	return heap.Pop(&h.heap).(T)
 }
 func (h *MyHeap[T]) Len() int {
+	return h.heap.Len()
+}
+
+// pairHeap: heapと一緒に任意の値を持てる
+type PairHeapItem[T constraints.Ordered, V any] struct {
+	value     T
+	pairValue V
+}
+
+type PairHeap[T constraints.Ordered, V any] []PairHeapItem[T, V]
+
+func (h PairHeap[T, V]) Len() int {
+	return len(h)
+}
+func (h PairHeap[T, V]) Less(i, j int) bool {
+	return h[i].value < h[j].value
+}
+func (h PairHeap[T, V]) Swap(i, j int) {
+	h[i], h[j] = h[j], h[i]
+}
+func (h *PairHeap[T, V]) Push(x any) {
+	*h = append(*h, x.(PairHeapItem[T, V]))
+}
+func (h *PairHeap[T, V]) Pop() interface{} {
+	old := *h
+	n := len(old)
+	x := old[n-1]
+	*h = old[0 : n-1]
+	return x
+}
+
+type MyPairHeap[T constraints.Ordered, V any] struct {
+	heap PairHeap[T, V]
+}
+
+func newPairHeap[T constraints.Ordered, V any]() *MyPairHeap[T, V] {
+	myHeap := &MyPairHeap[T, V]{}
+	heap.Init(&myHeap.heap)
+	return myHeap
+}
+func (h *MyPairHeap[T, V]) Push(value T, pairValue V) {
+	heap.Push(&h.heap, PairHeapItem[T, V]{
+		value:     value,
+		pairValue: pairValue,
+	})
+}
+func (h *MyPairHeap[T, V]) Pop() PairHeapItem[T, V] {
+	return heap.Pop(&h.heap).(PairHeapItem[T, V])
+}
+func (h *MyPairHeap[T, V]) Len() int {
 	return h.heap.Len()
 }
 
@@ -845,13 +894,13 @@ func newMyTupleHeap[T constraints.Ordered]() *MyTupleHeap[T] {
 	heap.Init(&myTupleHeap.heap)
 	return myTupleHeap
 }
-func (h *MyTupleHeap[T]) push(x []T) {
+func (h *MyTupleHeap[T]) Push(x []T) {
 	heap.Push(&h.heap, x)
 }
-func (h *MyTupleHeap[T]) pop() []T {
+func (h *MyTupleHeap[T]) Pop() []T {
 	return heap.Pop(&h.heap).([]T)
 }
-func (h *MyTupleHeap[T]) len() int {
+func (h *MyTupleHeap[T]) Len() int {
 	return h.heap.Len()
 }
 
