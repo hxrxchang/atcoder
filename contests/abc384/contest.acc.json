@@ -37,7 +37,11 @@
       "id": "abc384_e",
       "label": "E",
       "title": "Takahashi is Slime 2",
-      "url": "https://atcoder.jp/contests/abc384/tasks/abc384_e"
+      "url": "https://atcoder.jp/contests/abc384/tasks/abc384_e",
+      "directory": {
+        "path": "e",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc384_f",
