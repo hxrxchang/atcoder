@@ -31,6 +31,30 @@ func main() {
 }
 
 func solve() {
+	in := getInts()
+	n, k := in[0], in[1]
+
+	a := getInts()
+
+	// aのmod kにmapしてソート
+	a2 := make([]int, n)
+	for i, v := range a {
+		a2[i] = v % k
+	}
+	a2 = sortSlice(a2)
+
+	// +kして円環にする
+	a3 := copySlice(a2)
+	for _, v := range a2 {
+		a3 = append(a3, v+k)
+	}
+
+	ans := BIGGEST
+	for i := 0; i <= n; i++ {
+		ans = min(ans, a3[i+n-1]-a3[i])
+	}
+
+	fmt.Println(ans)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -258,6 +282,11 @@ func countNDigitIntegers(n int) int {
 // modInverse は a の m における逆元 (a^{-1} mod m) を返す (m は素数を想定)
 func modInverse(a, m int) int {
     return modPow(a, m-2, m)
+}
+
+// 整数を2進数で表したときの1の個数
+func popCount(x int) int {
+	return bits.OnesCount64(uint64(x))
 }
 
 //----------------------------------------
@@ -771,7 +800,6 @@ func (h *Heap[T]) Pop() interface{} {
 	*h = old[0 : n-1]
 	return x
 }
-
 type MyHeap[T constraints.Ordered] struct {
 	heap Heap[T]
 }
@@ -787,6 +815,56 @@ func (h *MyHeap[T]) Pop() T {
 	return heap.Pop(&h.heap).(T)
 }
 func (h *MyHeap[T]) Len() int {
+	return h.heap.Len()
+}
+
+// pairHeap: heapと一緒に任意の値を持てる
+type PairHeapItem[T constraints.Ordered, V any] struct {
+	value     T
+	pairValue V
+}
+
+type PairHeap[T constraints.Ordered, V any] []PairHeapItem[T, V]
+
+func (h PairHeap[T, V]) Len() int {
+	return len(h)
+}
+func (h PairHeap[T, V]) Less(i, j int) bool {
+	return h[i].value < h[j].value
+}
+func (h PairHeap[T, V]) Swap(i, j int) {
+	h[i], h[j] = h[j], h[i]
+}
+func (h *PairHeap[T, V]) Push(x any) {
+	*h = append(*h, x.(PairHeapItem[T, V]))
+}
+func (h *PairHeap[T, V]) Pop() interface{} {
+	old := *h
+	n := len(old)
+	x := old[n-1]
+	*h = old[0 : n-1]
+	return x
+}
+
+type MyPairHeap[T constraints.Ordered, V any] struct {
+	heap PairHeap[T, V]
+}
+
+func newPairHeap[T constraints.Ordered, V any]() *MyPairHeap[T, V] {
+	myHeap := &MyPairHeap[T, V]{}
+	heap.Init(&myHeap.heap)
+	return myHeap
+}
+func (h *MyPairHeap[T, V]) Push(value T, pairValue V) {
+	heap.Push(&h.heap, PairHeapItem[T, V]{
+		value:     value,
+		pairValue: pairValue,
+	})
+}
+func (h *MyPairHeap[T, V]) Pop() PairHeapItem[T, V] {
+	return heap.Pop(&h.heap).(PairHeapItem[T, V])
+}
+func (h *MyPairHeap[T, V]) Len() int {
 	return h.heap.Len()
 }
 
@@ -840,13 +918,13 @@ func newMyTupleHeap[T constraints.Ordered]() *MyTupleHeap[T] {
 	heap.Init(&myTupleHeap.heap)
 	return myTupleHeap
 }
-func (h *MyTupleHeap[T]) push(x []T) {
+func (h *MyTupleHeap[T]) Push(x []T) {
 	heap.Push(&h.heap, x)
 }
-func (h *MyTupleHeap[T]) pop() []T {
+func (h *MyTupleHeap[T]) Pop() []T {
 	return heap.Pop(&h.heap).([]T)
 }
-func (h *MyTupleHeap[T]) len() int {
+func (h *MyTupleHeap[T]) Len() int {
 	return h.heap.Len()
 }
 
